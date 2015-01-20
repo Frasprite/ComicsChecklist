@@ -1,0 +1,33 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "org.checklist.comics.comicschecklist"
+        minSdkVersion 15
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:21.+'
+    compile files('libs/jsoup-1.8.1.jar')
+    compile files('libs/picasso-2.3.4.jar')
+}
+
+dependencies {
+    repositories {
+        mavenCentral()
+    }
+    compile 'com.sothree.slidinguppanel:library:+'
+}

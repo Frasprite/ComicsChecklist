@@ -1,0 +1,367 @@
+package org.checklist.comics.comicschecklist;
+
+import android.annotation.SuppressLint;
+import android.app.DialogFragment;
+import android.content.BroadcastReceiver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
+
+import org.checklist.comics.comicschecklist.cartprovider.CartContentProvider;
+import org.checklist.comics.comicschecklist.database.CartDatabase;
+import org.checklist.comics.comicschecklist.service.DownloadService;
+import org.checklist.comics.comicschecklist.util.AppRater;
+import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.FloatingActionButton;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * An activity representing a list of Comics. This activity
+ * has different presentations for handset and tablet-size devices. On
+ * handsets, the activity presents a list of items, which when touched,
+ * lead to a {@link ComicDetailActivity} representing
+ * item details. On tablets, the activity presents the list of items and
+ * item details side-by-side using two vertical panes.
+ * <p>
+ * The activity makes heavy use of fragments. The list of items is a
+ * {@link ComicListFragment} and the item details
+ * (if present) is a {@link ComicDetailFragment}.
+ * <p>
+ * This activity also implements the required
+ * {@link ComicListFragment.Callbacks} interface
+ * to listen for item selections.
+ */
+public class ComicListActivity extends ActionBarActivity implements ComicListFragment.Callbacks, NavigationDrawerFragment.NavigationDrawerCallbacks,
+                                                                   ComicsChecklistDialogFragment.ComicsChecklistDialogListener {
+
+    // Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
+    private boolean mTwoPane;
+    private CharSequence mTitle;
+    // Other interface fragments.
+    private ComicDetailFragment mDetailFragment;
+    private ComicListFragment mListFragment;
+    // Fragment managing the behaviors, interactions and presentation of the navigation drawer.
+    private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                int resultCode = bundle.getInt(Constants.NOTIFICATION_RESULT);
+                String mCurrentEditor = bundle.getString(Constants.NOTIFICATION_EDITOR);
+                if (resultCode == Constants.RESULT_START)
+                    Toast.makeText(getApplicationContext(), mCurrentEditor + " " + getString(R.string.search_started), Toast.LENGTH_SHORT).show();
+                else if (resultCode == Constants.RESULT_FINISHED)
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_completed), Toast.LENGTH_SHORT).show();
+                else if (resultCode == Constants.RESULT_EDITOR_FINISHED) {
+                    if (mListFragment != null)
+                        mListFragment.setRefreshing(false);
+                    Toast.makeText(getApplicationContext(), mCurrentEditor + ": " + getResources().getString(R.string.search_editor_completed), Toast.LENGTH_SHORT).show();
+                } else if (resultCode == Constants.RESULT_CANCELED) {
+                    if (mListFragment != null)
+                        mListFragment.setRefreshing(false);
+                    Toast.makeText(getApplicationContext(), mCurrentEditor + ": " + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
+                } else if (resultCode == Constants.RESULT_NOT_CONNECTED)
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                else if (resultCode == Constants.RESULT_DESTROYED)
+                    Log.i(Constants.LOG_TAG, "Service destroyed");
+            }
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_comic_list);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        if (mToolbar != null) {
+            setSupportActionBar(mToolbar);
+        }
+
+        mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mTitle = getTitle();
+
+        // Set up the drawer.
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+
+        Intent intent = new Intent(this, DownloadService.class);
+        startService(intent);
+
+        FloatingActionButton fabButton = new FloatingActionButton.Builder(this)
+                .withDrawable(getResources().getDrawable(R.drawable.ic_action_add))
+                .withButtonColor(getResources().getColor(R.color.orange_500))
+                .withGravity(Gravity.BOTTOM | Gravity.END)
+                .withMargins(0, 0, 16, 16)
+                .create();
+
+        fabButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Open add dialog
+                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(2);
+                addDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+            }
+        });
+
+        // Launch AppRater
+        AppRater.app_launched(this);
+    }
+
+    /**
+     * @see android.app.Activity#onStart()
+     */
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // This code was originally on onCreate method; with fragments, must be placed here
+        if (findViewById(R.id.comic_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-large and
+            // res/values-sw600dp). If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+
+            // In two-pane mode, list items should be given the
+            // 'activated' state when touched.
+            //((ComicListFragment) getSupportFragmentManager().findFragmentById(R.id.comic_list)).setActivateOnItemClick(true);
+            mListFragment.setActivateOnItemClick(true);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter(Constants.NOTIFICATION));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        Log.i(Constants.LOG_TAG, "onNavigationDrawerItemSelected position " + position);
+        if (position <= 7) {
+            // Update the main content by replacing fragments
+            //getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, ComicListFragment.newInstance(position + 1)).commit();
+            mListFragment = mListFragment.newInstance(position + 1);
+            getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, mListFragment).commit();
+        } else {
+            switch (position) {
+                case 8:
+                    // Open settings
+                    Intent launchPreferencesIntent = new Intent().setClass(this, SettingsActivity.class);
+                    startActivity(launchPreferencesIntent);
+                    break;
+                case 9:
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
+                    break;
+                case 10:
+                    // Open help dialog
+                    DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(0);
+                    helpDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+                    break;
+                case 11:
+                    // Open info dialog
+                    DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(1);
+                    infoDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+                    break;
+            }
+        }
+    }
+
+    public void onSectionAttached(int section) {
+        switch (section) {
+            case 1:
+                mTitle = getString(R.string.title_section1);
+                break;
+            case 2:
+                mTitle = getString(R.string.title_section2);
+                break;
+            case 3:
+                mTitle = getString(R.string.title_section3);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_section4);
+                break;
+            case 5:
+                mTitle = getString(R.string.title_section5);
+                break;
+            case 6:
+                mTitle = getString(R.string.title_section6);
+                break;
+            case 7:
+                mTitle = getString(R.string.title_section7);
+                break;
+            case 8:
+                mTitle = getString(R.string.title_section8);
+                break;
+        }
+    }
+
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+            // Only show items in the action bar relevant to this screen
+            // if the drawer is not showing. Otherwise, let the drawer
+            // decide what to show in the action bar.
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+            restoreActionBar();
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = mNavigationDrawerFragment.isDrawerOpen();
+        // Hide detail buttons
+        if (mTwoPane && mDetailFragment != null) {
+            menu.findItem(R.id.calendar).setVisible(!drawerOpen);
+            menu.findItem(R.id.favorite).setVisible(!drawerOpen);
+            menu.findItem(R.id.buy).setVisible(!drawerOpen);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @SuppressLint("InflateParams")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            /**case R.id.settings:
+                // Open settings
+                Intent launchPreferencesIntent = new Intent().setClass(this, SettingsActivity.class);
+                startActivity(launchPreferencesIntent);
+                return true;
+            case R.id.google:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
+                return true;
+            case R.id.guida:
+                // Open help dialog
+                DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(0);
+                helpDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+                return true;
+            case R.id.info:
+                // Open info dialog
+                DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(1);
+                infoDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+                return true;*/
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * Callback method from {@link ComicListFragment.Callbacks}
+     * indicating that the comic was selected.
+     */
+    @Override
+    public void onItemSelected(long id, String section) {
+        if (mTwoPane) {
+            // In two-pane mode, show the detail view in this activity by
+            // adding or replacing the detail fragment using a
+            // fragment transaction.
+            Bundle arguments = new Bundle();
+            arguments.putLong(ComicDetailFragment.ARG_COMIC_ID, id);
+            arguments.putString(ComicDetailFragment.ARG_SECTION, section);
+            mDetailFragment = new ComicDetailFragment();
+            mDetailFragment.setArguments(arguments);
+            getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
+            /**ComicDetailFragment fragment = new ComicDetailFragment();
+             fragment.setArguments(arguments);
+             getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, fragment).commit();*/
+        } else {
+            // In single-pane mode, simply start the detail activity
+            // for the selected item ID.
+            Intent detailIntent = new Intent(this, ComicDetailActivity.class);
+            detailIntent.putExtra(ComicDetailFragment.ARG_COMIC_ID, id);
+            detailIntent.putExtra(ComicDetailFragment.ARG_SECTION, section);
+            startActivity(detailIntent);
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClick(DialogFragment dialog, String name, String info, String releaseDate) {
+        if (name.length() > 0) {
+            dialog.dismiss();
+            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            Date myDate;
+            try {
+                myDate = formatter.parse(releaseDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                myDate = new Date();
+            }
+            // Set the format to sql date time
+            ContentValues values = new ContentValues();
+            values.put(CartDatabase.COMICS_NAME_KEY, name);
+            values.put(CartDatabase.COMICS_EDITOR_KEY, Constants.CART);
+            values.put(CartDatabase.COMICS_DESCRIPTION_KEY, info);
+            values.put(CartDatabase.COMICS_RELEASE_KEY, releaseDate);
+            values.put(CartDatabase.COMICS_DATE_KEY, myDate.getTime());
+            values.put(CartDatabase.COMICS_COVER_KEY, "error");
+            values.put(CartDatabase.COMICS_FEATURE_KEY, "N.D.");
+            values.put(CartDatabase.COMICS_PRICE_KEY, "N.D.");
+            values.put(CartDatabase.COMICS_CART_KEY, "yes");
+            values.put(CartDatabase.COMICS_FAVORITE_KEY, "no");
+
+            this.getContentResolver().insert(CartContentProvider.CONTENT_URI, values);
+            Toast.makeText(this, getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, getResources().getString(R.string.fill_data_alert), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onDialogRateClick(DialogFragment dialog) {
+        dialog.dismiss();
+        this.startActivity(new Intent(Intent.ACTION_VIEW,
+                Uri.parse("market://details?id=" + this.getPackageName())));
+    }
+
+    @Override
+    public void onDialogAbortRateClick(DialogFragment dialog) {
+        dialog.dismiss();
+        SharedPreferences prefs = this.getSharedPreferences (Constants.PREF_APP_RATER, 0);
+        final SharedPreferences.Editor editorPref = prefs.edit();
+        if (editorPref != null) {
+            editorPref.putBoolean(Constants.PREF_USER_DONT_RATE, true);
+            editorPref.apply();
+        }
+    }
+}

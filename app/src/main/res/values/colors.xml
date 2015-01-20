@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="transparent">#99000000</color>
+    <color name="swipe_color_1">#ffc736</color>
+    <color name="swipe_color_2">#fcb427</color>
+    <color name="swipe_color_3">#f16621</color>
+    <color name="swipe_color_4">#792314</color>
+    <color name="white">#FFFFFF</color>
+    <color name="orange_700">#F57C00</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="grey">#424242</color>
+</resources>

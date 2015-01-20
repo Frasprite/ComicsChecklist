@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/settings"
+        android:enabled="true"
+        android:title="@string/menu_settings"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/google"
+        android:enabled="true"
+        android:title="@string/go_to_google_plus"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/guida"
+        android:enabled="true"
+        android:title="@string/guida"
+        android:visible="true">
+    </item>
+    <item
+        android:id="@+id/info"
+        android:enabled="true"
+        android:title="@string/info"
+        android:visible="true">
+    </item>
+</menu>
