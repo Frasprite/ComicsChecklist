@@ -2,17 +2,16 @@ package org.checklist.comics.comicschecklist;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.SearchManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -212,6 +211,12 @@ public class NavigationDrawerFragment extends Fragment {
         if (mDrawerLayout != null && isDrawerOpen()) {
             inflater.inflate(R.menu.menu_main, menu);
             //howGlobalContextActionBar();
+            // Get the SearchView and set the searchable configuration
+            SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+            // Assumes current activity is the searchable activity
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+            searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -225,30 +230,7 @@ public class NavigationDrawerFragment extends Fragment {
             return true;
         }
 
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.settings:
-                // Open settings
-                Intent launchPreferencesIntent = new Intent().setClass(getActivity(), SettingsActivity.class);
-                startActivity(launchPreferencesIntent);
-                return true;
-            case R.id.google:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
-                return true;
-            case R.id.guida:
-                // Open help dialog
-                DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(0);
-                helpDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
-                return true;
-            case R.id.info:
-                // Open info dialog
-                DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(1);
-                infoDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
-                return true;
-            default:
-                // Launch action
-                return super.onOptionsItemSelected(item);
-        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
