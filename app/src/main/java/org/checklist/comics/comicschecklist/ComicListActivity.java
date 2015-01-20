@@ -1,7 +1,7 @@
 package org.checklist.comics.comicschecklist;
 
-import android.annotation.SuppressLint;
 import android.app.DialogFragment;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -13,11 +13,11 @@ import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -124,6 +124,33 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
 
         // Launch AppRater
         AppRater.app_launched(this);
+
+        // Handle search intent
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    /**
+     * Method used to handle the intent received from search.
+     * @param intent the intent passed through search
+     */
+    private void handleIntent(Intent intent) {
+        // Get the intent, verify the action and get the query
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            doMySearch(query);
+        }
+    }
+
+    /**
+     * Method used to do a search and show data.
+     */
+    private void doMySearch(String query) {
+        Toast.makeText(this, "Search this " + query, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -236,6 +263,14 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
             // decide what to show in the action bar.
             getMenuInflater().inflate(R.menu.menu_main, menu);
             restoreActionBar();
+
+            // Get the SearchView and set the searchable configuration
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+            // Assumes current activity is the searchable activity
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+
             return true;
         }
         return super.onCreateOptionsMenu(menu);
@@ -252,34 +287,6 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
             menu.findItem(R.id.buy).setVisible(!drawerOpen);
         }
         return super.onPrepareOptionsMenu(menu);
-    }
-
-    @SuppressLint("InflateParams")
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            /**case R.id.settings:
-                // Open settings
-                Intent launchPreferencesIntent = new Intent().setClass(this, SettingsActivity.class);
-                startActivity(launchPreferencesIntent);
-                return true;
-            case R.id.google:
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
-                return true;
-            case R.id.guida:
-                // Open help dialog
-                DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(0);
-                helpDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
-                return true;
-            case R.id.info:
-                // Open info dialog
-                DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(1);
-                infoDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
-                return true;*/
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     /**
