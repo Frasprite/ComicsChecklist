@@ -140,17 +140,31 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
      */
     private void handleIntent(Intent intent) {
         // Get the intent, verify the action and get the query
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            // Handles a click on a search suggestion; launches activity/fragment to show comic detail
+            Intent comicIntent = new Intent(this, ComicDetailActivity.class);
+            comicIntent.setData(intent.getData());
+            startActivity(comicIntent);
+        } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            // Handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
             doMySearch(query);
         }
     }
 
     /**
-     * Method used to do a search and show data.
+     * Method used to do a search and show founded data.
      */
     private void doMySearch(String query) {
-        Toast.makeText(this, "Search this " + query, Toast.LENGTH_SHORT).show();
+        // TODO implement code to make a search
+
+        if (query.length() == 0) {
+            // There are no results, show a message
+            Toast.makeText(this, "Search this " + query + " has no results.", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Search this " + query + " founded " + query.length() + " results!", Toast.LENGTH_SHORT).show();
+            // Display the results in a dialog, then open comic on detail
+        }
     }
 
     /**
@@ -253,7 +267,6 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
