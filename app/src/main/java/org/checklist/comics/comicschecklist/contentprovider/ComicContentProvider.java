@@ -21,10 +21,10 @@ import java.util.HashSet;
  */
 public class ComicContentProvider extends ContentProvider {
 
-    // database
+    // Database
     private ComicDatabaseHelper database;
 
-    // used for the UriMacher
+    // Used for the UriMacher
     private static final int COMICS = 10;
     private static final int COMIC_ID = 20;
 
