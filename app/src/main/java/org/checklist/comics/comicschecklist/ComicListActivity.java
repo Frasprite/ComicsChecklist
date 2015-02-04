@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.cartprovider.CartContentProvider;
 import org.checklist.comics.comicschecklist.database.CartDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -156,14 +158,18 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
      * Method used to do a search and show founded data.
      */
     private void doMySearch(String query) {
-        // TODO implement code to make a search
+        ComicDatabase db = new ComicDatabase(this);
+        //String query = intent.getStringExtra(SearchManager.QUERY);
+        Cursor c = db.getComicMatches(query, null);
+        //process Cursor and display results
 
-        if (query.length() == 0) {
+        if (c == null || c.getCount() == 0) {
             // There are no results, show a message
             Toast.makeText(this, "Search this " + query + " has no results.", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Search this " + query + " founded " + query.length() + " results!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Search this " + query + " founded " + c.getCount() + " results!", Toast.LENGTH_SHORT).show();
             // Display the results in a dialog, then open comic on detail
+            c.close();
         }
     }
 
