@@ -14,7 +14,7 @@ import android.util.Log;
 
 import org.checklist.comics.comicschecklist.ComicListActivity;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.contentprovider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.parser.Parser;
 import org.checklist.comics.comicschecklist.util.Constants;

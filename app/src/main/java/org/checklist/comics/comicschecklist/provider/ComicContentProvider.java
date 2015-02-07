@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist.cartprovider;
+package org.checklist.comics.comicschecklist.provider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -9,26 +9,26 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import org.checklist.comics.comicschecklist.database.CartDatabase;
-import org.checklist.comics.comicschecklist.database.CartDatabaseHelper;
+import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
 /**
- * Created by Francesco Bevilacqua on 31/10/2014.
- * This code is part of Comics Checklist project.
+ * Created by Francesco Bevilacqua on 24/10/2014.
+ * This code is part of ComicsChecklist project.
  */
-public class CartContentProvider extends ContentProvider {
+public class ComicContentProvider extends ContentProvider {
 
-    // database
-    private CartDatabaseHelper database;
+    // Database
+    private ComicDatabaseHelper database;
 
-    // used for the UriMacher
+    // Used for the UriMacher
     private static final int COMICS = 10;
     private static final int COMIC_ID = 20;
 
-    private static final String AUTHORITY = "org.checklist.comics.comicschecklist.cartprovider";
+    private static final String AUTHORITY = "org.checklist.comics.comicschecklist.contentprovider";
 
     private static final String BASE_PATH = "comics";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
@@ -45,7 +45,7 @@ public class CartContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        database = new CartDatabaseHelper(getContext());
+        database = new ComicDatabaseHelper(getContext());
         return false;
     }
 
@@ -59,7 +59,7 @@ public class CartContentProvider extends ContentProvider {
         checkColumns(projection);
 
         // Set the table
-        queryBuilder.setTables(CartDatabase.COMICS_TABLE);
+        queryBuilder.setTables(ComicDatabase.COMICS_TABLE);
 
         int uriType = sURIMatcher.match(uri);
         switch (uriType) {
@@ -67,7 +67,7 @@ public class CartContentProvider extends ContentProvider {
                 break;
             case COMIC_ID:
                 // Adding the ID to the original query
-                queryBuilder.appendWhere(CartDatabase.ID + "=" + uri.getLastPathSegment());
+                queryBuilder.appendWhere(ComicDatabase.ID + "=" + uri.getLastPathSegment());
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -94,7 +94,7 @@ public class CartContentProvider extends ContentProvider {
         long id;
         switch (uriType) {
             case COMICS:
-                id = sqlDB.insert(CartDatabase.COMICS_TABLE, null, values);
+                id = sqlDB.insert(ComicDatabase.COMICS_TABLE, null, values);
                 break;
             default:
                 throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -110,14 +110,14 @@ public class CartContentProvider extends ContentProvider {
         int rowsDeleted;
         switch (uriType) {
             case COMICS:
-                rowsDeleted = sqlDB.delete(CartDatabase.COMICS_TABLE, selection, selectionArgs);
+                rowsDeleted = sqlDB.delete(ComicDatabase.COMICS_TABLE, selection, selectionArgs);
                 break;
             case COMIC_ID:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    rowsDeleted = sqlDB.delete(CartDatabase.COMICS_TABLE, CartDatabase.ID + "=" + id, null);
+                    rowsDeleted = sqlDB.delete(ComicDatabase.COMICS_TABLE, ComicDatabase.ID + "=" + id, null);
                 } else {
-                    rowsDeleted = sqlDB.delete(CartDatabase.COMICS_TABLE, CartDatabase.ID + "=" + id + " and " + selection, selectionArgs);
+                    rowsDeleted = sqlDB.delete(ComicDatabase.COMICS_TABLE, ComicDatabase.ID + "=" + id + " and " + selection, selectionArgs);
                 }
                 break;
             default:
@@ -135,7 +135,7 @@ public class CartContentProvider extends ContentProvider {
         int rowsUpdated;
         switch (uriType) {
             case COMICS:
-                rowsUpdated = sqlDB.update(CartDatabase.COMICS_TABLE,
+                rowsUpdated = sqlDB.update(ComicDatabase.COMICS_TABLE,
                         values,
                         selection,
                         selectionArgs);
@@ -143,14 +143,14 @@ public class CartContentProvider extends ContentProvider {
             case COMIC_ID:
                 String id = uri.getLastPathSegment();
                 if (TextUtils.isEmpty(selection)) {
-                    rowsUpdated = sqlDB.update(CartDatabase.COMICS_TABLE,
+                    rowsUpdated = sqlDB.update(ComicDatabase.COMICS_TABLE,
                             values,
-                            CartDatabase.ID + "=" + id,
+                            ComicDatabase.ID + "=" + id,
                             null);
                 } else {
-                    rowsUpdated = sqlDB.update(CartDatabase.COMICS_TABLE,
+                    rowsUpdated = sqlDB.update(ComicDatabase.COMICS_TABLE,
                             values,
-                            CartDatabase.ID + "=" + id
+                            ComicDatabase.ID + "=" + id
                                     + " and "
                                     + selection,
                             selectionArgs);
@@ -164,15 +164,15 @@ public class CartContentProvider extends ContentProvider {
     }
 
     private void checkColumns(String[] projection) {
-        String[] available = {CartDatabase.COMICS_NAME_KEY, CartDatabase.ID,
-                CartDatabase.COMICS_RELEASE_KEY, CartDatabase.COMICS_DATE_KEY,
-                CartDatabase.COMICS_DESCRIPTION_KEY, CartDatabase.COMICS_PRICE_KEY,
-                CartDatabase.COMICS_FEATURE_KEY, CartDatabase.COMICS_COVER_KEY,
-                CartDatabase.COMICS_EDITOR_KEY, CartDatabase.COMICS_FAVORITE_KEY,
-                CartDatabase.COMICS_CART_KEY};
+        String[] available = {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.ID,
+                ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
+                ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
+                ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
+                ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY,
+                ComicDatabase.COMICS_CART_KEY};
         if (projection != null) {
-            HashSet<String> requestedColumns = new HashSet<String>(Arrays.asList(projection));
-            HashSet<String> availableColumns = new HashSet<String>(Arrays.asList(available));
+            HashSet<String> requestedColumns = new HashSet<>(Arrays.asList(projection));
+            HashSet<String> availableColumns = new HashSet<>(Arrays.asList(available));
             // check if all columns which are requested are available
             if (!availableColumns.containsAll(requestedColumns)) {
                 throw new IllegalArgumentException("Unknown columns in projection");

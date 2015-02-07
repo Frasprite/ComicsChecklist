@@ -13,13 +13,13 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.cartprovider.CartContentProvider;
-import org.checklist.comics.comicschecklist.contentprovider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.provider.CartContentProvider;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.CartDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.WidgetItem;
-import org.checklist.comics.comicschecklist.widgetprovider.WidgetProvider;
+import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 
 import java.util.ArrayList;
 import java.util.List;

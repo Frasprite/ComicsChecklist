@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -20,11 +22,15 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import org.checklist.comics.comicschecklist.cartprovider.CartContentProvider;
-import org.checklist.comics.comicschecklist.database.CartDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
+import org.checklist.comics.comicschecklist.database.SuggestionDatabase;
+import org.checklist.comics.comicschecklist.provider.CartContentProvider;
+import org.checklist.comics.comicschecklist.database.CartDatabase;
+import org.checklist.comics.comicschecklist.provider.SuggestionProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -144,9 +150,34 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
         // Get the intent, verify the action and get the query
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             // Handles a click on a search suggestion; launches activity/fragment to show comic detail
-            Intent comicIntent = new Intent(this, ComicDetailActivity.class);
-            comicIntent.setData(intent.getData());
-            startActivity(comicIntent);
+            Uri uri = intent.getData();
+            Cursor cursor = this.getContentResolver().query(uri, null, null, null, null);
+
+            if (cursor != null) {
+                cursor.moveToFirst();
+
+                String name = cursor.getString(cursor.getColumnIndexOrThrow(SuggestionDatabase.KEY_COMIC_NAME));
+                //String release = cursor.getString(cursor.getColumnIndexOrThrow(SuggestionDatabase.KEY_COMIC_RELEASE));
+
+                ComicDatabaseHelper database = new ComicDatabaseHelper(this);
+                // Using SQLiteQueryBuilder instead of query() method
+                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+                // Set the table
+                queryBuilder.setTables(ComicDatabase.COMICS_TABLE);
+                // Adding name and release to the original query
+                queryBuilder.appendWhere(ComicDatabase.COMICS_NAME_KEY + "='" + name + "'");
+                SQLiteDatabase db = database.getWritableDatabase();
+                Cursor comicCursor = queryBuilder.query(db, null, null, null, null, null, null);
+
+                if (comicCursor != null) {
+                    comicCursor.moveToFirst();
+                    launchDetailView(comicCursor.getLong(comicCursor.getColumnIndex(ComicDatabase.ID)), "search");
+                    comicCursor.close();
+                } else
+                    Toast.makeText(this, getResources().getText(R.string.search_error), Toast.LENGTH_SHORT).show();
+
+                cursor.close();
+            }
         } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // Handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
@@ -155,21 +186,19 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
     }
 
     /**
-     * Method used to do a search and show founded data.
+     * Method used to do a search and show founded data in dialog.
+     * @param query the text to search on database
      */
     private void doMySearch(String query) {
-        ComicDatabase db = new ComicDatabase(this);
-        //String query = intent.getStringExtra(SearchManager.QUERY);
-        Cursor c = db.getComicMatches(query, null);
-        //process Cursor and display results
+        Cursor cursor = this.getContentResolver().query(SuggestionProvider.CONTENT_URI, null, null,
+                new String[] {query}, null);
 
-        if (c == null || c.getCount() == 0) {
-            // There are no results, show a message
-            Toast.makeText(this, "Search this " + query + " has no results.", Toast.LENGTH_SHORT).show();
+        if (cursor == null) {
+            // There are no results
+            Toast.makeText(this, getResources().getText(R.string.search_no_result), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Search this " + query + " founded " + c.getCount() + " results!", Toast.LENGTH_SHORT).show();
-            // Display the results in a dialog, then open comic on detail
-            c.close();
+            Toast.makeText(this, "Search this " + query + " founded " + cursor.getCount() + " results!", Toast.LENGTH_SHORT).show();
+            cursor.close();
         }
     }
 
@@ -314,6 +343,15 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
      */
     @Override
     public void onItemSelected(long id, String section) {
+        launchDetailView(id, section);
+    }
+
+    /**
+     * This method launch detail view in a Fragment or on a new Activity.
+     * @param id the comic id
+     * @param section is the editor of the comic
+     */
+    public void launchDetailView(long id, String section) {
         if (mTwoPane) {
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a

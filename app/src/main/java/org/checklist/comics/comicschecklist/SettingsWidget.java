@@ -12,7 +12,7 @@ import android.widget.ListView;
 import android.widget.RemoteViews;
 
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.widgetprovider.WidgetProvider;
+import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 
 /**
  * Created by Francesco Bevilacqua on 05/01/2015.

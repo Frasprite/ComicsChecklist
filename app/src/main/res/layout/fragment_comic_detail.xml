@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    xmlns:umano="http://schemas.android.com/tools"
     android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
-    sothree:dragView="@+id/comic_detail_visible_layout"
-    sothree:overlay="true"
-    sothree:panelHeight="60dp">
+    umano:dragView="@+id/comic_detail_visible_layout"
+    umano:overlay="true"
+    umano:panelHeight="60dp">
     <!-- sothree:shadowHeight="4dp"
      tools:context="com.bitpurple.comicschecklist.ComicDetailFragment"-->
 

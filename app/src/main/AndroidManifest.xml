@@ -41,16 +41,23 @@
 
         <provider
             android:authorities="org.checklist.comics.comicschecklist.contentprovider"
-            android:name=".contentprovider.ComicContentProvider"
+            android:name=".provider.ComicContentProvider"
             android:exported="false"
             android:multiprocess="true" >
         </provider>
 
         <provider
             android:authorities="org.checklist.comics.comicschecklist.cartprovider"
-            android:name=".cartprovider.CartContentProvider"
+            android:name=".provider.CartContentProvider"
             android:exported="false"
             android:multiprocess="true" >
+        </provider>
+
+        <!-- Provides search suggestions for comics. -->
+        <provider
+            android:authorities="org.checklist.comics.comicschecklist.suggestionprovider"
+            android:name=".provider.SuggestionProvider"
+            android:exported="false">
         </provider>
 
         <!--<activity
@@ -60,7 +67,7 @@
             </intent-filter>
         </activity> -->
 
-        <receiver android:name=".widgetprovider.WidgetProvider" >
+        <receiver android:name=".provider.WidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

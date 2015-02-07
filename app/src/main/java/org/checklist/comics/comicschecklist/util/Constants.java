@@ -34,9 +34,10 @@ public class Constants {
     public static final String BONELLI = "bonelli";
     public static final String STAR = "star";
     public static final String RW = "rw";
-    // List created by user
+    // List created/searched by user
     public static final String FAVORITE = "preferiti";
     public static final String CART = "da comprare";
+    public static final String SEARCH = "ricerca";
     // Preference last scan
     public static final String PREF_MARVEL_LAST_SCAN = "marvel_lastscan";
     public static final String PREF_PANINI_LAST_SCAN = "panini_lastscan";

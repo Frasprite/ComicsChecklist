@@ -23,19 +23,18 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.RemoteViews;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 
-import org.checklist.comics.comicschecklist.cartprovider.CartContentProvider;
-import org.checklist.comics.comicschecklist.contentprovider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.provider.CartContentProvider;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.CartDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.widgetprovider.WidgetProvider;
+import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 
 import java.text.DateFormat;
 import java.text.ParseException;

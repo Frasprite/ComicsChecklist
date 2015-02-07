@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
-import org.checklist.comics.comicschecklist.contentprovider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.jsoup.Jsoup;

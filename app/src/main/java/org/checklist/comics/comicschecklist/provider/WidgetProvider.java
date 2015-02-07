@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist.widgetprovider;
+package org.checklist.comics.comicschecklist.provider;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
