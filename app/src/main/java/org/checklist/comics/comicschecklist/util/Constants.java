@@ -37,7 +37,6 @@ public class Constants {
     // List created/searched by user
     public static final String FAVORITE = "preferiti";
     public static final String CART = "da comprare";
-    public static final String SEARCH = "ricerca";
     // Preference last scan
     public static final String PREF_MARVEL_LAST_SCAN = "marvel_lastscan";
     public static final String PREF_PANINI_LAST_SCAN = "panini_lastscan";
@@ -86,5 +85,7 @@ public class Constants {
     public static final String WIDGET_TITLE = "WIDGET_TITLE";
     public static final String COMIC_ID_FROM_WIDGET = "COMIC_ID_FROM_WIDGET";
     public static final String URI_SCHEME = "CC_WIDGET";
+    // Search
+    public static final String PREF_SEARCH_QUERY = "search_query";
 
 }

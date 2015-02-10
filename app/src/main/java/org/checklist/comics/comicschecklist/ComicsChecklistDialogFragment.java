@@ -6,11 +6,27 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
+import org.checklist.comics.comicschecklist.database.SuggestionDatabase;
+import org.checklist.comics.comicschecklist.provider.SuggestionProvider;
+import org.checklist.comics.comicschecklist.util.Constants;
 
 /**
  * Created by Francesco Bevilacqua on 16/10/2014.
@@ -26,6 +42,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
         public void onDialogNegativeClick(DialogFragment dialog);
         public void onDialogRateClick(DialogFragment dialog);
         public void onDialogAbortRateClick(DialogFragment dialog);
+        public void onDialogListItemClick(DialogFragment dialog, long id, String search);
     }
 
     // Use this instance of the interface to deliver action events
@@ -67,6 +84,12 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
         switch (type) {
             case 0:
+                builder.setNegativeButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Send the negative button event back to the host activity
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                    }
+                });
                 // Get the layout inflater
                 LayoutInflater inflaterHelp = getActivity().getLayoutInflater();
                 // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
@@ -75,6 +98,12 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setTitle(R.string.guida);
                 break;
             case 1:
+                builder.setNegativeButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Send the negative button event back to the host activity
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                    }
+                });
                 // Get the layout inflater
                 LayoutInflater inflaterInfo = getActivity().getLayoutInflater();
                 // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
@@ -115,7 +144,6 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setTitle(R.string.title_section2);
                 break;
             case 3:
-
                 // Launch Google Play page
                 builder.setPositiveButton(R.string.rate_button, new DialogInterface.OnClickListener() {
                     @Override
@@ -137,6 +165,60 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 // Add decoration
                 builder.setTitle(R.string.app_name);
                 builder.setMessage(R.string.rate_text);
+                break;
+            case 4:
+                // Launch a dialog with a list
+                builder.setNegativeButton(R.string.dialog_undo, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Send the negative button event back to the host activity
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                    }
+                });
+
+                LayoutInflater listInflater = getActivity().getLayoutInflater();
+                View listView = listInflater.inflate(R.layout.dialog_search_list, null);
+
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String mQuery = sp.getString(Constants.PREF_SEARCH_QUERY, "error");
+                final Cursor cursor = getActivity().getContentResolver().query(SuggestionProvider.CONTENT_URI, null, null,
+                        new String[] {mQuery}, null);
+
+                final ListView mList = (ListView)listView.findViewById(R.id.searchListView);
+
+                // Fields from the database (projection) must include the id column for the adapter to work
+                String[] from = new String[] {SuggestionDatabase.KEY_COMIC_NAME, SuggestionDatabase.KEY_COMIC_RELEASE};
+                // Fields on the UI to which we map
+                int[] to = new int[] {android.R.id.text1, android.R.id.text2};
+
+                SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_activated_2, cursor, from, to, 0);
+                mList.setAdapter(adapter);
+                mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        TextView tv = (TextView) view.findViewById(android.R.id.text1);
+                        String name = tv.getText().toString();
+                        ComicDatabaseHelper database = new ComicDatabaseHelper(getActivity());
+                        // Using SQLiteQueryBuilder instead of query() method
+                        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+                        // Set the table
+                        queryBuilder.setTables(ComicDatabase.COMICS_TABLE);
+                        // Adding name and release to the original query
+                        queryBuilder.appendWhere(ComicDatabase.COMICS_NAME_KEY + "='" + name + "'");
+                        SQLiteDatabase db = database.getWritableDatabase();
+                        Cursor comicCursor = queryBuilder.query(db, null, null, null, null, null, null);
+
+                        if (comicCursor != null) {
+                            comicCursor.moveToFirst();
+                            mListener.onDialogListItemClick(ComicsChecklistDialogFragment.this, comicCursor.getLong(comicCursor.getColumnIndex(ComicDatabase.ID)), "search");
+                            comicCursor.close();
+                            cursor.close();
+                        } else
+                            Toast.makeText(getActivity(), getResources().getText(R.string.search_error), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                builder.setTitle(R.string.search_result).setView(listView);
+
                 break;
             default:
                 return null;

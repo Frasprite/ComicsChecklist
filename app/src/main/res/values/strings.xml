@@ -108,5 +108,6 @@
     <string name="search_description">Inserisci il nome del fumetto che cerchi.</string>
     <string name="search_error">Impossibile reperire ulteriori dettagli sul fumetto.</string>
     <string name="search_no_result">Non ci sono fumetti che contengono il testo inserito.</string>
+    <string name="search_result">Risultati ricerca</string>
 
 </resources>

@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -22,7 +23,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
@@ -186,7 +186,7 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
     }
 
     /**
-     * Method used to do a search and show founded data in dialog.
+     * Method used to do a search and show founded data in a dialog.
      * @param query the text to search on database
      */
     private void doMySearch(String query) {
@@ -197,8 +197,15 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
             // There are no results
             Toast.makeText(this, getResources().getText(R.string.search_no_result), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Search this " + query + " founded " + cursor.getCount() + " results!", Toast.LENGTH_SHORT).show();
+            // There are multiple results which fit the given query, so show this on dialog
             cursor.close();
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = sp.edit();
+            editor.putString(Constants.PREF_SEARCH_QUERY, query);
+            editor.apply();
+            // Open a dialog with a list of results
+            DialogFragment listDialog = ComicsChecklistDialogFragment.newInstance(4);
+            listDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
         }
     }
 
@@ -427,5 +434,11 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
             editorPref.putBoolean(Constants.PREF_USER_DONT_RATE, true);
             editorPref.apply();
         }
+    }
+
+    @Override
+    public void onDialogListItemClick(DialogFragment dialog, long id, String search) {
+        dialog.dismiss();
+        launchDetailView(id, search);
     }
 }
