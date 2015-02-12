@@ -1,6 +1,5 @@
 package org.checklist.comics.comicschecklist;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.SearchManager;
@@ -16,7 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -210,7 +208,7 @@ public class NavigationDrawerFragment extends Fragment {
         // showGlobalContextActionBar, which controls the top-left area of the action bar.
         if (mDrawerLayout != null && isDrawerOpen()) {
             inflater.inflate(R.menu.menu_main, menu);
-            //howGlobalContextActionBar();
+            //showGlobalContextActionBar();
             // Get the SearchView and set the searchable configuration
             SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
             SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
@@ -219,18 +217,6 @@ public class NavigationDrawerFragment extends Fragment {
             searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
         }
         super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @SuppressLint("InflateParams")
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
-        // ActionBarDrawerToggle will take care of this.
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -249,9 +235,9 @@ public class NavigationDrawerFragment extends Fragment {
     }*/
 
     /** Return the selected item in position. */
-    public int getCheckedItem() {
+    /**public int getCheckedItem() {
         return mDrawerListView.getCheckedItemPosition();
-    }
+    }*/
 
     /**
      * Callbacks interface that all activities using this fragment must implement.

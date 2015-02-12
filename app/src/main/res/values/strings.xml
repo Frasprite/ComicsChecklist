@@ -69,14 +69,15 @@
 	<string name="menu_calendar">Aggiungi uscita al calendario</string>
 	<string name="menu_favorites">Aggiungi ai preferiti</string>
     <string name="menu_wishlist">Da comprare</string>
-    <string name="menu_delete_comic">Togli dalla lista</string>
     <string name="menu_settings">Impostazioni</string>
+    <string name="context_menu_delete_comic">Togli dalla lista</string>
+    <string name="context_menu_delete_all">Cancella tutta la lista</string>
     <string name="dialog_confirm">OK</string>
     <string name="dialog_undo">Annulla</string>
 
     <string name="empty_list">La lista è vuota!</string>
-    <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nCerca tra gli editori i tuoi fumetti preferiti ed aggiungili alla lista cliccando sulla stella nella schermata dei dettagli.</string>
-    <string name="empty_cart_list">La lista dei fumetti da comprare è vuota.\nPuoi aggiungere un fumetto alla lista cliccando sul carrello nella schermata dei dettagli, oppure creando una nota col bottone in basso a destra dell\'interfaccia.</string>
+    <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>
+    <string name="empty_cart_list">La lista dei fumetti da comprare è vuota.\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>
     <string name="empty_editor_list">La lista per questo editore è vuota.</string>
 
     <string name="search_started">: ricerca in corso&#8230;</string>

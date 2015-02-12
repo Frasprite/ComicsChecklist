@@ -294,7 +294,7 @@ public class ComicDetailFragment extends Fragment {
                     String[] mSelectionArgs = {mComicName};
                     getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
                     // Add comic to cart database
-                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     Date myDate;
                     try {
                         myDate = formatter.parse(mComicRelease);

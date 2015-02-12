@@ -18,8 +18,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
 
-import org.checklist.comics.comicschecklist.R;
-
 /**
  * https://gist.github.com/Jogan/9def6110edf3247825c9
  */
@@ -173,13 +171,13 @@ public class FloatingActionButton extends View {
             return this;
         }
 
-        public FloatingActionButton create() {
+        public FloatingActionButton create(int container) {
             final FloatingActionButton button = new FloatingActionButton(activity);
             button.setFloatingActionButtonColor(this.color);
             button.setFloatingActionButtonDrawable(this.drawable);
             params.gravity = this.gravity;
-            // Add FAB to root view, in this case is the FrameLayout which contains the list
-            ViewGroup root = (ViewGroup) activity.findViewById(R.id.comic_list_container);//android.R.id.content);
+            // Add FAB to root view, in this case is the RelativeLayout which contains the list
+            ViewGroup root = (ViewGroup) activity.findViewById(container);//android.R.id.content);
             root.addView(button, params);
             return button;
         }

@@ -40,6 +40,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * An activity representing a list of Comics. This activity
@@ -119,7 +120,7 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
                 .withButtonColor(getResources().getColor(R.color.orange_500))
                 .withGravity(Gravity.BOTTOM | Gravity.END)
                 .withMargins(0, 0, 16, 16)
-                .create();
+                .create(android.R.id.content);
 
         fabButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -340,7 +341,9 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
             menu.findItem(R.id.calendar).setVisible(!drawerOpen);
             menu.findItem(R.id.favorite).setVisible(!drawerOpen);
             menu.findItem(R.id.buy).setVisible(!drawerOpen);
-        }
+            menu.findItem(R.id.search).setVisible(!drawerOpen);
+        } else
+            menu.findItem(R.id.search).setVisible(!drawerOpen);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -369,9 +372,6 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
             mDetailFragment = new ComicDetailFragment();
             mDetailFragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
-            /**ComicDetailFragment fragment = new ComicDetailFragment();
-             fragment.setArguments(arguments);
-             getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, fragment).commit();*/
         } else {
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
@@ -386,7 +386,7 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
     public void onDialogPositiveClick(DialogFragment dialog, String name, String info, String releaseDate) {
         if (name.length() > 0) {
             dialog.dismiss();
-            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             Date myDate;
             try {
                 myDate = formatter.parse(releaseDate);

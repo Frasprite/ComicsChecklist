@@ -50,6 +50,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     private String mEditor;
     private int mEditorNumber;
     private static final int DELETE_ID = Menu.FIRST + 1;
+    private static final int DELETE_ALL = Menu.FIRST + 2;
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -168,6 +169,8 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
 
         ListView lv = (ListView) view.findViewById(android.R.id.list);
         lv.setEmptyView(emptyText);
+        if (mEditorNumber == 1 || mEditorNumber == 2)
+            registerForContextMenu(lv);
 
         /**
          * Implement {@link SwipeRefreshLayout.OnRefreshListener}. When users do the "swipe to
@@ -243,7 +246,8 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, DELETE_ID, 0, R.string.menu_delete_comic);
+        menu.add(0, DELETE_ID, 0, R.string.context_menu_delete_comic);
+        menu.add(0, DELETE_ALL, 1, R.string.context_menu_delete_all);
     }
 
     @Override
@@ -274,6 +278,10 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     mCursor.close();
                     return true;
                 }
+            case DELETE_ALL:
+                // TODO show a dialog where user can confirm or not this action
+
+                return true;
         }
         return super.onContextItemSelected(item);
     }
