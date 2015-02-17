@@ -20,10 +20,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
+
+import com.software.shell.fab.FloatingActionButton;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
@@ -34,7 +35,6 @@ import org.checklist.comics.comicschecklist.provider.SuggestionProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.FloatingActionButton;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -115,14 +115,8 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
         Intent intent = new Intent(this, DownloadService.class);
         startService(intent);
 
-        FloatingActionButton fabButton = new FloatingActionButton.Builder(this)
-                .withDrawable(getResources().getDrawable(R.drawable.ic_action_add))
-                .withButtonColor(getResources().getColor(R.color.orange_500))
-                .withGravity(Gravity.BOTTOM | Gravity.END)
-                .withMargins(0, 0, 16, 16)
-                .create(android.R.id.content);
-
-        fabButton.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton actionButton = (FloatingActionButton) findViewById(R.id.action_button);
+        actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Open add dialog

@@ -26,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.provider.CartContentProvider;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
@@ -280,7 +281,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                 }
             case DELETE_ALL:
                 // TODO show a dialog where user can confirm or not this action
-
+                Toast.makeText(getActivity(), "Coming soon!", Toast.LENGTH_SHORT).show();
                 return true;
         }
         return super.onContextItemSelected(item);
