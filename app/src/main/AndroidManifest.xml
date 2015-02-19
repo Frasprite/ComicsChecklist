@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:allowBackup="true"
@@ -35,10 +37,12 @@
             android:label="@string/help_settings" >
         </activity>
 
+        <!-- Service which launch search & download data -->
         <service
             android:name="org.checklist.comics.comicschecklist.service.DownloadService" >
         </service>
 
+        <!-- Database & search suggestion provider -->
         <provider
             android:authorities="org.checklist.comics.comicschecklist.contentprovider"
             android:name=".provider.ComicContentProvider"
@@ -53,20 +57,13 @@
             android:multiprocess="true" >
         </provider>
 
-        <!-- Provides search suggestions for comics. -->
         <provider
             android:authorities="org.checklist.comics.comicschecklist.suggestionprovider"
             android:name=".provider.SuggestionProvider"
             android:exported="false">
         </provider>
 
-        <!--<activity
-            android:name=".SettingsWidget">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
-            </intent-filter>
-        </activity> -->
-
+        <!-- Widget stuff -->
         <receiver android:name=".provider.WidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -78,6 +75,26 @@
         <service android:name=".service.WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"
             android:exported="false" />
+
+        <!--<activity
+            android:name=".SettingsWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity> -->
+
+        <!-- Alarm stuff -->
+        <service android:name=".service.AlarmService"
+            android:enabled="true" />
+
+        <receiver android:name=".receiver.AlarmReceiver"/>
+
+        <receiver android:name=".receiver.BootReceiver"
+            android:enabled="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

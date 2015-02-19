@@ -55,6 +55,8 @@ public class Constants {
     public static final String NOTIFICATION_EDITOR = "editor";
     public static final String NOTIFICATION = "org.checklist.comics.comicschecklist.service.receiver";
     public static final int NOTIFICATION_ID = 299;
+    public static final String PREF_SEARCH_NOTIFICATION = "notifications_new_message";
+    public static final String PREF_FAVORITE_NOTIFICATION = "notifications_favorite_available";
     /**
      * Constants for parser class.
      */

@@ -157,7 +157,7 @@ public class DownloadService extends IntentService {
             } else {
                 //Log.i(Constants.LOG_TAG, "Manual search for section n. " + intent.getIntExtra(Constants.ARG_SECTION_NUMBER, 0));
                 int section = intent.getIntExtra(Constants.ARG_SECTION_NUMBER, 0);
-                boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);
+                boolean notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true);
 
                 searchNecessary = true;
 

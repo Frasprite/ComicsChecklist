@@ -1,5 +1,11 @@
 package org.checklist.comics.comicschecklist;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -11,6 +17,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
+import org.checklist.comics.comicschecklist.receiver.BootReceiver;
+import org.checklist.comics.comicschecklist.util.Constants;
+
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -25,22 +36,10 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity {
-    /**
-     * Determines whether to always show the simplified settings UI, where
-     * settings are presented in a single list. When false, settings are shown
-     * as a master/detail two-pane view on tablets. When true, a single pane is
-     * shown on tablets.
-     */
-    //private static final boolean ALWAYS_SIMPLE_PREFS = false;
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-
-        /**SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String syncPref = sharedPref.getString("sync_frequency", "3");
-        String deletePref = sharedPref.getString("delete_frequency", "7");
-        boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);*/
 
         // Get the root container of the preferences list and insert toolbar
         LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
@@ -88,7 +87,6 @@ public class SettingsActivity extends PreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
-
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -127,6 +125,53 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_notification);
+            findPreference(Constants.PREF_FAVORITE_NOTIFICATION).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    boolean boolValue = (boolean) newValue;
+                    Context mContext = getActivity();
+                    if (boolValue) {
+                        // Activate notification for favorite
+                        AlarmManager alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+                        Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);
+                        PendingIntent alarmIntent = PendingIntent.getBroadcast(mContext, 0, mIntentReceiver, 0);
+
+                        // Set the alarm to start at 10:00 a.m.
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(System.currentTimeMillis());
+                        calendar.set(Calendar.HOUR_OF_DAY, 10);
+
+                        // Specify a non-precise custom interval, in this case every days.
+                        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                                AlarmManager.INTERVAL_DAY, alarmIntent);
+
+                        // Enabling also receiver on boot
+                        ComponentName receiver = new ComponentName(mContext, BootReceiver.class);
+                        PackageManager pm = mContext.getPackageManager();
+
+                        pm.setComponentEnabledSetting(receiver,
+                                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                                PackageManager.DONT_KILL_APP);
+                    } else {
+                        // Disable notification for favorite
+                        AlarmManager alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+                        Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);
+                        PendingIntent alarmIntent = PendingIntent.getBroadcast(mContext, 0, mIntentReceiver, 0);
+                        if (alarmMgr != null) {
+                            alarmMgr.cancel(alarmIntent);
+                        }
+
+                        // Disable also receiver on boot
+                        ComponentName receiver = new ComponentName(mContext, BootReceiver.class);
+                        PackageManager pm = mContext.getPackageManager();
+
+                        pm.setComponentEnabledSetting(receiver,
+                                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                                PackageManager.DONT_KILL_APP);
+                    }
+                    return true;
+                }
+            });
         }
     }
 

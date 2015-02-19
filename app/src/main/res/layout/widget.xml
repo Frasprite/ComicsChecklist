@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:background="@color/orange_500"
+        android:background="@color/primary"
         android:gravity="center_vertical"
         android:lines="2"
         android:maxLines="2"
@@ -43,7 +43,7 @@
             android:layout_margin="4dp"
             android:gravity="center"
             android:text="@string/empty_list"
-            android:textColor="#ffffff"
+            android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
 

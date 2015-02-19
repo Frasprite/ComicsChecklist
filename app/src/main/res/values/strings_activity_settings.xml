@@ -62,6 +62,8 @@
     <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifiche</string>
 
-    <string name="pref_title_notifications">Attiva le notifiche</string>
-    <string name="pref_summary_notifications">Mostra lo stato della ricerca nella barra delle notifiche</string>
+    <string name="pref_title_notifications">Notifiche stato ricerca</string>
+    <string name="pref_summary_notifications">Mostra lo stato della ricerca dei dati nella barra delle notifiche</string>
+    <string name="pref_title_notification_favorite">Notifiche dei preferiti</string>
+    <string name="pref_summary_notification_favorite">Verrai avvertito da una notifica, se uno dei tuoi fumetti preferiti è disponibile (utile se non inserisci l\'uscita sul calendario)</string>
 </resources>

@@ -1,11 +1,17 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- A 'parent' preference, which enables/disables child preferences (below)
-         when checked/unchecked. -->
+         when checked/unchecked. This one is for enable notification during search. -->
     <SwitchPreference
         android:key="notifications_new_message"
         android:title="@string/pref_title_notifications"
         android:summary="@string/pref_summary_notifications"
         android:defaultValue="true" />
+    <!-- Enable notification if a favorite comic is available. -->
+    <SwitchPreference
+        android:key="notifications_favorite_available"
+        android:title="@string/pref_title_notification_favorite"
+        android:summary="@string/pref_summary_notification_favorite"
+        android:defaultValue="false" />
 
 </PreferenceScreen>
