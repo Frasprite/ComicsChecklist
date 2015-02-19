@@ -219,8 +219,9 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
 
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
-            //((ComicListFragment) getSupportFragmentManager().findFragmentById(R.id.comic_list)).setActivateOnItemClick(true);
-            mListFragment.setActivateOnItemClick(true);
+            //((ComicListFragment) getFragmentManager().findFragmentById(R.id.comic_list)).setActivateOnItemClick(true);
+            if (mListFragment != null)
+                mListFragment.setActivateOnItemClick(true);
         }
     }
 

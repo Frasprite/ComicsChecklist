@@ -2,7 +2,7 @@
 
     <!-- Strings related to Settings -->
 
-    <!-- Example settings for Data & Sync -->
+    <!-- String set for Data & Sync -->
     <string name="pref_header_data_sync">Dati &amp; sincronizzazione</string>
 
     <string name="pref_title_sync_frequency">Frequenza sincronizzazione</string>
@@ -59,11 +59,11 @@
         <item>DESC</item>
     </string-array>
 
-    <!-- Example settings for Notifications -->
+    <!-- String set for Notifications -->
     <string name="pref_header_notifications">Notifiche</string>
 
     <string name="pref_title_notifications">Notifiche stato ricerca</string>
     <string name="pref_summary_notifications">Mostra lo stato della ricerca dei dati nella barra delle notifiche</string>
     <string name="pref_title_notification_favorite">Notifiche dei preferiti</string>
-    <string name="pref_summary_notification_favorite">Verrai avvertito da una notifica, se uno dei tuoi fumetti preferiti è disponibile (utile se non inserisci l\'uscita sul calendario)</string>
+    <string name="pref_summary_notification_favorite">Verrai avvertito se uno dei tuoi fumetti preferiti è disponibile</string>
 </resources>
