@@ -13,9 +13,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.provider.CartContentProvider;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.database.CartDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.WidgetItem;
@@ -71,12 +69,13 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
             mCursor = mContext.getContentResolver().query(uri, projection, ComicDatabase.COMICS_FAVORITE_KEY + "=?", new String[]{"yes"},
                     ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
         } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
-            Uri uri = CartContentProvider.CONTENT_URI;
-            String[] projection = {CartDatabase.ID, CartDatabase.COMICS_NAME_KEY, CartDatabase.COMICS_RELEASE_KEY, CartDatabase.COMICS_DATE_KEY,
-                    CartDatabase.COMICS_DESCRIPTION_KEY, CartDatabase.COMICS_PRICE_KEY, CartDatabase.COMICS_FEATURE_KEY, CartDatabase.COMICS_COVER_KEY,
-                    CartDatabase.COMICS_EDITOR_KEY, CartDatabase.COMICS_FAVORITE_KEY, CartDatabase.COMICS_CART_KEY};
+            Uri uri = ComicContentProvider.CONTENT_URI;
+            String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
+                    ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
+                    ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
 
-            mCursor = mContext.getContentResolver().query(uri, projection, null, null, CartDatabase.COMICS_DATE_KEY + " " + sortOrder);
+            mCursor = mContext.getContentResolver().query(uri, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
+                    ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
         } else {
             Log.i(Constants.LOG_TAG, "Editor founded, query database.");
             Uri uri = ComicContentProvider.CONTENT_URI;

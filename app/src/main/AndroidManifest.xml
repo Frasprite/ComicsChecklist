@@ -51,13 +51,6 @@
         </provider>
 
         <provider
-            android:authorities="org.checklist.comics.comicschecklist.cartprovider"
-            android:name=".provider.CartContentProvider"
-            android:exported="false"
-            android:multiprocess="true" >
-        </provider>
-
-        <provider
             android:authorities="org.checklist.comics.comicschecklist.suggestionprovider"
             android:name=".provider.SuggestionProvider"
             android:exported="false">

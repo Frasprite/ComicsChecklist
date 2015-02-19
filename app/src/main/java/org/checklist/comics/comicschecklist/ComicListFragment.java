@@ -28,9 +28,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.checklist.comics.comicschecklist.provider.CartContentProvider;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.database.CartDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -264,19 +262,10 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     return true;
                 } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
                     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                    Uri uriCart = Uri.parse(CartContentProvider.CONTENT_URI + "/" + info.id);
-                    String[] projection = {CartDatabase.ID, CartDatabase.COMICS_NAME_KEY};
-                    Cursor mCursor = getActivity().getContentResolver().query(uriCart, projection, null, null, null);
-                    mCursor.moveToFirst();
-                    // Update entry on comic database
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
-                    String mComicName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
-                    String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
-                    String[] mSelectionArgs = {mComicName};
-                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
-                    getActivity().getContentResolver().delete(uriCart, null, null);
-                    mCursor.close();
+                    Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
+                    getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
                     return true;
                 }
             case DELETE_ALL:
@@ -480,7 +469,8 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
             return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_FAVORITE_KEY + "=?", new String[]{"yes"},
                     ComicDatabase.COMICS_DATE_KEY + " " + order);
         } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
-            return new CursorLoader(getActivity(), CartContentProvider.CONTENT_URI, projection, null, null, CartDatabase.COMICS_DATE_KEY + " " + order);
+            return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
+                    ComicDatabase.COMICS_DATE_KEY + " " + order);
         } else {
             return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
                     ComicDatabase.COMICS_DATE_KEY + " " + order);

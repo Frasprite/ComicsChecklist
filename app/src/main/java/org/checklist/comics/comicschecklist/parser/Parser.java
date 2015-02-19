@@ -51,10 +51,10 @@ public class Parser {
         int nextYear = year + 1;
         int weekOfTheYear = calendar.get(Calendar.WEEK_OF_YEAR);
 
-        DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         Date lastDec = null;
         try {
-            lastDec = sdf.parse("28/12/" + year);
+            lastDec = formatter.parse("28/12/" + year);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -94,12 +94,12 @@ public class Parser {
     // Metodo che raccoglie i dati dall'url fornito.
     private void parsePaniniUrl(String url, String editor) {
         //Log.i(Constants.LOG_TAG, url);
-        ArrayList<String> arrayCoverUrl = new ArrayList<String>();
-        ArrayList<String> arrayName = new ArrayList<String>();
-        ArrayList<String> arrayFeature = new ArrayList<String>();
-        ArrayList<String> arrayPrice = new ArrayList<String>();
-        ArrayList<String> arrayReleaseDate = new ArrayList<String>();
-        ArrayList<String> arrayDescription = new ArrayList<String>();
+        ArrayList<String> arrayCoverUrl = new ArrayList<>();
+        ArrayList<String> arrayName = new ArrayList<>();
+        ArrayList<String> arrayFeature = new ArrayList<>();
+        ArrayList<String> arrayPrice = new ArrayList<>();
+        ArrayList<String> arrayReleaseDate = new ArrayList<>();
+        ArrayList<String> arrayDescription = new ArrayList<>();
         try {
             // Prendo solo la parte di codice che mi interessa
             Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
@@ -147,7 +147,7 @@ public class Parser {
             if (!title.equalsIgnoreCase("play") && !arrayName.get(i).equalsIgnoreCase("n.d.")) {
                 try {
                     // Calculating date for sql
-                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     Date myDate = formatter.parse(arrayReleaseDate.get(i));
                     insertComic(arrayName.get(i), editor, arrayDescription.get(i), arrayReleaseDate.get(i),
                             myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i));
@@ -190,7 +190,7 @@ public class Parser {
 
             try {
                 // Calculating date for sql
-                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date myDate = formatter.parse(releaseDate);
 
                 // Detecting all p tag
@@ -337,7 +337,7 @@ public class Parser {
                 //Log.i(Constants.LOG_TAG, price + " " + description);
 
                 // Calculating date for sql
-                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date myDate = formatter.parse(releaseDate);
                 // Insert comic on database
                 insertComic(name, Constants.STAR, description, releaseDate, myDate, coverUrl, feature, price);
@@ -425,7 +425,7 @@ public class Parser {
 
                 // Calculating date for sql
                 releaseDate = spanRelease.get(i).text();
-                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date myDate = formatter.parse(releaseDate);
 
                 // Insert comic on database

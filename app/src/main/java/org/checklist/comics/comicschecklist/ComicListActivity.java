@@ -29,8 +29,7 @@ import com.software.shell.fab.FloatingActionButton;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
 import org.checklist.comics.comicschecklist.database.SuggestionDatabase;
-import org.checklist.comics.comicschecklist.provider.CartContentProvider;
-import org.checklist.comics.comicschecklist.database.CartDatabase;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.provider.SuggestionProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
@@ -390,18 +389,18 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
             }
             // Set the format to sql date time
             ContentValues values = new ContentValues();
-            values.put(CartDatabase.COMICS_NAME_KEY, name);
-            values.put(CartDatabase.COMICS_EDITOR_KEY, Constants.CART);
-            values.put(CartDatabase.COMICS_DESCRIPTION_KEY, info);
-            values.put(CartDatabase.COMICS_RELEASE_KEY, releaseDate);
-            values.put(CartDatabase.COMICS_DATE_KEY, myDate.getTime());
-            values.put(CartDatabase.COMICS_COVER_KEY, "error");
-            values.put(CartDatabase.COMICS_FEATURE_KEY, "N.D.");
-            values.put(CartDatabase.COMICS_PRICE_KEY, "N.D.");
-            values.put(CartDatabase.COMICS_CART_KEY, "yes");
-            values.put(CartDatabase.COMICS_FAVORITE_KEY, "no");
+            values.put(ComicDatabase.COMICS_NAME_KEY, name);
+            values.put(ComicDatabase.COMICS_EDITOR_KEY, Constants.CART);
+            values.put(ComicDatabase.COMICS_DESCRIPTION_KEY, info);
+            values.put(ComicDatabase.COMICS_RELEASE_KEY, releaseDate);
+            values.put(ComicDatabase.COMICS_DATE_KEY, myDate.getTime());
+            values.put(ComicDatabase.COMICS_COVER_KEY, "error");
+            values.put(ComicDatabase.COMICS_FEATURE_KEY, "N.D.");
+            values.put(ComicDatabase.COMICS_PRICE_KEY, "N.D.");
+            values.put(ComicDatabase.COMICS_CART_KEY, "yes");
+            values.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
 
-            this.getContentResolver().insert(CartContentProvider.CONTENT_URI, values);
+            this.getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
             Toast.makeText(this, getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
         } else
             Toast.makeText(this, getResources().getString(R.string.fill_data_alert), Toast.LENGTH_SHORT).show();
