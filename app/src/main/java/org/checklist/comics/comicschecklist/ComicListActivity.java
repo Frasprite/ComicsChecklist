@@ -109,16 +109,6 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         Intent intent = new Intent(this, DownloadService.class);
         startService(intent);
 
-        /*FloatingActionButton actionButton = (FloatingActionButton) findViewById(R.id.action_button);
-        actionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Open add dialog
-                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(2);
-                addDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
-            }
-        });*/
-
         // Launch AppRater
         AppRater.app_launched(this);
 

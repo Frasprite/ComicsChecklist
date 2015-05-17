@@ -1,6 +1,7 @@
 package org.checklist.comics.comicschecklist;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,8 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.melnykov.fab.FloatingActionButton;
 
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
@@ -191,6 +194,18 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Create the list fragment's content view by calling the super method
         final View listFragmentView = inflater.inflate(R.layout.fragment_list, container, false);//super.onCreateView(inflater, container, savedInstanceState);
+
+        ListView listView = (ListView) listFragmentView.findViewById(android.R.id.list);
+        FloatingActionButton fab = (FloatingActionButton) listFragmentView.findViewById(R.id.fab);
+        fab.attachToListView(listView);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Open add dialog
+                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(2);
+                addDialog.show(getActivity().getFragmentManager(), "ComicsChecklistDialogFragment");
+            }
+        });
 
         if (mEditor.equalsIgnoreCase(Constants.FAVORITE) || mEditor.equalsIgnoreCase(Constants.CART))
             return listFragmentView;
