@@ -21,10 +21,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
-import android.view.View;
 import android.widget.Toast;
-
-import com.software.shell.fab.FloatingActionButton;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
@@ -114,7 +111,7 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
         Intent intent = new Intent(this, DownloadService.class);
         startService(intent);
 
-        FloatingActionButton actionButton = (FloatingActionButton) findViewById(R.id.action_button);
+        /*FloatingActionButton actionButton = (FloatingActionButton) findViewById(R.id.action_button);
         actionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,7 +119,7 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
                 DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(2);
                 addDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
             }
-        });
+        });*/
 
         // Launch AppRater
         AppRater.app_launched(this);
@@ -152,6 +149,8 @@ public class ComicListActivity extends ActionBarActivity implements ComicListFra
 
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(SuggestionDatabase.KEY_COMIC_NAME));
                 //String release = cursor.getString(cursor.getColumnIndexOrThrow(SuggestionDatabase.KEY_COMIC_RELEASE));
+                // Replace special characters
+                name = name.replaceAll("'", "''");
 
                 ComicDatabaseHelper database = new ComicDatabaseHelper(this);
                 // Using SQLiteQueryBuilder instead of query() method

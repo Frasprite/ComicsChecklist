@@ -53,27 +53,6 @@
 
                 </FrameLayout>
 
-                <com.software.shell.fab.FloatingActionButton
-                    xmlns:fab="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/action_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginBottom="@dimen/fab_mid_panel_margin"
-                    android:layout_marginRight="@dimen/fab_mid_panel_margin"
-                    android:layout_marginEnd="@dimen/fab_margin"
-                    fab:type="normal"
-                    fab:button_color="@color/accent"
-                    fab:image="@drawable/fab_plus_icon"
-                    fab:image_size="24dp"
-                    fab:shadow_color="#757575"
-                    fab:shadow_radius="1.0dp"
-                    fab:shadow_xOffset="0.5dp"
-                    fab:shadow_yOffset="1.0dp"
-                    fab:animation_onShow="@anim/fab_roll_from_down"
-                    fab:animation_onHide="@anim/fab_roll_to_down" />
             </RelativeLayout>
 
             <FrameLayout

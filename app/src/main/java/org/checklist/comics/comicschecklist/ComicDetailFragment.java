@@ -31,8 +31,8 @@ import com.squareup.picasso.Picasso;
 
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
+import org.checklist.comics.comicschecklist.util.Constants;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -240,13 +240,9 @@ public class ComicDetailFragment extends Fragment {
                 }
 
                 // TODO Update widget
-                Intent intent = new Intent(getActivity(), WidgetProvider.class);
-                intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                // Use an array and EXTRA_APPWIDGET_IDS instead of AppWidgetManager.EXTRA_APPWIDGET_ID,
-                // since it seems the onUpdate() is only fired on that.
-                int[] ids = AppWidgetManager.getInstance(getActivity()).getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
-                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                getActivity().sendBroadcast(intent);
+                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
+                int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
 
                 return true;
             case R.id.buy:

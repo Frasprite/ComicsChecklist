@@ -101,6 +101,7 @@
 
     <string name="fill_data_alert">Il nome del fumetto non è stato inserito: la nota è stata annullata!</string>
 
+    <string name="widget_label">CC Widget</string>
     <string name="appwidget_configure_instructions">This text will be shown before the date in our example widget.</string>
     <string name="appwidget_prefix_default">Oh hai</string>
 
@@ -110,5 +111,72 @@
     <string name="search_error">Impossibile reperire ulteriori dettagli sul fumetto.</string>
     <string name="search_no_result">Non ci sono fumetti che contengono il testo inserito.</string>
     <string name="search_result">Risultati ricerca</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- String set for Data & Sync -->
+    <string name="pref_header_data_sync">Dati &amp; sincronizzazione</string>
+
+    <string name="pref_title_sync_frequency">Frequenza sincronizzazione</string>
+    <string-array name="pref_sync_frequency_titles">
+        <item>ogni giorno</item>
+        <item>ogni 2 giorni</item>
+        <item>ogni 3 giorni</item>
+        <item>ogni 4 giorni</item>
+        <item>ogni 5 giorni</item>
+        <item>ogni 6 giorni</item>
+        <item>ogni 1 settimana</item>
+        <item>Mai, lo farò manualmente</item>
+    </string-array>
+    <string-array name="pref_sync_frequency_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_title_delete_frequency">Elimina le uscite più vecchie di</string>
+    <string-array name="pref_delete_frequency_titles">
+        <item>1 giorno</item>
+        <item>2 giorni</item>
+        <item>3 giorni</item>
+        <item>4 giorni</item>
+        <item>5 giorni</item>
+        <item>6 giorni</item>
+        <item>1 settimana</item>
+        <item>Non cancellare i dati</item>
+    </string-array>
+    <string-array name="pref_delete_frequency_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>-1</item>
+    </string-array>
+
+    <string name="pref_title_data_order">Ordina la lista</string>
+    <string-array name="pref_data_order_titles">
+        <item>per data crescente</item>
+        <item>per data decrescente</item>
+    </string-array>
+    <string-array name="pref_data_order_values">
+        <item>ASC</item>
+        <item>DESC</item>
+    </string-array>
+
+    <!-- String set for Notifications -->
+    <string name="pref_header_notifications">Notifiche</string>
+
+    <string name="pref_title_notifications">Notifiche stato ricerca</string>
+    <string name="pref_summary_notifications">Mostra lo stato della ricerca dei dati nella barra delle notifiche</string>
+    <string name="pref_title_notification_favorite">Notifiche dei preferiti</string>
+    <string name="pref_summary_notification_favorite">Verrai avvertito se uno dei tuoi fumetti preferiti è disponibile</string>
 
 </resources>
