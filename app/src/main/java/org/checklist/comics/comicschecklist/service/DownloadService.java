@@ -22,6 +22,7 @@ import org.checklist.comics.comicschecklist.util.Constants;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Francesco Bevilacqua on 25/10/2014.
@@ -328,6 +329,7 @@ public class DownloadService extends IntentService {
             );
 
             Log.i(Constants.LOG_TAG, "Entries deleted = " + rowsDeleted);
+            // TODO bug on search suggestion: database / provider must be updated
         }
     }
 
@@ -351,7 +353,7 @@ public class DownloadService extends IntentService {
         String today = day + "/" + month + "/" + year;
 
         // HH converts hour in 24 hours format (0-23), day calculation
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
         try {
             Date d1 = format.parse(dateStart);

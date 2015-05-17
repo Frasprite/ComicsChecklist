@@ -105,7 +105,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     @Override
     public void onDataSetChanged() {
-
+        // TODO update widget adapter
     }
 
     @Override
