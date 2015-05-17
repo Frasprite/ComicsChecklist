@@ -16,7 +16,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -54,7 +54,7 @@ import java.util.Locale;
  * {@link ComicListFragment.Callbacks} interface
  * to listen for item selections.
  */
-public class ComicListActivity extends ActionBarActivity implements ComicListFragment.Callbacks, NavigationDrawerFragment.NavigationDrawerCallbacks,
+public class ComicListActivity extends AppCompatActivity implements ComicListFragment.Callbacks, NavigationDrawerFragment.NavigationDrawerCallbacks,
                                                                    ComicsChecklistDialogFragment.ComicsChecklistDialogListener {
 
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
