@@ -41,8 +41,8 @@ public class AppRater {
             if (System.currentTimeMillis() >= date_firstLaunch +
                     (Constants.DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000)) {
                 FragmentManager fm = ((ComicListActivity) mContext).getFragmentManager();
-                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(3);
-                addDialog.show(fm, "ComicsChecklistDialogFragment");
+                DialogFragment rateDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_RATE);
+                rateDialog.show(fm, "ComicsChecklistDialogFragment");
             }
         }
 

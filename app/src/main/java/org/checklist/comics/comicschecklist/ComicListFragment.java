@@ -202,7 +202,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
             @Override
             public void onClick(View v) {
                 // Open add dialog
-                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(2);
+                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_ADD_COMIC);
                 addDialog.show(getActivity().getFragmentManager(), "ComicsChecklistDialogFragment");
             }
         });

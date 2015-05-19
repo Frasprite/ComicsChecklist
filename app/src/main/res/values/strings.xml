@@ -74,6 +74,10 @@
     <string name="context_menu_delete_all">Cancella tutta la lista</string>
     <string name="dialog_confirm">OK</string>
     <string name="dialog_undo">Annulla</string>
+    <string name="dialog_yes">Si</string>
+    <string name="dialog_no">No</string>
+    <string name="dialog_welcome_title">Benvenuto su CC</string>
+    <string name="dialog_welcome_message">Vuoi lanciare subito la ricerca dei fumetti? Potrai sempre lanciare la ricerca manuale tirando verso il basso la lista di ogni editore.</string>
 
     <string name="empty_list">La lista è vuota!</string>
     <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>

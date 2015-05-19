@@ -38,11 +38,12 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */
     public interface ComicsChecklistDialogListener {
-        public void onDialogPositiveClick(DialogFragment dialog, String name, String info, String date);
-        public void onDialogNegativeClick(DialogFragment dialog);
-        public void onDialogRateClick(DialogFragment dialog);
-        public void onDialogAbortRateClick(DialogFragment dialog);
-        public void onDialogListItemClick(DialogFragment dialog, long id, String search);
+        void onDialogPositiveClick(DialogFragment dialog, String name, String info, String date);
+        void onDialogNegativeClick(DialogFragment dialog);
+        void onDialogRateClick(DialogFragment dialog);
+        void onDialogAbortRateClick(DialogFragment dialog);
+        void onDialogListItemClick(DialogFragment dialog, long id, String search);
+        void onDialogLaunchSearchClick(DialogFragment dialog);
     }
 
     // Use this instance of the interface to deliver action events
@@ -83,7 +84,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         switch (type) {
-            case 0:
+            case Constants.DIALOG_GUIDE:
                 builder.setNegativeButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Send the negative button event back to the host activity
@@ -97,7 +98,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 // Set title
                 builder.setTitle(R.string.guida);
                 break;
-            case 1:
+            case Constants.DIALOG_INFO:
                 builder.setNegativeButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Send the negative button event back to the host activity
@@ -111,7 +112,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 // Set title
                 builder.setTitle(R.string.info);
                 break;
-            case 2:
+            case Constants.DIALOG_ADD_COMIC:
                 // Get the layout inflater
                 LayoutInflater inflater = getActivity().getLayoutInflater();
                 View view = inflater.inflate(R.layout.dialog_add_comic, null);
@@ -143,7 +144,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 // Set title
                 builder.setTitle(R.string.title_section2);
                 break;
-            case 3:
+            case Constants.DIALOG_RATE:
                 // Launch Google Play page
                 builder.setPositiveButton(R.string.rate_button, new DialogInterface.OnClickListener() {
                     @Override
@@ -166,7 +167,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setTitle(R.string.app_name);
                 builder.setMessage(R.string.rate_text);
                 break;
-            case 4:
+            case Constants.DIALOG_RESULT_LIST:
                 // Launch a dialog with a list
                 builder.setNegativeButton(R.string.dialog_undo, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -219,6 +220,21 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
                 builder.setTitle(R.string.search_result).setView(listView);
 
+                break;
+            case Constants.DIALOG_LAUNCH_SEARCH:
+                builder.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        mListener.onDialogRateClick(ComicsChecklistDialogFragment.this);
+                    }
+                });
+                builder.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                    }
+                });
+                builder.setTitle(R.string.dialog_welcome_title);
+                builder.setMessage(R.string.dialog_welcome_message);
                 break;
             default:
                 return null;

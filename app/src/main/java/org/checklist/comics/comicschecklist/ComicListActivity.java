@@ -105,9 +105,16 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), getSupportActionBar());
 
-        // TODO detect if this is the first launch and ask user if he want to launch download now
-        Intent intent = new Intent(this, DownloadService.class);
-        startService(intent);
+        SharedPreferences prefs = getSharedPreferences(Constants.PREF_APP_RATER, 0);
+        long launch_count = prefs.getLong(Constants.PREF_LAUNCH_COUNT, 0);
+        if (launch_count == 0) {
+            // Ask user if he want to launch download or if he plan to do it manually
+            DialogFragment dialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_LAUNCH_SEARCH);
+            dialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+        } else {
+            Intent intent = new Intent(this, DownloadService.class);
+            startService(intent);
+        }
 
         // Launch AppRater
         AppRater.app_launched(this);
@@ -185,7 +192,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             editor.putString(Constants.PREF_SEARCH_QUERY, query);
             editor.apply();
             // Open a dialog with a list of results
-            DialogFragment listDialog = ComicsChecklistDialogFragment.newInstance(4);
+            DialogFragment listDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_RESULT_LIST);
             listDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
         }
     }
@@ -244,12 +251,12 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
                     break;
                 case 10:
                     // Open help dialog
-                    DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(0);
+                    DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_GUIDE);
                     helpDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
                     break;
                 case 11:
                     // Open info dialog
-                    DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(1);
+                    DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_INFO);
                     infoDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
                     break;
             }
@@ -421,5 +428,12 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     public void onDialogListItemClick(DialogFragment dialog, long id, String search) {
         dialog.dismiss();
         launchDetailView(id, search);
+    }
+
+    @Override
+    public void onDialogLaunchSearchClick(DialogFragment dialog) {
+        dialog.dismiss();
+        Intent intent = new Intent(this, DownloadService.class);
+        startService(intent);
     }
 }
