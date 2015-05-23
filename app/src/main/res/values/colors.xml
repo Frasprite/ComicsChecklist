@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="transparent">#99000000</color>
-    <color name="swipe_color_1">#ffc736</color>
-    <color name="swipe_color_2">#fcb427</color>
-    <color name="swipe_color_3">#f16621</color>
-    <color name="swipe_color_4">#792314</color>
 
     <!-- Lollipop colors -->
     <color name="primary">#FF9800</color>

@@ -103,7 +103,7 @@
 
     <string name="title_comic_detail">Dettagli</string>
 
-    <string name="fill_data_alert">Il nome del fumetto non è stato inserito: la nota è stata annullata!</string>
+    <string name="fill_data_alert">Devi inserire il nome del fumetto!</string>
 
     <string name="widget_label">CC Widget</string>
     <string name="appwidget_configure_instructions">This text will be shown before the date in our example widget.</string>

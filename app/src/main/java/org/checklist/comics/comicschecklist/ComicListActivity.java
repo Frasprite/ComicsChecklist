@@ -3,7 +3,6 @@ package org.checklist.comics.comicschecklist;
 import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,17 +24,10 @@ import android.widget.Toast;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
 import org.checklist.comics.comicschecklist.database.SuggestionDatabase;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.provider.SuggestionProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.Constants;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * An activity representing a list of Comics. This activity
@@ -371,69 +363,59 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog, String name, String info, String releaseDate) {
-        if (name.length() > 0) {
-            dialog.dismiss();
-            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date myDate;
-            try {
-                myDate = formatter.parse(releaseDate);
-            } catch (ParseException e) {
-                e.printStackTrace();
-                myDate = new Date();
-            }
-            // Set the format to sql date time
-            ContentValues values = new ContentValues();
-            values.put(ComicDatabase.COMICS_NAME_KEY, name);
-            values.put(ComicDatabase.COMICS_EDITOR_KEY, Constants.CART);
-            values.put(ComicDatabase.COMICS_DESCRIPTION_KEY, info);
-            values.put(ComicDatabase.COMICS_RELEASE_KEY, releaseDate);
-            values.put(ComicDatabase.COMICS_DATE_KEY, myDate.getTime());
-            values.put(ComicDatabase.COMICS_COVER_KEY, "error");
-            values.put(ComicDatabase.COMICS_FEATURE_KEY, "N.D.");
-            values.put(ComicDatabase.COMICS_PRICE_KEY, "N.D.");
-            values.put(ComicDatabase.COMICS_CART_KEY, "yes");
-            values.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-
-            this.getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
-            Toast.makeText(this, getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
-        } else
-            Toast.makeText(this, getResources().getString(R.string.fill_data_alert), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-        dialog.dismiss();
-    }
-
-    @Override
-    public void onDialogRateClick(DialogFragment dialog) {
-        dialog.dismiss();
-        this.startActivity(new Intent(Intent.ACTION_VIEW,
-                Uri.parse("market://details?id=" + this.getPackageName())));
-    }
-
-    @Override
-    public void onDialogAbortRateClick(DialogFragment dialog) {
-        dialog.dismiss();
-        SharedPreferences prefs = this.getSharedPreferences (Constants.PREF_APP_RATER, 0);
-        final SharedPreferences.Editor editorPref = prefs.edit();
-        if (editorPref != null) {
-            editorPref.putBoolean(Constants.PREF_USER_DONT_RATE, true);
-            editorPref.apply();
+    public void onDialogPositiveClick(DialogFragment dialog, int dialogId) {
+        switch (dialogId) {
+            case Constants.DIALOG_ADD_COMIC:
+                dialog.dismiss();
+                Toast.makeText(this, getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
+                break;
+            case Constants.DIALOG_RATE:
+                dialog.dismiss();
+                this.startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("market://details?id=" + this.getPackageName())));
+                break;
+            case Constants.DIALOG_LAUNCH_SEARCH:
+                dialog.dismiss();
+                Intent intent = new Intent(this, DownloadService.class);
+                startService(intent);
+                break;
         }
     }
 
     @Override
-    public void onDialogListItemClick(DialogFragment dialog, long id, String search) {
-        dialog.dismiss();
-        launchDetailView(id, search);
+    public void onDialogNegativeClick(DialogFragment dialog, int dialogId) {
+        switch (dialogId) {
+            case Constants.DIALOG_GUIDE:
+            case Constants.DIALOG_INFO:
+            case Constants.DIALOG_ADD_COMIC:
+            case Constants.DIALOG_RESULT_LIST:
+            case Constants.DIALOG_LAUNCH_SEARCH:
+                dialog.dismiss();
+                break;
+            case Constants.DIALOG_RATE:
+                dialog.dismiss();
+                SharedPreferences prefs = this.getSharedPreferences (Constants.PREF_APP_RATER, 0);
+                final SharedPreferences.Editor editorPref = prefs.edit();
+                if (editorPref != null) {
+                    editorPref.putBoolean(Constants.PREF_USER_DONT_RATE, true);
+                    editorPref.apply();
+                }
+                break;
+        }
     }
 
     @Override
-    public void onDialogLaunchSearchClick(DialogFragment dialog) {
+    public void onDialogNeutralClick(DialogFragment dialog, int dialogId) {
+        switch (dialogId) {
+            case Constants.DIALOG_RATE:
+                dialog.dismiss();
+                break;
+        }
+    }
+
+    @Override
+    public void onDialogListItemClick(DialogFragment dialog, int dialogId, long id, String search) {
         dialog.dismiss();
-        Intent intent = new Intent(this, DownloadService.class);
-        startService(intent);
+        launchDetailView(id, search);
     }
 }

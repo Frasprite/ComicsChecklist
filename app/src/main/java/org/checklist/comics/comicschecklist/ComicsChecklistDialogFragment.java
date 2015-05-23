@@ -1,10 +1,10 @@
 package org.checklist.comics.comicschecklist;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -25,8 +25,15 @@ import android.widget.Toast;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
 import org.checklist.comics.comicschecklist.database.SuggestionDatabase;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.provider.SuggestionProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by Francesco Bevilacqua on 16/10/2014.
@@ -38,12 +45,10 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */
     public interface ComicsChecklistDialogListener {
-        void onDialogPositiveClick(DialogFragment dialog, String name, String info, String date);
-        void onDialogNegativeClick(DialogFragment dialog);
-        void onDialogRateClick(DialogFragment dialog);
-        void onDialogAbortRateClick(DialogFragment dialog);
-        void onDialogListItemClick(DialogFragment dialog, long id, String search);
-        void onDialogLaunchSearchClick(DialogFragment dialog);
+        void onDialogPositiveClick(DialogFragment dialog, int dialogId);
+        void onDialogNegativeClick(DialogFragment dialog, int dialogId);
+        void onDialogNeutralClick(DialogFragment dialog, int dialogId);
+        void onDialogListItemClick(DialogFragment dialog, int dialogId, long id, String search);
     }
 
     // Use this instance of the interface to deliver action events
@@ -75,7 +80,6 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
         }
     }
 
-    @SuppressLint("InflateParams")
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // We have 4 type of dialog on CC: 0 help, 1 guide, 2 add and 3 rater
@@ -88,7 +92,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setNegativeButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Send the negative button event back to the host activity
-                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_GUIDE);
                     }
                 });
                 // Get the layout inflater
@@ -102,7 +106,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setNegativeButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Send the negative button event back to the host activity
-                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_INFO);
                     }
                 });
                 // Get the layout inflater
@@ -115,7 +119,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
             case Constants.DIALOG_ADD_COMIC:
                 // Get the layout inflater
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                View view = inflater.inflate(R.layout.dialog_add_comic, null);
+                final View view = inflater.inflate(R.layout.dialog_add_comic, null);
 
                 mNameEditText = (EditText) view.findViewById(R.id.name_edit_text);
                 mInfoEditText = (EditText) view.findViewById(R.id.info_edit_text);
@@ -127,17 +131,43 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                         .setPositiveButton(R.string.dialog_confirm, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                // Send the positive button event back to the host activity
+                                // Save new data and the positive button event back to the host activity
                                 String name = mNameEditText.getText().toString();
                                 String info = mInfoEditText.getText().toString();
                                 String date = mDatePicker.getDayOfMonth() + "/" + mDatePicker.getMonth() + "/" + mDatePicker.getYear();
-                                mListener.onDialogPositiveClick(ComicsChecklistDialogFragment.this, name, info, date);
+                                if (name.length() > 0) {
+                                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                                    Date myDate;
+                                    try {
+                                        myDate = formatter.parse(date);
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                        myDate = new Date();
+                                    }
+                                    // Set the format to sql date time
+                                    ContentValues values = new ContentValues();
+                                    values.put(ComicDatabase.COMICS_NAME_KEY, name);
+                                    values.put(ComicDatabase.COMICS_EDITOR_KEY, Constants.CART);
+                                    values.put(ComicDatabase.COMICS_DESCRIPTION_KEY, info);
+                                    values.put(ComicDatabase.COMICS_RELEASE_KEY, date);
+                                    values.put(ComicDatabase.COMICS_DATE_KEY, myDate.getTime());
+                                    values.put(ComicDatabase.COMICS_COVER_KEY, "error");
+                                    values.put(ComicDatabase.COMICS_FEATURE_KEY, "N.D.");
+                                    values.put(ComicDatabase.COMICS_PRICE_KEY, "N.D.");
+                                    values.put(ComicDatabase.COMICS_CART_KEY, "yes");
+                                    values.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
+
+                                    view.getContext().getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
+                                    mListener.onDialogPositiveClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_ADD_COMIC);
+                                } else {
+                                    Toast.makeText(view.getContext(), getResources().getString(R.string.fill_data_alert), Toast.LENGTH_SHORT).show();
+                                }
                             }
                         })
                         .setNegativeButton(R.string.dialog_undo, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // Send the negative button event back to the host activity
-                                mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                                mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_ADD_COMIC);
                             }
                         });
 
@@ -149,17 +179,17 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setPositiveButton(R.string.rate_button, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogRateClick(ComicsChecklistDialogFragment.this);
+                        mListener.onDialogPositiveClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_RATE);
                     }
                 });
                 builder.setNegativeButton(R.string.no_thanks_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogAbortRateClick(ComicsChecklistDialogFragment.this);
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_RATE);
                     }
                 });
                 builder.setNeutralButton(R.string.late_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                        mListener.onDialogNeutralClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_RATE);
                     }
                 });
 
@@ -172,7 +202,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setNegativeButton(R.string.dialog_undo, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Send the negative button event back to the host activity
-                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_RESULT_LIST);
                     }
                 });
 
@@ -210,7 +240,8 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
                         if (comicCursor != null) {
                             comicCursor.moveToFirst();
-                            mListener.onDialogListItemClick(ComicsChecklistDialogFragment.this, comicCursor.getLong(comicCursor.getColumnIndex(ComicDatabase.ID)), "search");
+                            mListener.onDialogListItemClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_RESULT_LIST,
+                                                            comicCursor.getLong(comicCursor.getColumnIndex(ComicDatabase.ID)), "search");
                             comicCursor.close();
                             cursor.close();
                         } else
@@ -225,12 +256,12 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogRateClick(ComicsChecklistDialogFragment.this);
+                        mListener.onDialogPositiveClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_LAUNCH_SEARCH);
                     }
                 });
                 builder.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this);
+                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_LAUNCH_SEARCH);
                     }
                 });
                 builder.setTitle(R.string.dialog_welcome_title);

@@ -224,7 +224,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                             ViewGroup.LayoutParams.MATCH_PARENT));
 
             // Set color
-            mSwipeRefreshLayout.setColorSchemeResources(R.color.swipe_color_1, R.color.swipe_color_2, R.color.swipe_color_3, R.color.swipe_color_4);
+            mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent);
 
             // Now return the SwipeRefreshLayout as this fragment's content view
             return mSwipeRefreshLayout;
