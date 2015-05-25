@@ -88,25 +88,19 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_list);
-
-        getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setElevation(5);
+        }
 
         mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getTitle();
 
         // Set up the drawer.
-        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), getSupportActionBar());
+        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), actionBar);
 
-        SharedPreferences prefs = getSharedPreferences(Constants.PREF_APP_RATER, 0);
-        long launch_count = prefs.getLong(Constants.PREF_LAUNCH_COUNT, 0);
-        if (launch_count == 0) {
-            // Ask user if he want to launch download or if he plan to do it manually
-            DialogFragment dialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_LAUNCH_SEARCH);
-            dialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
-        } else {
-            Intent intent = new Intent(this, DownloadService.class);
-            startService(intent);
-        }
+        Intent intent = new Intent(this, DownloadService.class);
+        startService(intent);
 
         // Launch AppRater
         AppRater.app_launched(this);
@@ -229,7 +223,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         if (position <= 7) {
             // Update the main content by replacing fragments
             //getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, ComicListFragment.newInstance(position + 1)).commit();
-            mListFragment = mListFragment.newInstance(position + 1);
+            mListFragment = ComicListFragment.newInstance(position + 1);
             getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, mListFragment).commit();
         } else {
             switch (position) {
@@ -287,8 +281,10 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
         //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setTitle(mTitle);
+        }
     }
 
     @Override
@@ -374,11 +370,6 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
                 this.startActivity(new Intent(Intent.ACTION_VIEW,
                         Uri.parse("market://details?id=" + this.getPackageName())));
                 break;
-            case Constants.DIALOG_LAUNCH_SEARCH:
-                dialog.dismiss();
-                Intent intent = new Intent(this, DownloadService.class);
-                startService(intent);
-                break;
         }
     }
 
@@ -389,7 +380,6 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             case Constants.DIALOG_INFO:
             case Constants.DIALOG_ADD_COMIC:
             case Constants.DIALOG_RESULT_LIST:
-            case Constants.DIALOG_LAUNCH_SEARCH:
                 dialog.dismiss();
                 break;
             case Constants.DIALOG_RATE:

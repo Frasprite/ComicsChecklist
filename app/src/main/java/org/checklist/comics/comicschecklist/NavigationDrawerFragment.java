@@ -82,7 +82,7 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter((new EditorAdapter(getActivity(), R.layout.row_drawer_list_item, mNavDrawerTitles)));
+        mDrawerListView.setAdapter((new NavDrawerAdapter(getActivity(), R.layout.row_drawer_list_item, mNavDrawerTitles)));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
@@ -250,7 +250,7 @@ public class NavigationDrawerFragment extends Fragment {
     /**
      * Callbacks interface that all activities using this fragment must implement.
      */
-    public static interface NavigationDrawerCallbacks {
+    public interface NavigationDrawerCallbacks {
         /**
          * Called when an item in the navigation drawer is selected.
          */
@@ -258,11 +258,11 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     /** Adapter used for the list in DrawerLayout. */
-    public class EditorAdapter extends ArrayAdapter<String> {
+    public class NavDrawerAdapter extends ArrayAdapter<String> {
         private int resource;
         private LayoutInflater inflater;
 
-        public EditorAdapter (Context context, int resourceId, String[] mEditorTitles) {
+        public NavDrawerAdapter(Context context, int resourceId, String[] mEditorTitles) {
             super(context, resourceId, mEditorTitles);
             resource = resourceId;
             inflater = LayoutInflater.from(context);

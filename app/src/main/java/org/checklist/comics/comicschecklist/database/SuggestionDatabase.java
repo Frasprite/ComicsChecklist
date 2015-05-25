@@ -186,7 +186,7 @@ public class SuggestionDatabase {
         }
 
         private void loadComics() throws IOException {
-            Log.d(Constants.LOG_TAG, "Loading words...");
+            Log.d(Constants.LOG_TAG, "Loading comics...");
 
             Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/");
             String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY,
@@ -205,7 +205,7 @@ public class SuggestionDatabase {
             }
 
             mCursor.close();
-            Log.d(Constants.LOG_TAG, "DONE loading words.");
+            Log.d(Constants.LOG_TAG, "DONE loading comics.");
         }
 
         /**

@@ -80,7 +80,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         /**
          * Callback for when an item has been selected.
          */
-        public void onItemSelected(long id, String mEditor);
+        void onItemSelected(long id, String mEditor);
     }
 
     /**
@@ -297,7 +297,6 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        //mCallbacks.onItemSelected((String)getListAdapter().getItem(position));
         mCallbacks.onItemSelected(id, mEditor);
     }
 

@@ -55,14 +55,10 @@ public class ComicDetailFragment extends Fragment {
     // The comic content this fragment is presenting.
     private String mComicName;
     private String mComicRelease;
-    private String mComicDescription;
-    private String mComicPrice;
-    private String mComicFeature;
-    private String mComicCover;
-    private String mComicEditor;
     private String mFavorite;
     private String mCart;
     private boolean mUserLearnedSliding;
+    private long mComicId = -1;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -77,31 +73,7 @@ public class ComicDetailFragment extends Fragment {
         if (getArguments().containsKey(ARG_COMIC_ID)) {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             // For better performance, use a Loader to load content from a content provider.
-            long mComicId = getArguments().getLong(ARG_COMIC_ID);
-            Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + mComicId);
-            String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY,
-                    ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
-                    ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY, ComicDatabase.COMICS_EDITOR_KEY,
-                    ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
-            Cursor mCursor = getActivity().getContentResolver().query(uri, projection, null, null, null);
-            mCursor.moveToFirst();
-            mComicName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
-            mComicRelease = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY));
-            //mComicDate = ;
-            mComicDescription = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY));
-            if (mComicDescription.length() == 0)
-                mComicDescription = "N.D";
-            mComicPrice = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY));
-            if (mComicPrice.length() == 0)
-                mComicPrice = "N.D.";
-            mComicFeature = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY));
-            if (mComicFeature.length() == 0)
-                mComicFeature = "N.D.";
-            mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
-            mComicEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
-            mFavorite = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FAVORITE_KEY));
-            mCart = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY));
-            mCursor.close();
+            mComicId = getArguments().getLong(ARG_COMIC_ID);
         }
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -115,7 +87,32 @@ public class ComicDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_comic_detail, container, false);
 
         // Show the comic contents.
-        if (mComicName != null) {
+        if (mComicId > -1) {
+            Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + mComicId);
+            String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY,
+                    ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
+                    ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY, ComicDatabase.COMICS_EDITOR_KEY,
+                    ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
+            Cursor mCursor = getActivity().getContentResolver().query(uri, projection, null, null, null);
+            mCursor.moveToFirst();
+            mComicName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
+            mComicRelease = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY));
+            //mComicDate = ;
+            String mComicDescription = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY));
+            if (mComicDescription.length() == 0)
+                mComicDescription = "N.D";
+            String mComicPrice = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY));
+            if (mComicPrice.length() == 0)
+                mComicPrice = "N.D.";
+            String mComicFeature = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY));
+            if (mComicFeature.length() == 0)
+                mComicFeature = "N.D.";
+            String mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
+            //String mComicEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
+            mFavorite = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FAVORITE_KEY));
+            mCart = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY));
+            mCursor.close();
+            // Populating view
             ((TextView) rootView.findViewById(R.id.title_text_view)).setText(mComicName);
             ((TextView) rootView.findViewById(R.id.release_text_view)).setText(mComicRelease);
             ((TextView) rootView.findViewById(R.id.description_text_view)).setText(mComicDescription);

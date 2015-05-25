@@ -252,21 +252,6 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setTitle(R.string.search_result).setView(listView);
 
                 break;
-            case Constants.DIALOG_LAUNCH_SEARCH:
-                builder.setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogPositiveClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_LAUNCH_SEARCH);
-                    }
-                });
-                builder.setNegativeButton(R.string.dialog_no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_LAUNCH_SEARCH);
-                    }
-                });
-                builder.setTitle(R.string.dialog_welcome_title);
-                builder.setMessage(R.string.dialog_welcome_message);
-                break;
             default:
                 return null;
         }

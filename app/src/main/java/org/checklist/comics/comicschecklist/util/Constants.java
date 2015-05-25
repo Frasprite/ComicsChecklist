@@ -93,6 +93,5 @@ public class Constants {
     public static final int DIALOG_ADD_COMIC = 2;
     public static final int DIALOG_RATE = 3;
     public static final int DIALOG_RESULT_LIST = 4;
-    public static final int DIALOG_LAUNCH_SEARCH = 5;
 
 }
