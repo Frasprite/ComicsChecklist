@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -24,9 +25,7 @@ import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
-import org.checklist.comics.comicschecklist.database.SuggestionDatabase;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.provider.SuggestionProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 import java.text.DateFormat;
@@ -41,9 +40,11 @@ import java.util.Locale;
  */
 public class ComicsChecklistDialogFragment extends DialogFragment {
 
+    private static final String TAG = ComicsChecklistDialogFragment.class.getSimpleName();
+
     /* The activity that creates an instance of this dialog fragment must
-     * implement this interface in order to receive event callbacks.
-     * Each method passes the DialogFragment in case the host needs to query it. */
+         * implement this interface in order to receive event callbacks.
+         * Each method passes the DialogFragment in case the host needs to query it. */
     public interface ComicsChecklistDialogListener {
         void onDialogPositiveClick(DialogFragment dialog, int dialogId);
         void onDialogNegativeClick(DialogFragment dialog, int dialogId);
@@ -211,13 +212,12 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 String mQuery = sp.getString(Constants.PREF_SEARCH_QUERY, "error");
-                final Cursor cursor = getActivity().getContentResolver().query(SuggestionProvider.CONTENT_URI, null, null,
-                        new String[] {mQuery}, null);
-
+                final Cursor cursor = getActivity().getContentResolver().query(ComicContentProvider.CONTENT_URI, null, ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
+                        new String[] {"%" + mQuery + "%"}, null);
                 final ListView mList = (ListView)listView.findViewById(R.id.searchListView);
 
                 // Fields from the database (projection) must include the id column for the adapter to work
-                String[] from = new String[] {SuggestionDatabase.KEY_COMIC_NAME, SuggestionDatabase.KEY_COMIC_RELEASE};
+                String[] from = new String[] {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
                 // Fields on the UI to which we map
                 int[] to = new int[] {android.R.id.text1, android.R.id.text2};
 

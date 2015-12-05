@@ -50,12 +50,6 @@
             android:multiprocess="true" >
         </provider>
 
-        <provider
-            android:authorities="org.checklist.comics.comicschecklist.suggestionprovider"
-            android:name=".provider.SuggestionProvider"
-            android:exported="false">
-        </provider>
-
         <!-- Widget stuff -->
         <receiver
             android:icon="@drawable/ic_launcher"

@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,9 +20,7 @@ import android.view.Menu;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
-import org.checklist.comics.comicschecklist.database.SuggestionDatabase;
-import org.checklist.comics.comicschecklist.provider.SuggestionProvider;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -48,6 +44,7 @@ import org.checklist.comics.comicschecklist.util.Constants;
 public class ComicListActivity extends AppCompatActivity implements ComicListFragment.Callbacks, NavigationDrawerFragment.NavigationDrawerCallbacks,
                                                                    ComicsChecklistDialogFragment.ComicsChecklistDialogListener {
 
+    private static final String TAG = ComicListActivity.class.getSimpleName();
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
     private boolean mTwoPane;
     private CharSequence mTitle;
@@ -106,7 +103,9 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         AppRater.app_launched(this);
 
         // Handle search intent
-        handleIntent(getIntent());
+        if (getIntent() != null) {
+            handleIntent(getIntent());
+        }
     }
 
     @Override
@@ -119,40 +118,9 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
      * @param intent the intent passed through search
      */
     private void handleIntent(Intent intent) {
-        // Get the intent, verify the action and get the query
-        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            // Handles a click on a search suggestion; launches activity/fragment to show comic detail
-            Uri uri = intent.getData();
-            Cursor cursor = this.getContentResolver().query(uri, null, null, null, null);
-
-            if (cursor != null) {
-                cursor.moveToFirst();
-
-                String name = cursor.getString(cursor.getColumnIndexOrThrow(SuggestionDatabase.KEY_COMIC_NAME));
-                //String release = cursor.getString(cursor.getColumnIndexOrThrow(SuggestionDatabase.KEY_COMIC_RELEASE));
-                // Replace special characters
-                name = name.replaceAll("'", "''");
-
-                ComicDatabaseHelper database = new ComicDatabaseHelper(this);
-                // Using SQLiteQueryBuilder instead of query() method
-                SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-                // Set the table
-                queryBuilder.setTables(ComicDatabase.COMICS_TABLE);
-                // Adding name and release to the original query
-                queryBuilder.appendWhere(ComicDatabase.COMICS_NAME_KEY + "='" + name + "'");
-                SQLiteDatabase db = database.getWritableDatabase();
-                Cursor comicCursor = queryBuilder.query(db, null, null, null, null, null, null);
-
-                if (comicCursor != null) {
-                    comicCursor.moveToFirst();
-                    launchDetailView(comicCursor.getLong(comicCursor.getColumnIndex(ComicDatabase.ID)), "search");
-                    comicCursor.close();
-                } else
-                    Toast.makeText(this, getResources().getText(R.string.search_error), Toast.LENGTH_SHORT).show();
-
-                cursor.close();
-            }
-        } else if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        // Special processing of the incoming intent only occurs if the if the action specified
+        // by the intent is ACTION_SEARCH.
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // Handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
             doMySearch(query);
@@ -164,13 +132,17 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
      * @param query the text to search on database
      */
     private void doMySearch(String query) {
-        Cursor cursor = this.getContentResolver().query(SuggestionProvider.CONTENT_URI, null, null,
-                new String[] {query}, null);
+        Log.d(TAG, "Searching " + query);
+        Cursor cursor = this.getContentResolver().query(ComicContentProvider.CONTENT_URI, null, ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
+                new String[] {"%" + query + "%"}, null);
 
-        if (cursor == null) {
+        if (cursor != null && cursor.getCount() == 0) {
+            Log.d(TAG, "No data found!");
             // There are no results
+            cursor.close();
             Toast.makeText(this, getResources().getText(R.string.search_no_result), Toast.LENGTH_SHORT).show();
-        } else {
+        } else if (cursor != null && cursor.getCount() > 0) {
+            Log.d(TAG, "Found data: " + cursor.getCount());
             // There are multiple results which fit the given query, so show this on dialog
             cursor.close();
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);

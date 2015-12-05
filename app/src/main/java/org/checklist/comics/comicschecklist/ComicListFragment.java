@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -28,8 +29,6 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.melnykov.fab.FloatingActionButton;
 
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
@@ -197,7 +196,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
 
         ListView listView = (ListView) listFragmentView.findViewById(android.R.id.list);
         FloatingActionButton fab = (FloatingActionButton) listFragmentView.findViewById(R.id.fab);
-        fab.attachToListView(listView);
+        //fab.attachToListView(listView);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
