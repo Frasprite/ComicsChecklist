@@ -1,6 +1,5 @@
 package org.checklist.comics.comicschecklist;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.ContentValues;
 import android.content.Context;
@@ -231,15 +230,15 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        ((ComicListActivity) activity).onSectionAttached(getArguments().getInt(Constants.ARG_SECTION_NUMBER));
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        ((ComicListActivity) context).onSectionAttached(getArguments().getInt(Constants.ARG_SECTION_NUMBER));
         // Activities containing this fragment must implement its callbacks.
-        if (!(activity instanceof Callbacks)) {
+        if (!(context instanceof Callbacks)) {
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
         }
 
-        mCallbacks = (Callbacks) activity;
+        mCallbacks = (Callbacks) context;
     }
 
     @Override
