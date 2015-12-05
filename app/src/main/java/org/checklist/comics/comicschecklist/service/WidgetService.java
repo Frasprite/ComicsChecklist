@@ -35,6 +35,8 @@ public class WidgetService extends RemoteViewsService {
 
 class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
+    private static final String TAG = ComicsRemoteViewsFactory.class.getSimpleName();
+
     private int mCount = 0;
     private List<WidgetItem> mWidgetItems = new ArrayList<>();
     private Context mContext;
@@ -51,7 +53,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     @Override
     public void onCreate() {
-        Log.i(Constants.LOG_TAG, "WidgetService onCreate " + mEditor + " " + mTitle  + " " + mAppWidgetId);
+        Log.i(TAG, "WidgetService onCreate " + mEditor + " " + mTitle  + " " + mAppWidgetId);
         // In onCreate() you setup any connections / cursors to your data source. Heavy lifting,
         // for example downloading or creating content etc, should be deferred to onDataSetChanged()
         // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.
@@ -77,7 +79,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
             mCursor = mContext.getContentResolver().query(uri, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
                     ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
         } else {
-            Log.i(Constants.LOG_TAG, "Editor founded, query database.");
+            Log.d(TAG, "Editor founded, query database.");
             Uri uri = ComicContentProvider.CONTENT_URI;
             String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                                    ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
@@ -88,7 +90,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         }
 
         if (mCursor != null) {
-            Log.i(Constants.LOG_TAG, "Cursor is not null!");
+            Log.d(TAG, "Cursor has data");
             for (int i = 0; i < mCursor.getCount(); i++) {
                 mCursor.moveToNext();
                 mID = mCursor.getInt(mCursor.getColumnIndex(ComicDatabase.ID));
@@ -121,7 +123,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.i(Constants.LOG_TAG, "WidgetService getViewAt for position: " + position);
+        Log.i(TAG, "WidgetService getViewAt for position: " + position);
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_item);
         rv.setTextViewText(R.id.widget_tv1, mWidgetItems.get(position)._name);
         rv.setTextViewText(R.id.widget_tv2, mWidgetItems.get(position)._release);

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
@@ -21,6 +22,7 @@ import java.util.HashSet;
  */
 public class ComicContentProvider extends ContentProvider {
 
+    private static final String TAG = ComicContentProvider.class.getSimpleName();
     // Database
     private ComicDatabaseHelper database;
 
@@ -51,6 +53,7 @@ public class ComicContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Log.v(TAG, "Ricerca " + selection);
         // Using SQLiteQueryBuilder instead of query() method
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 
@@ -163,6 +166,7 @@ public class ComicContentProvider extends ContentProvider {
     }
 
     private void checkColumns(String[] projection) {
+        Log.v(TAG, "Controllo delle colonne");
         String[] available = {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.ID,
                 ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,

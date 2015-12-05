@@ -8,6 +8,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import org.checklist.comics.comicschecklist.ComicListActivity;
 import org.checklist.comics.comicschecklist.R;
@@ -18,6 +19,8 @@ import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
  * This code is part of Comics Checklist project.
  */
 public class AlarmService extends IntentService {
+
+    private static final String TAG = AlarmService.class.getSimpleName();
 
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
@@ -41,6 +44,7 @@ public class AlarmService extends IntentService {
     }
 
     private void createNotification(String message, boolean bool) {
+        Log.d(TAG, "Creating notification");
         // Prepare intent which is triggered if the notification is selected
         Intent intent = new Intent(this, ComicListActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);

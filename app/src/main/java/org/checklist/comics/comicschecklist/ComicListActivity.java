@@ -45,6 +45,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
                                                                    ComicsChecklistDialogFragment.ComicsChecklistDialogListener {
 
     private static final String TAG = ComicListActivity.class.getSimpleName();
+
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
     private boolean mTwoPane;
     private CharSequence mTitle;
@@ -76,7 +77,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
                 } else if (resultCode == Constants.RESULT_NOT_CONNECTED)
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_connection), Toast.LENGTH_LONG).show();
                 else if (resultCode == Constants.RESULT_DESTROYED)
-                    Log.i(Constants.LOG_TAG, "Service destroyed");
+                    Log.i(TAG, "Service destroyed");
             }
         }
     };
@@ -191,7 +192,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        Log.i(Constants.LOG_TAG, "onNavigationDrawerItemSelected position " + position);
+        Log.d(TAG, "onNavigationDrawerItemSelected position " + position);
         if (position <= 7) {
             // Update the main content by replacing fragments
             //getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, ComicListFragment.newInstance(position + 1)).commit();

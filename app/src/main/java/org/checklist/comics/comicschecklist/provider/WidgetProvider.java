@@ -20,6 +20,8 @@ import org.checklist.comics.comicschecklist.util.Constants;
  */
 public class WidgetProvider extends AppWidgetProvider {
 
+    private static final String TAG = WidgetProvider.class.getSimpleName();
+
     public static final String CLICK_ACTION = "CLICK_ACTION";
     public static final String COMIC_ID = "COMIC_ID";
     /**public static final String TOAST_ACTION = "TOAST_ACTION";
@@ -36,7 +38,7 @@ public class WidgetProvider extends AppWidgetProvider {
             // Add the app widget unique ID to the intent extras.
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
             //Uri data = Uri.withAppendedPath(Uri.parse(Constants.URI_SCHEME + "://widget/id/"),  String.valueOf(appWidgetId));
-            Log.i(Constants.LOG_TAG, "WidgetProvider onUpdate widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
+            Log.d(TAG, "WidgetProvider onUpdate widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));//(data);
             // Instantiate the RemoteViews object for the app widget layout.
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
@@ -66,7 +68,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.i(Constants.LOG_TAG, "WidgetProvider onReceive");
+        Log.i(TAG, "WidgetProvider onReceive");
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
 
         /**if (intent.getAction().equals(TOAST_ACTION)) {

@@ -5,8 +5,6 @@ package org.checklist.comics.comicschecklist.util;
  * This code is part of ComicsChecklist project.
  */
 public class Constants {
-    /* Log */
-    public static final String LOG_TAG = "ComicsChecklist";
     /* The fragment argument representing the section number for this fragment. */
     public static final String ARG_SECTION_NUMBER = "section_number";
     /* Remember the position of the selected item */

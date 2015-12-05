@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,8 @@ import org.checklist.comics.comicschecklist.util.Constants;
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
 public class NavigationDrawerFragment extends Fragment {
+
+    private static final String TAG = NavigationDrawerFragment.class.getSimpleName();
 
     // A pointer to the current callbacks instance (the Activity).
     private NavigationDrawerCallbacks mCallbacks;
@@ -61,7 +64,7 @@ public class NavigationDrawerFragment extends Fragment {
             mCurrentSelectedPosition = savedInstanceState.getInt(Constants.STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
         }
-
+        Log.i(TAG, "onCreate " + mCurrentSelectedPosition);
         // Select either the default item (0) or the last selected item.
         selectItem(mCurrentSelectedPosition);
     }
@@ -160,6 +163,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     private void selectItem(int position) {
+        Log.d(TAG, "selectItem " + position);
         mCurrentSelectedPosition = position;
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);

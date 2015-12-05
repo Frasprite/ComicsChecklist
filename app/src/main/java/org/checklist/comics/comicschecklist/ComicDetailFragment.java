@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,6 +47,9 @@ import java.util.Locale;
  * on handsets.
  */
 public class ComicDetailFragment extends Fragment {
+
+    private static final String TAG = ComicDetailFragment.class.getSimpleName();
+
     /**
      * The fragment arguments representing the item ID that this fragment represents.
      */
@@ -74,6 +78,7 @@ public class ComicDetailFragment extends Fragment {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             // For better performance, use a Loader to load content from a content provider.
             mComicId = getArguments().getLong(ARG_COMIC_ID);
+            Log.d(TAG, "onCreate " + mComicId);
         }
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -84,6 +89,7 @@ public class ComicDetailFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_comic_detail, container, false);
 
         // Show the comic contents.
@@ -187,6 +193,7 @@ public class ComicDetailFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.calendar:
                 try {
+                    Log.i(TAG, "Add event on calendar");
                     // ACTION_INSERT does not work on all phones; use Intent.ACTION_EDIT in this case
                     Intent intent = new Intent(Intent.ACTION_INSERT);
                     intent.setType("vnd.android.cursor.item/event");
@@ -215,6 +222,7 @@ public class ComicDetailFragment extends Fragment {
                 return true;
             case R.id.favorite:
                 if (mFavorite.equalsIgnoreCase("no")) {
+                    Log.i(TAG, "Add comic to favorite");
                     // Add comic to favorite
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "yes");
@@ -225,6 +233,7 @@ public class ComicDetailFragment extends Fragment {
                     getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
                 } else {
+                    Log.i(TAG, "Delete from favorite");
                     // Delete from favorite
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
@@ -244,6 +253,7 @@ public class ComicDetailFragment extends Fragment {
                 return true;
             case R.id.buy:
                 if (mCart.equalsIgnoreCase("no")) {
+                    Log.i(TAG, "Update entry on comic database: add to chart");
                     // Update entry on comic database
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "yes");
@@ -255,6 +265,7 @@ public class ComicDetailFragment extends Fragment {
 
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
+                    Log.i(TAG, "Update entry on comic database: remove from chart");
                     // Update entry on comic database
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");

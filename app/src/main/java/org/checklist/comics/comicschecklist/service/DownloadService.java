@@ -30,6 +30,7 @@ import java.util.Locale;
  */
 public class DownloadService extends IntentService {
 
+    private static final String TAG = DownloadService.class.getSimpleName();
     private boolean error = false;
 
     public DownloadService() {
@@ -52,6 +53,7 @@ public class DownloadService extends IntentService {
 
         if (isConnected) {
             if (frequency > -1) {
+                Log.i(TAG, "Automatic search launched");
                 boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);
                 if (calculateDayDifference(Constants.PREF_RW_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
@@ -156,7 +158,7 @@ public class DownloadService extends IntentService {
                         createNotification(getResources().getString(R.string.search_completed), false);
                 }
             } else {
-                //Log.i(Constants.LOG_TAG, "Manual search for section n. " + intent.getIntExtra(Constants.ARG_SECTION_NUMBER, 0));
+                Log.i(TAG, "Manual search for section n. " + intent.getIntExtra(Constants.ARG_SECTION_NUMBER, 0));
                 int section = intent.getIntExtra(Constants.ARG_SECTION_NUMBER, 0);
                 boolean notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true);
 
@@ -291,6 +293,7 @@ public class DownloadService extends IntentService {
     }
 
     private void createNotification(String message, boolean bool) {
+        Log.v(TAG, "Creating notification");
         // Prepare intent which is triggered if the notification is selected
         Intent intent = new Intent(this, ComicListActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
@@ -328,12 +331,12 @@ public class DownloadService extends IntentService {
                     mSelectionArgs                      // the value to compare to
             );
 
-            Log.i(Constants.LOG_TAG, "Entries deleted = " + rowsDeleted);
-            // TODO bug on search suggestion: database / provider must be updated
+            Log.d(TAG, "Entries deleted: " + rowsDeleted);
         }
     }
 
     private void publishResults(int result, String editor) {
+        Log.v(TAG, "Result of search " + result + " " + editor);
         Intent intent = new Intent(Constants.NOTIFICATION);
         intent.putExtra(Constants.NOTIFICATION_RESULT, result);
         intent.putExtra(Constants.NOTIFICATION_EDITOR, editor);
@@ -341,6 +344,7 @@ public class DownloadService extends IntentService {
     }
 
     private long calculateDayDifference(String editorLastScan) {
+        Log.v(TAG, "calculateDayDifference");
         long result; // If result is 3, we need a refresh
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);

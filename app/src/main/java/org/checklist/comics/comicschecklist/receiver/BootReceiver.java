@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import java.util.Calendar;
 
@@ -14,8 +15,11 @@ import java.util.Calendar;
  */
 public class BootReceiver extends BroadcastReceiver {
 
+    private static final String TAG = AlarmReceiver.class.getSimpleName();
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "onReceive");
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             // Set the alarm here.
             AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

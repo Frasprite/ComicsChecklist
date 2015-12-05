@@ -20,6 +20,8 @@ import org.checklist.comics.comicschecklist.provider.WidgetProvider;
  */
 public class SettingsWidget extends ListActivity {
 
+    private static final String TAG = SettingsWidget.class.getSimpleName();
+
     String[] mEditor;
     ArrayAdapter<String> mAdapter;
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
@@ -28,7 +30,7 @@ public class SettingsWidget extends ListActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.i(Constants.LOG_TAG, "SettingsWidget onCreate");
+        Log.d(TAG, "SettingsWidget onCreate");
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
@@ -52,7 +54,7 @@ public class SettingsWidget extends ListActivity {
 
     @Override
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
-        Log.i(Constants.LOG_TAG, "SettingsWidget onListItemClick");
+        Log.d(TAG, "SettingsWidget onListItemClick " + position);
         Context mContext = getApplicationContext();
         // Take text reference of editor choosed: Lista preferiti Da comprare Marvel Panini Comics Planet Manga Star Comics Sergio Bonelli RW Edizioni
         String editor, title;

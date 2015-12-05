@@ -30,6 +30,8 @@ import java.util.StringTokenizer;
  */
 public class Parser {
 
+    private static final String TAG = Parser.class.getSimpleName();
+
     private Context mContext;
     private boolean comicErrorBonelli;
     private boolean comicErrorPanini;
@@ -44,6 +46,7 @@ public class Parser {
     }
 
     public boolean startParsePanini(String editor) {
+        Log.d(TAG, "Inizio scansione Panini");
         comicErrorPanini = false;
 
         Calendar calendar = new GregorianCalendar();
@@ -52,40 +55,40 @@ public class Parser {
         int weekOfTheYear = calendar.get(Calendar.WEEK_OF_YEAR);
 
         DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        Date lastDec = null;
+        Date lastDec;
         try {
             lastDec = formatter.parse("28/12/" + year);
+            Calendar calIt = Calendar.getInstance(Locale.ITALY);
+            calIt.setTime(lastDec);
+
+            if (weekOfTheYear <= (calIt.get(Calendar.WEEK_OF_YEAR) - 3)) {
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 3), editor);
+            } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 2)) {
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
+            } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 1)) {
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
+            } else if (weekOfTheYear == calIt.get(Calendar.WEEK_OF_YEAR)) {
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
+                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 3, editor);
+            }
         } catch (ParseException e) {
+            Log.w(TAG, "Can't compute date: search Panini interrupted");
             e.printStackTrace();
-        }
-
-        Calendar calIt = Calendar.getInstance(Locale.ITALY);
-        calIt.setTime(lastDec);
-
-        if (weekOfTheYear <= (calIt.get(Calendar.WEEK_OF_YEAR) - 3)) {
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 3), editor);
-        } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 2)) {
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-        } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 1)) {
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
-        } else if (weekOfTheYear == calIt.get(Calendar.WEEK_OF_YEAR)) {
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 3, editor);
         }
 
         return comicErrorPanini;
@@ -93,7 +96,7 @@ public class Parser {
 
     // Metodo che raccoglie i dati dall'url fornito.
     private void parsePaniniUrl(String url, String editor) {
-        //Log.i(Constants.LOG_TAG, url);
+        Log.v(TAG, "Inizio scansione URL " + editor + " " + url);
         ArrayList<String> arrayCoverUrl = new ArrayList<>();
         ArrayList<String> arrayName = new ArrayList<>();
         ArrayList<String> arrayFeature = new ArrayList<>();
@@ -137,7 +140,7 @@ public class Parser {
             Document divDesc = Jsoup.parse(docDesc);
             for (Element element : divDesc.select("p")) arrayDescription.add(element.text());
         } catch (Exception e) {
-            Log.i(Constants.LOG_TAG, "Something is wrong with parsePaniniUrl " + url + " " + e.toString());
+            Log.d(TAG, "Something is wrong with parsePaniniUrl " + url + " " + e.toString());
         }
 
         // Unisco tutti i dati e li inserisco nel com.example.fra.parsertest.database
@@ -153,7 +156,7 @@ public class Parser {
                             myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i));
                 } catch (Exception e) {
                     // Error during fetching of a comic
-                    //Log.i(Constants.LOG_TAG, title + " " + e.toString());
+                    Log.w(TAG, title + " " + e.toString());
                     comicErrorPanini = true;
                 }
             }
@@ -161,6 +164,7 @@ public class Parser {
     }
 
     public boolean startParseRW() {
+        Log.d(TAG, "Inizio scansione RW");
         comicErrorRw = false;
 
         Calendar calendar = new GregorianCalendar();
@@ -179,6 +183,7 @@ public class Parser {
 
     /** Metodo che raccoglie i dati dall'url fornito. */
     private void parseUrlRW(String url, String releaseDate) {
+        Log.v(TAG, "Inizio scansione URL RW " + url);
         try {
             // Prendo solo la parte di codice che mi interessa
             Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
@@ -263,16 +268,16 @@ public class Parser {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
-                Log.i(Constants.LOG_TAG, "Error during comic fetching " + e.toString());
+                Log.w(TAG, "Error during comic fetching " + e.toString());
                 comicErrorRw = true;
             }
         } catch (Exception e) {
-            Log.i(Constants.LOG_TAG, "This url does not exists " + url + " " + e.toString());
+            Log.w(TAG, "This url does not exists " + url + " " + e.toString());
         }
     }
 
     public boolean startParseStarC() {
+        Log.d(TAG, "Inizio scansione Star Comics");
         comicErrorStar = false;
 
         int from = 0, to = 0;
@@ -287,7 +292,7 @@ public class Parser {
             to = Integer.parseInt(myLink) + 40;
         } catch (Exception e) {
             // Unable to find data for Star Comics
-            Log.i(Constants.LOG_TAG, "Error on startParseStarC " + e.toString());
+            Log.w(TAG, "Error on startParseStarC " + e.toString());
         }
 
         if (from != 0 && to != 0 && from < to)
@@ -297,6 +302,7 @@ public class Parser {
     }
 
     private void parseUrlStarC(int from, int to) {
+        Log.v(TAG, "Inizio scansione URL Star comics da " + from + " to " + to);
         // Parte di codice che cerca tutti i fumetti
         Document doc;
         String name, releaseDate = "", description, price, feature = "N.D.", coverUrl, testata = "", number = "";
@@ -342,13 +348,14 @@ public class Parser {
                 // Insert comic on database
                 insertComic(name, Constants.STAR, description, releaseDate, myDate, coverUrl, feature, price);
             } catch (Exception e) {
-                Log.i(Constants.LOG_TAG, "Error on parseUrlStarC comic id " + i + " " + e.toString());
+                Log.w(TAG, "Error on parseUrlStarC comic id " + i + " " + e.toString());
                 comicErrorStar = true;
             }
         }
     }
 
     public boolean startParseBonelli() {
+        Log.d(TAG, "Inizio scansione Bonelli");
         comicErrorBonelli = false;
 
         parseUrlBonelli(Constants.EDICOLA_INEDITI);
@@ -363,6 +370,7 @@ public class Parser {
 
     /** Metodo che raccoglie i dati dall'url fornito. */
     private void parseUrlBonelli(String url) {
+        Log.v(TAG, "Inizio scansione URL Bonelli " + url);
         try {
             // Creating doc file from URL
             Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
@@ -432,13 +440,14 @@ public class Parser {
                 insertComic(name.toUpperCase(), Constants.BONELLI, description, releaseDate, myDate, coverUrl, feature, price);
             }
         } catch (Exception e) {
-            Log.i(Constants.LOG_TAG, "Error during comic fetching " + url + " " + e.toString());
+            Log.w(TAG, "Error during comic fetching " + url + " " + e.toString());
             comicErrorBonelli = true;
         }
     }
 
     private void insertComic(String name, String editor, String description, String releaseDate,
                              Date date, String coverUrl, String feature, String price) {
+        Log.v(TAG, "Insert comic " + name + " " + editor + " " + releaseDate);
         ContentValues values = new ContentValues();
         values.put(ComicDatabase.COMICS_NAME_KEY, name);
         values.put(ComicDatabase.COMICS_EDITOR_KEY, editor);

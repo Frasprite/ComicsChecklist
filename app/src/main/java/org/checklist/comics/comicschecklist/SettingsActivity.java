@@ -13,6 +13,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -121,6 +122,9 @@ public class SettingsActivity extends PreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     public static class NotificationPreferenceFragment extends PreferenceFragment {
+
+        private static final String TAG = NotificationPreferenceFragment.class.getSimpleName();
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -131,6 +135,7 @@ public class SettingsActivity extends PreferenceActivity {
                     boolean boolValue = (boolean) newValue;
                     Context mContext = getActivity();
                     if (boolValue) {
+                        Log.d(TAG, "Activate notification for favorite");
                         // Activate notification for favorite
                         AlarmManager alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
                         Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);
@@ -153,6 +158,7 @@ public class SettingsActivity extends PreferenceActivity {
                                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                                 PackageManager.DONT_KILL_APP);
                     } else {
+                        Log.d(TAG, "Disable notification for favorite");
                         // Disable notification for favorite
                         AlarmManager alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
                         Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);

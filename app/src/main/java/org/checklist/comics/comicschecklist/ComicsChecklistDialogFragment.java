@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -82,8 +83,9 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // We have 4 type of dialog on CC: 0 help, 1 guide, 2 add and 3 rater
+        // We have 4 type of dialog on CC: 0 help, 1 guide, 2 add, 3 rater, 4 search result
         int type = getArguments().getInt("type");
+        Log.d(TAG, "Creating " + type + "(0 help, 1 guide, 2 add, 3 rater, 4 search result)");
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 

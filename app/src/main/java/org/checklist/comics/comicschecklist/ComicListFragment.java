@@ -16,6 +16,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,6 +45,8 @@ import org.checklist.comics.comicschecklist.util.Constants;
  * interface.
  */
 public class ComicListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final String TAG = ComicListFragment.class.getSimpleName();
 
     private SimpleCursorAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -94,6 +97,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
      * Returns a new instance of this fragment for the given section number.
      */
     public static ComicListFragment newInstance(int section) {
+        Log.v(TAG, "Creating new instance");
         ComicListFragment fragment = new ComicListFragment();
         Bundle args = new Bundle();
         args.putInt(Constants.ARG_SECTION_NUMBER, section);
@@ -108,6 +112,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         // Find editor
         mEditor = findEditor(getArguments().getInt(Constants.ARG_SECTION_NUMBER));
         mEditorNumber = getArguments().getInt(Constants.ARG_SECTION_NUMBER);
+        Log.d(TAG, "onCreate - " + mEditor);
         // Retain this fragment across configuration changes.
         //setRetainInstance(true); // NOT GOOD WITH LOADERS!!!
 
@@ -193,9 +198,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         // Create the list fragment's content view by calling the super method
         final View listFragmentView = inflater.inflate(R.layout.fragment_list, container, false);//super.onCreateView(inflater, container, savedInstanceState);
 
-        ListView listView = (ListView) listFragmentView.findViewById(android.R.id.list);
         FloatingActionButton fab = (FloatingActionButton) listFragmentView.findViewById(R.id.fab);
-        //fab.attachToListView(listView);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -423,7 +426,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
      * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
      */
     private void initiateRefresh() {
-
+        Log.i(TAG, "initiateRefresh");
         // Defines selection criteria for the rows to delete
         String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
         String[] mSelectionArgs = {mEditor};
@@ -460,6 +463,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     }
 
     private void fillData() {
+        Log.d(TAG, "fillData");
         // Fields from the database (projection) must include the id column for the adapter to work
         String[] from = new String[] {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
         // Fields on the UI to which we map
