@@ -45,6 +45,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     private Cursor mCursor;
 
     public ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {
+        // TODO show any editor / favorite / cart
         mContext = applicationContext;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         mEditor = Constants.FAVORITE;//intent.getStringExtra(Constants.WIDGET_EDITOR);
@@ -57,8 +58,12 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         // In onCreate() you setup any connections / cursors to your data source. Heavy lifting,
         // for example downloading or creating content etc, should be deferred to onDataSetChanged()
         // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.
-        int mID;
-        String mName, mRelease;
+        populateWidget();
+    }
+
+    private void populateWidget() {
+        mCount = 0;
+        mWidgetItems.clear();
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
         String sortOrder = sharedPref.getString("data_order", "ASC");
@@ -82,13 +87,15 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
             Log.d(TAG, "Editor founded, query database.");
             Uri uri = ComicContentProvider.CONTENT_URI;
             String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
-                                   ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
-                                   ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
+                    ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
+                    ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
 
             mCursor = mContext.getContentResolver().query(uri, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
                     ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
         }
-
+        int mID;
+        String mName;
+        String mRelease;
         if (mCursor != null) {
             Log.d(TAG, "Cursor has data");
             for (int i = 0; i < mCursor.getCount(); i++) {
@@ -107,13 +114,12 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     @Override
     public void onDataSetChanged() {
-        // TODO update widget adapter
+        populateWidget();
     }
 
     @Override
     public void onDestroy() {
         mCursor.close();
-        //mWidgetItems.clear();
     }
 
     @Override

@@ -70,7 +70,7 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "WidgetProvider onReceive");
         AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-
+        // TODO launch comic detail
         /**if (intent.getAction().equals(TOAST_ACTION)) {
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);

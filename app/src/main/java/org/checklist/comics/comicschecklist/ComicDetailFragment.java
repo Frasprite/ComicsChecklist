@@ -245,7 +245,6 @@ public class ComicDetailFragment extends Fragment {
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
                 }
 
-                // TODO Update widget
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
                 int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
