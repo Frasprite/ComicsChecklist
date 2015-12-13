@@ -82,6 +82,7 @@ public class Constants {
     public static final String WIDGET_EDITOR = "WIDGET_EDITOR";
     public static final String WIDGET_TITLE = "WIDGET_TITLE";
     public static final String COMIC_ID_FROM_WIDGET = "COMIC_ID_FROM_WIDGET";
+    public static final String ACTION_COMIC_WIDGET = "comic_widget";
     public static final String URI_SCHEME = "CC_WIDGET";
     /* Search */
     public static final String PREF_SEARCH_QUERY = "search_query";
@@ -91,5 +92,4 @@ public class Constants {
     public static final int DIALOG_ADD_COMIC = 2;
     public static final int DIALOG_RATE = 3;
     public static final int DIALOG_RESULT_LIST = 4;
-
 }

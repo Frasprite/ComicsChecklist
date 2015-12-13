@@ -85,7 +85,15 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(TAG, "onCreate");
         setContentView(R.layout.activity_comic_list);
+        if (findViewById(R.id.comic_detail_container) != null) {
+            // The detail container view will be present only in the
+            // large-screen layouts (res/values-large and
+            // res/values-sw600dp). If this view is present, then the
+            // activity should be in two-pane mode.
+            mTwoPane = true;
+        }
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setElevation(5);
@@ -111,6 +119,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
 
     @Override
     protected void onNewIntent(Intent intent) {
+        Log.v(TAG, "onNewIntent " + intent);
         handleIntent(intent);
     }
 
@@ -125,6 +134,10 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             // Handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
             doMySearch(query);
+        } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_COMIC_WIDGET)) {
+            int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
+            Log.d(TAG, "Comic id is " + comicId);
+            launchDetailView(comicId, "preferiti");
         }
     }
 
@@ -162,14 +175,8 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     @Override
     protected void onStart() {
         super.onStart();
-        // This code was originally on onCreate method; with fragments, must be placed here
-        if (findViewById(R.id.comic_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-large and
-            // res/values-sw600dp). If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
-
+        Log.v(TAG, "onStart");
+        if (mTwoPane) {
             // In two-pane mode, list items should be given the
             // 'activated' state when touched.
             //((ComicListFragment) getFragmentManager().findFragmentById(R.id.comic_list)).setActivateOnItemClick(true);
@@ -181,12 +188,14 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     @Override
     protected void onResume() {
         super.onResume();
+        Log.v(TAG, "onResume");
         registerReceiver(receiver, new IntentFilter(Constants.NOTIFICATION));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.v(TAG, "onPause");
         unregisterReceiver(receiver);
     }
 
@@ -302,6 +311,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
      */
     @Override
     public void onItemSelected(long id, String section) {
+        Log.d(TAG, "Launching comic with id " + id + " section " + section);
         launchDetailView(id, section);
     }
 
@@ -320,7 +330,8 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             arguments.putString(ComicDetailFragment.ARG_SECTION, section);
             mDetailFragment = new ComicDetailFragment();
             mDetailFragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
+            // TODO warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
+            getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commitAllowingStateLoss();
         } else {
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.

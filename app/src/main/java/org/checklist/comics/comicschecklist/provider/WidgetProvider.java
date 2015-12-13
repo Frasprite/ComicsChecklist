@@ -83,6 +83,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
             //Uri details = Uri.withAppendedPath(ComicContentProvider.CONTENT_URI, "" + empID);
             Intent detailsIntent = new Intent(context, ComicListActivity.class);
+            detailsIntent.setAction(Constants.ACTION_COMIC_WIDGET);
             detailsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             detailsIntent.putExtra(Constants.COMIC_ID_FROM_WIDGET, comicID);
             context.startActivity(detailsIntent);
