@@ -42,7 +42,7 @@
             android:name="org.checklist.comics.comicschecklist.service.DownloadService" >
         </service>
 
-        <!-- Database & search suggestion provider -->
+        <!-- Database provider -->
         <provider
             android:authorities="org.checklist.comics.comicschecklist.contentprovider"
             android:name=".provider.ComicContentProvider"

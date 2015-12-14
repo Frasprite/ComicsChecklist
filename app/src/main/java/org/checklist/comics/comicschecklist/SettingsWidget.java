@@ -30,7 +30,7 @@ public class SettingsWidget extends ListActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "SettingsWidget onCreate");
+        Log.d(TAG, "onCreate");
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
@@ -56,7 +56,7 @@ public class SettingsWidget extends ListActivity {
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
         Log.d(TAG, "SettingsWidget onListItemClick " + position);
         Context mContext = getApplicationContext();
-        // Take text reference of editor choosed: Lista preferiti Da comprare Marvel Panini Comics Planet Manga Star Comics Sergio Bonelli RW Edizioni
+        // Take text reference of editor chosen: Preferiti Da comprare Marvel Panini Comics Planet Manga Star Comics Sergio Bonelli RW Edizioni
         String editor, title;
         switch (position) {
             case 0:

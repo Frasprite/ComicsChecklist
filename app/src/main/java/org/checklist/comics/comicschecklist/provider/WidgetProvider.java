@@ -69,8 +69,8 @@ public class WidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "WidgetProvider onReceive");
-        AppWidgetManager mgr = AppWidgetManager.getInstance(context);
-        // TODO launch comic detail
+        //AppWidgetManager mgr = AppWidgetManager.getInstance(context);
+
         /**if (intent.getAction().equals(TOAST_ACTION)) {
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
@@ -78,7 +78,7 @@ public class WidgetProvider extends AppWidgetProvider {
         }*/
 
         if (intent.getAction().equals(CLICK_ACTION)) {
-            int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
+            //int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int comicID = intent.getIntExtra(COMIC_ID, 0);
 
             //Uri details = Uri.withAppendedPath(ComicContentProvider.CONTENT_URI, "" + empID);
