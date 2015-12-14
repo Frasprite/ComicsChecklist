@@ -165,7 +165,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
             emptyText.setText(getString(R.string.empty_favorite_list));
             //setEmptyText(getResources().getString(R.string.empty_favorite_list));
         } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
-            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_content_add, 0, 0);
+            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_shopping, 0, 0);
             emptyText.setText(getString(R.string.empty_cart_list));
             //setEmptyText(getResources().getString(R.string.empty_cart_list));
         } else
