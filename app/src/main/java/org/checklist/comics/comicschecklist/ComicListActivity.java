@@ -63,17 +63,17 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
                 int resultCode = bundle.getInt(Constants.NOTIFICATION_RESULT);
                 String mCurrentEditor = bundle.getString(Constants.NOTIFICATION_EDITOR);
                 if (resultCode == Constants.RESULT_START)
-                    Toast.makeText(getApplicationContext(), mCurrentEditor + " " + getString(R.string.search_started), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), mCurrentEditor + getString(R.string.search_started), Toast.LENGTH_SHORT).show();
                 else if (resultCode == Constants.RESULT_FINISHED)
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_completed), Toast.LENGTH_SHORT).show();
                 else if (resultCode == Constants.RESULT_EDITOR_FINISHED) {
                     if (mListFragment != null)
                         mListFragment.setRefreshing(false);
-                    Toast.makeText(getApplicationContext(), mCurrentEditor + ": " + getResources().getString(R.string.search_editor_completed), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), mCurrentEditor + getResources().getString(R.string.search_editor_completed), Toast.LENGTH_SHORT).show();
                 } else if (resultCode == Constants.RESULT_CANCELED) {
                     if (mListFragment != null)
                         mListFragment.setRefreshing(false);
-                    Toast.makeText(getApplicationContext(), mCurrentEditor + ": " + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), mCurrentEditor + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
                 } else if (resultCode == Constants.RESULT_NOT_CONNECTED)
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_connection), Toast.LENGTH_LONG).show();
                 else if (resultCode == Constants.RESULT_DESTROYED)

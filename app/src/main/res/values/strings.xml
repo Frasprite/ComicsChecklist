@@ -3,7 +3,6 @@
     <string name="app_name">Comics Checklist</string>
     <string name="guida">Guida</string>
     <string name="info">Info</string>
-    <string name="go_to_google_plus">Segui su G+</string>
     <string name="og_text">Applicazione sviluppata da un idea di Francesco Bevilacqua, fondatore e admin di www.opengeek.it .\nPotete seguirne l\'evoluzione sulla pagina ufficiale di Google+!</string>
     <string name="bp_text">Realizzazione grafica, ottimizzazione, pubblicazione e promozione di Purple Soc. Coop. www.bitpurple.com .</string>
     <string name="disclaimer_text">Tutti i marchi, i loghi e i simboli presenti nell\'applicazione sono dei rispettivi proprietari.\nPurple Soc. Coop. non è in alcun modo affiliata ai siti utilizzati come feed di informazioni.\nL\'applicazione è da intendersi come metodo aggiuntivo per la fruizione dei contenuti diffusi dai rispettivi proprietari.</string>
@@ -60,7 +59,6 @@
     <string name="title_section10">Segui su Google+</string>
     <string name="title_section11">Guida</string>
     <string name="title_section12">Info</string>
-    <string name="addComic">Aggiungi un fumetto</string>
     <string name="drawer_open">Apri la barra di navigazione</string>
     <string name="drawer_close">Chiudi la barra di navigazione</string>
     <string name="preview_title">Nome fumetto</string>
@@ -69,15 +67,10 @@
 	<string name="menu_calendar">Aggiungi uscita al calendario</string>
 	<string name="menu_favorites">Aggiungi ai preferiti</string>
     <string name="menu_wishlist">Da comprare</string>
-    <string name="menu_settings">Impostazioni</string>
     <string name="context_menu_delete_comic">Togli dalla lista</string>
     <string name="context_menu_delete_all">Cancella tutta la lista</string>
     <string name="dialog_confirm">OK</string>
     <string name="dialog_undo">Annulla</string>
-    <string name="dialog_yes">Si</string>
-    <string name="dialog_no">No</string>
-    <string name="dialog_welcome_title">Benvenuto su CC</string>
-    <string name="dialog_welcome_message">Vuoi lanciare subito la ricerca dei fumetti? Potrai sempre lanciare la ricerca manuale tirando verso il basso la lista di ogni editore.</string>
 
     <string name="empty_list">La lista è vuota!</string>
     <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>
@@ -106,8 +99,6 @@
     <string name="fill_data_alert">Devi inserire il nome del fumetto!</string>
 
     <string name="widget_label">CC Widget</string>
-    <string name="appwidget_configure_instructions">This text will be shown before the date in our example widget.</string>
-    <string name="appwidget_prefix_default">Oh hai</string>
 
     <string name="search_hint">Cerca un fumetto</string>
     <string name="search_title">Cerca</string>
