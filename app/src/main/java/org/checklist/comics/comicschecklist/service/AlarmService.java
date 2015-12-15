@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -30,8 +29,6 @@ public class AlarmService extends IntentService {
     private static final String TAG = AlarmService.class.getSimpleName();
 
     public static final int NOTIFICATION_ID = 1;
-    private NotificationManager mNotificationManager;
-    NotificationCompat.Builder builder;
 
     public AlarmService() {
         super("AlarmService");
@@ -39,26 +36,36 @@ public class AlarmService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Bundle extras = intent.getExtras();
-
+        Log.d(TAG, "onHandleIntent");
         // Do the work that requires your app to keep the CPU running.
-        // TODO search on favorite and find out if something is available today, then create a notification
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String formattedDate = df.format(calendar.getTime());
-        String selection = ComicDatabase.COMICS_RELEASE_KEY + " LIKE =? AND " + ComicDatabase.COMICS_FAVORITE_KEY + " =?";
+        String[] columns = new String[]{ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_RELEASE_KEY};
+        String selection = ComicDatabase.COMICS_RELEASE_KEY + " LIKE ? AND " + ComicDatabase.COMICS_FAVORITE_KEY + " LIKE ?";
         String[] selectionArguments = new String[]{formattedDate, "yes"};
-        Cursor cursor = this.getContentResolver().query(ComicContentProvider.CONTENT_URI, null, selection,
-                selectionArguments, null);
-
-        createNotification("AlarmManagerDemo: this is a test message!", false);
+        String order = ComicDatabase.COMICS_DATE_KEY + " " + "ASC";
+        Cursor cursor = this.getContentResolver().query(ComicContentProvider.CONTENT_URI, columns, selection,
+                selectionArguments, order);
+        if (cursor != null) {
+            if (cursor.getCount() == 1) {
+                Log.i(TAG, "Trovato un fumetto preferito");
+                createNotification(getResources().getString(R.string.notification_comic_out), false);
+            } else if (cursor.getCount() > 1) {
+                Log.i(TAG, "Trovati più fumetti preferiti");
+                String text = getResources().getString(R.string.notification_comics_out_1) + " " + cursor.getCount() + " " +
+                                getResources().getString(R.string.notification_comics_out_2);
+                createNotification(text, false);
+            }
+            cursor.close();
+        }
 
         // Release the wake lock provided by the WakefulBroadcastReceiver.
         AlarmReceiver.completeWakefulIntent(intent);
     }
 
     private void createNotification(String message, boolean bool) {
-        Log.d(TAG, "Creating notification");
+        Log.d(TAG, "Creating notification for favorite alert");
         // Prepare intent which is triggered if the notification is selected
         Intent intent = new Intent(this, ComicListActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
