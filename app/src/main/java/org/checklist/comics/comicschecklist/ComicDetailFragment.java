@@ -248,7 +248,6 @@ public class ComicDetailFragment extends Fragment {
                 AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
                 int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
-
                 return true;
             case R.id.buy:
                 if (mCart.equalsIgnoreCase("no")) {

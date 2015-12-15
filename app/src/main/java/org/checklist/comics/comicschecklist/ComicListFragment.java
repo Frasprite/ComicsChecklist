@@ -285,8 +285,19 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     return true;
                 }
             case DELETE_ALL:
-                // TODO show a dialog where user can confirm or not this action
-                Toast.makeText(getActivity(), "Coming soon!", Toast.LENGTH_SHORT).show();
+                if (mEditor.equalsIgnoreCase(Constants.FAVORITE)) {
+                    // Update all favorite
+                    ContentValues mUpdateValues = new ContentValues();
+                    mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
+                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, null, null);
+                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
+                } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
+                    // Update all comic on cart
+                    ContentValues mUpdateValues = new ContentValues();
+                    mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
+                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, null, null);
+                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
+                }
                 return true;
         }
         return super.onContextItemSelected(item);
