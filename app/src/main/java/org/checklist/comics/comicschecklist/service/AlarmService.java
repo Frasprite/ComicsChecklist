@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,7 +13,13 @@ import android.util.Log;
 
 import org.checklist.comics.comicschecklist.ComicListActivity;
 import org.checklist.comics.comicschecklist.R;
+import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by Francesco Bevilacqua on 18/02/2015.
@@ -36,6 +43,13 @@ public class AlarmService extends IntentService {
 
         // Do the work that requires your app to keep the CPU running.
         // TODO search on favorite and find out if something is available today, then create a notification
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        String formattedDate = df.format(calendar.getTime());
+        String selection = ComicDatabase.COMICS_RELEASE_KEY + " LIKE =? AND " + ComicDatabase.COMICS_FAVORITE_KEY + " =?";
+        String[] selectionArguments = new String[]{formattedDate, "yes"};
+        Cursor cursor = this.getContentResolver().query(ComicContentProvider.CONTENT_URI, null, selection,
+                selectionArguments, null);
 
         createNotification("AlarmManagerDemo: this is a test message!", false);
 
