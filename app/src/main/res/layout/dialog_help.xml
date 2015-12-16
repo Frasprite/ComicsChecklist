@@ -13,73 +13,73 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_home"
+            android:text="@string/dialog_help_home"
             android:id="@+id/textViewHome"
             android:textStyle="bold" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_home_text"
+            android:text="@string/dialog_help_home_text"
             android:id="@+id/textViewHomeDetail" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_list"
+            android:text="@string/dialog_help_list"
             android:id="@+id/textViewList"
             android:textStyle="bold"
             android:paddingTop="3dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_list_text"
+            android:text="@string/dialog_help_list_text"
             android:id="@+id/textViewListDetail" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_detail"
+            android:text="@string/dialog_help_detail"
             android:id="@+id/textViewDetail"
             android:textStyle="bold"
             android:paddingTop="3dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_detail_text"
+            android:text="@string/dialog_help_detail_text"
             android:id="@+id/textViewDetailDetail" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_favorite"
+            android:text="@string/dialog_help_favorite"
             android:id="@+id/textViewFavorite"
             android:textStyle="bold"
             android:paddingTop="3dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_favorite_text"
+            android:text="@string/dialog_help_favorite_text"
             android:id="@+id/textViewFavoriteDetail" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_buy"
+            android:text="@string/dialog_help_buy"
             android:id="@+id/textViewBuy"
             android:textStyle="bold"
             android:paddingTop="3dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_buy_text"
+            android:text="@string/dialog_help_buy_text"
             android:id="@+id/textViewBuyDetail" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_settings"
+            android:text="@string/dialog_help_settings"
             android:id="@+id/textViewSettings"
             android:textStyle="bold"
             android:paddingTop="3dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/help_settings_text"
+            android:text="@string/dialog_help_settings_text"
             android:id="@+id/textViewSettingsDetail" />
     </LinearLayout>
 </ScrollView>

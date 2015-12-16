@@ -130,7 +130,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     @Override
     public RemoteViews getViewAt(int position) {
         Log.i(TAG, "WidgetService getViewAt for position: " + position);
-        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_item);
+        RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_item_widget);
         rv.setTextViewText(R.id.widget_tv1, mWidgetItems.get(position)._name);
         rv.setTextViewText(R.id.widget_tv2, mWidgetItems.get(position)._release);
 

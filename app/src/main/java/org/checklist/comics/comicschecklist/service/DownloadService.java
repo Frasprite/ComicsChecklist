@@ -278,7 +278,7 @@ public class DownloadService extends IntentService {
         } else {
             error = true;
             publishResults(Constants.RESULT_NOT_CONNECTED, "noEditor");
-            createNotification(getResources().getString(R.string.no_connection), false);
+            createNotification(getResources().getString(R.string.toast_no_connection), false);
         }
 
         deleteOldRows();

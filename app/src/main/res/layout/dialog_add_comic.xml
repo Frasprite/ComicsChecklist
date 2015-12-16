@@ -12,7 +12,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/name_edit_text"
             android:layout_weight="1"
-            android:hint="@string/preview_title" />
+            android:hint="@string/dialog_preview_title" />
 
         <EditText
             android:layout_width="match_parent"
@@ -20,7 +20,7 @@
             android:id="@+id/info_edit_text"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:hint="@string/preview_other"
+            android:hint="@string/dialog_preview_other"
             android:maxLines="3"
             android:lines="3" />
 
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="@string/preview_release"
+            android:text="@string/dialog_preview_release"
             android:id="@+id/future_release_text_view"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1" />

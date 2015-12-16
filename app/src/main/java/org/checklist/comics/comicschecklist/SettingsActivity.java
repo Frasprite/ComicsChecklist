@@ -44,7 +44,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         // Get the root container of the preferences list and insert toolbar
         LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
-        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.cc_settings_toolbar, root, false);
+        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
         root.addView(bar, 0); // insert at top
         bar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

@@ -15,7 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:contentDescription="@string/opengeek_image"
+            android:contentDescription="@string/description_opengeek_image"
             android:src="@drawable/ic_dialog_opengeektext" />
 
         <TextView
@@ -24,14 +24,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:autoLink="web"
-            android:text="@string/og_text" />
+            android:text="@string/dialog_og_text" />
 
         <ImageView
             android:id="@+id/bp_image_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:contentDescription="@string/bitpurple_image"
+            android:contentDescription="@string/description_bitpurple_image"
             android:src="@drawable/ic_dialog_purple" />
 
         <TextView
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:autoLink="web"
-            android:text="@string/bp_text" />
+            android:text="@string/dialog_bp_text" />
 
         <TextView
             android:id="@+id/disclaimer"
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:text="@string/disclaimer_text" />
+            android:text="@string/dialog_disclaimer_text" />
     </LinearLayout>
 
 </ScrollView>

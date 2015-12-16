@@ -47,7 +47,7 @@ public class SettingsWidget extends ListActivity {
         }
 
         // Set list of editors
-        mEditor = getResources().getStringArray(R.array.editors_array);
+        mEditor = getResources().getStringArray(R.array.widget_editors_array);
         mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, mEditor);
         getListView().setAdapter(mAdapter);
     }

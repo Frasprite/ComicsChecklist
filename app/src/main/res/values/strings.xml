@@ -1,29 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Comics Checklist</string>
-    <string name="guida">Guida</string>
-    <string name="info">Info</string>
-    <string name="og_text">Applicazione sviluppata da un idea di Francesco Bevilacqua, fondatore e admin di www.opengeek.it .\nPotete seguirne l\'evoluzione sulla pagina ufficiale di Google+!</string>
-    <string name="bp_text">Realizzazione grafica, ottimizzazione, pubblicazione e promozione di Purple Soc. Coop. www.bitpurple.com .</string>
-    <string name="disclaimer_text">Tutti i marchi, i loghi e i simboli presenti nell\'applicazione sono dei rispettivi proprietari.\nPurple Soc. Coop. non è in alcun modo affiliata ai siti utilizzati come feed di informazioni.\nL\'applicazione è da intendersi come metodo aggiuntivo per la fruizione dei contenuti diffusi dai rispettivi proprietari.</string>
-    <string name="help_home">Home</string>
-    <string name="help_home_text">Clicca su l\'icona di Comics Checklist per aprire la schermata laterale e seleziona una delle opzioni per visualizzare le prossime uscite.</string>
-    <string name="help_list">Lista delle uscite</string>
-    <string name="help_list_text">Clicca su un elemento della lista per avere più informazioni. Puoi aggiornare la lista di un editore facendo scorrere verso il basso la lista.</string>
-    <string name="help_detail">Schermata dettagli</string>
-    <string name="help_detail_text">In questa schermata potrai salvare l\'uscita del fumetto sul calendario, salvare la serie tra i tuoi preferiti oppure aggiungerlo alla lista da comprare.</string>
-    <string name="help_favorite">Lista preferiti</string>
-    <string name="help_favorite_text">Questa sezione caricherà solo i fumetti che sono stati inseriti tra i preferiti. Puoi togliere i fumetti effettuando un long-click su un elemento.</string>
-    <string name="help_buy">Da comprare</string>
-    <string name="help_buy_text">In questa sezione trovi tutti i fumetti da comprare. Puoi aggiungere manualmente uno o pi\ù fumetti alla lista, cliccando sull\'icona + dal menu. Puoi togliere i fumetti effettuando un long-click su un elemento.</string>
-    <string name="help_settings">Impostazioni</string>
-    <string name="help_settings_text">Nelle impostazioni potrai:\n - scegliere se visualizzare le notifiche durante la ricerca delle uscite;\n - impostare ogni quanto effettuare la ricerca automatica e dopo quanto tempo cancellare le uscite più vecchie;\n - scegliere l\'ordinamento delle uscite nella lista.\nPotrai sempre decidere se fare la ricerca manualmente e/o mantenere le uscite più vecchie.</string>
-    <string name="rate_text">Comics Checklist non usa nessun banner pubblicitario, è completamente gratuita e non richiede permessi particolari o superflui.\nSe l\'applicazione ti è stata utile lascia un commento su Google Play.\nGrazie per il tuo supporto!</string>
-    <string name="rate_button">Recensisci ora!</string>
-    <string name="late_button">Più tardi</string>
-    <string name="no_thanks_button">No, grazie</string>
-    <string name="no_connection">Problema alla connessione di rete: verifica la tua connettività.</string>
-    <string-array name="nav_drawer_array">
+    <string name="activity_title_comic_detail">Dettagli</string>
+
+    <!-- Dialog text -->
+    <string name="dialog_help_title">Guida</string>
+    <string name="dialog_info_title">Info</string>
+    <string name="dialog_og_text">Applicazione sviluppata da un idea di Francesco Bevilacqua, fondatore e admin di www.opengeek.it .\nPotete seguirne l\'evoluzione sulla pagina ufficiale di Google+!</string>
+    <string name="dialog_bp_text">Realizzazione grafica, ottimizzazione, pubblicazione e promozione di Purple Soc. Coop. www.bitpurple.com .</string>
+    <string name="dialog_disclaimer_text">Tutti i marchi, i loghi e i simboli presenti nell\'applicazione sono dei rispettivi proprietari.\nPurple Soc. Coop. non è in alcun modo affiliata ai siti utilizzati come feed di informazioni.\nL\'applicazione è da intendersi come metodo aggiuntivo per la fruizione dei contenuti diffusi dai rispettivi proprietari.</string>
+    <string name="dialog_help_home">Home</string>
+    <string name="dialog_help_home_text">Clicca su l\'icona di Comics Checklist per aprire la schermata laterale e seleziona una delle opzioni per visualizzare le prossime uscite.</string>
+    <string name="dialog_help_list">Lista delle uscite</string>
+    <string name="dialog_help_list_text">Clicca su un elemento della lista per avere più informazioni. Puoi aggiornare la lista di un editore facendo scorrere verso il basso la lista.</string>
+    <string name="dialog_help_detail">Schermata dettagli</string>
+    <string name="dialog_help_detail_text">In questa schermata potrai salvare l\'uscita del fumetto sul calendario, salvare la serie tra i tuoi preferiti oppure aggiungerlo alla lista da comprare.</string>
+    <string name="dialog_help_favorite">Lista preferiti</string>
+    <string name="dialog_help_favorite_text">Questa sezione caricherà solo i fumetti che sono stati inseriti tra i preferiti. Puoi togliere i fumetti effettuando un long-click su un elemento.</string>
+    <string name="dialog_help_buy">Da comprare</string>
+    <string name="dialog_help_buy_text">In questa sezione trovi tutti i fumetti da comprare. Puoi aggiungere manualmente uno o pi\ù fumetti alla lista, cliccando sull\'icona + dal menu. Puoi togliere i fumetti effettuando un long-click su un elemento.</string>
+    <string name="dialog_help_settings">Impostazioni</string>
+    <string name="dialog_help_settings_text">Nelle impostazioni potrai:\n - scegliere se visualizzare le notifiche durante la ricerca delle uscite;\n - impostare ogni quanto effettuare la ricerca automatica e dopo quanto tempo cancellare le uscite più vecchie;\n - scegliere l\'ordinamento delle uscite nella lista.\nPotrai sempre decidere se fare la ricerca manualmente e/o mantenere le uscite più vecchie.</string>
+    <string name="dialog_rate_text">Comics Checklist non usa nessun banner pubblicitario, è completamente gratuita e non richiede permessi particolari o superflui.\nSe l\'applicazione ti è stata utile lascia un commento su Google Play.\nGrazie per il tuo supporto!</string>
+    <string name="dialog_rate_button">Recensisci ora!</string>
+    <string name="dialog_late_button">Più tardi</string>
+    <string name="dialog_confirm_button">OK</string>
+    <string name="dialog_undo_button">Annulla</string>
+    <string name="dialog_no_thanks_button">No, grazie</string>
+    <string name="dialog_preview_title">Nome fumetto</string>
+    <string name="dialog_preview_release">Data d\'uscita (facoltatita)</string>
+    <string name="dialog_preview_other">Altre info, es.: editore, numeri mancanti</string>
+
+    <!-- Navigation drawer test -->
+    <string-array name="drawer_array">
         <item>Lista preferiti</item>
         <item>Da comprare</item>
         <item>Marvel</item>
@@ -37,7 +46,11 @@
         <item>Guida</item>
         <item>Info</item>
     </string-array>
-    <string-array name="editors_array">
+    <string name="drawer_open">Apri la barra di navigazione</string>
+    <string name="drawer_close">Chiudi la barra di navigazione</string>
+
+    <!-- Widget text -->
+    <string-array name="widget_editors_array">
         <item>Lista preferiti</item>
         <item>Da comprare</item>
         <item>Marvel</item>
@@ -47,59 +60,16 @@
         <item>Sergio Bonelli</item>
         <item>RW Edizioni</item>
     </string-array>
-    <string name="title_section1">Lista preferiti</string>
-    <string name="title_section2">Da comprare</string>
-    <string name="title_section3">Marvel</string>
-    <string name="title_section4">Panini Comics</string>
-    <string name="title_section5">Planet Manga</string>
-    <string name="title_section6">Star Comics</string>
-    <string name="title_section7">Sergio Bonelli</string>
-    <string name="title_section8">RW Edizioni</string>
-    <string name="title_section9">Impostazioni</string>
-    <string name="title_section10">Segui su Google+</string>
-    <string name="title_section11">Guida</string>
-    <string name="title_section12">Info</string>
-    <string name="drawer_open">Apri la barra di navigazione</string>
-    <string name="drawer_close">Chiudi la barra di navigazione</string>
-    <string name="preview_title">Nome fumetto</string>
-	<string name="preview_release">Data d\'uscita (facoltatita)</string>
-    <string name="preview_other">Altre info, es.: editore, numeri mancanti</string>
+    <string name="widget_label">CC Widget</string>
+
+    <!-- Menu & context menu text -->
 	<string name="menu_calendar">Aggiungi uscita al calendario</string>
 	<string name="menu_favorites">Aggiungi ai preferiti</string>
     <string name="menu_wishlist">Da comprare</string>
     <string name="context_menu_delete_comic">Togli dalla lista</string>
     <string name="context_menu_delete_all">Cancella tutta la lista</string>
-    <string name="dialog_confirm">OK</string>
-    <string name="dialog_undo">Annulla</string>
 
-    <string name="empty_list">La lista è vuota!</string>
-    <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>
-    <string name="empty_cart_list">La lista dei fumetti da comprare è vuota.\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>
-    <string name="empty_editor_list">La lista per questo editore è vuota.</string>
-
-    <string name="search_started">: ricerca in corso&#8230;</string>
-    <string name="search_completed">Ricerca terminata.</string>
-    <string name="search_editor_completed">: ricerca completata.</string>
-    <string name="search_failed">: la lista potrebbe essere incompleta. Puoi riprovare con uno swipe verso il basso.</string>
-
-    <string name="comic_added_cart">Fumetto aggiunto alla lista da comprare!</string>
-    <string name="comic_deleted_cart">Fumetto tolto dalla lista da comprare.</string>
-    <string name="comic_added_favorite">Fumetto agggiunto alla lista dei preferiti!</string>
-    <string name="comic_deleted_favorite">Fumetto tolto dalla lista dei preferiti.</string>
-
-    <string name="cover_description">This is the cover of the comic.</string>
-    <string name="opengeek_image">OpenGeek logo</string>
-    <string name="bitpurple_image">BitPurple logo</string>
-
-    <string name="calendar_release">Disponibile da oggi in edicola/libreria.</string>
-    <string name="calendar_error">Spiacente, non \è possibile inserire l\'evento nel calendario.</string>
-
-    <string name="title_comic_detail">Dettagli</string>
-
-    <string name="fill_data_alert">Devi inserire il nome del fumetto!</string>
-
-    <string name="widget_label">CC Widget</string>
-
+    <!-- Search text -->
     <string name="search_hint">Cerca un fumetto</string>
     <string name="search_title">Cerca</string>
     <string name="search_description">Inserisci il nome del fumetto che cerchi.</string>
@@ -108,7 +78,6 @@
     <string name="search_result">Risultati ricerca</string>
 
     <!-- Strings related to Settings -->
-
     <!-- String set for Data & Sync -->
     <string name="pref_header_data_sync">Dati &amp; sincronizzazione</string>
 
@@ -172,10 +141,51 @@
     <string name="pref_summary_notifications">Mostra lo stato della ricerca dei dati nella barra delle notifiche</string>
     <string name="pref_title_notification_favorite">Notifiche dei preferiti</string>
     <string name="pref_summary_notification_favorite">Verrai avvertito se uno dei tuoi fumetti preferiti è disponibile</string>
-    <string name="comic_deleted_all_favorite">La lista dei preferiti è stata cancellata.</string>
-    <string name="comic_deleted_all_cart">La lista dei fumetti da comprare è stata cancellata.</string>
+
+    <!-- Notification text -->
     <string name="notification_comic_out">Oggi esce un solo fumetto, apri la lista dei preferiti!</string>
     <string name="notification_comics_out_1">Oggi escono</string>
     <string name="notification_comics_out_2">fumetti, apri la lista dei preferiti!</string>
+
+    <!-- Various text -->
+    <string name="comic_deleted_all_favorite">La lista dei preferiti è stata cancellata.</string>
+    <string name="comic_deleted_all_cart">La lista dei fumetti da comprare è stata cancellata.</string>
+    <string name="comic_added_cart">Fumetto aggiunto alla lista da comprare!</string>
+    <string name="comic_deleted_cart">Fumetto tolto dalla lista da comprare.</string>
+    <string name="comic_added_favorite">Fumetto agggiunto alla lista dei preferiti!</string>
+    <string name="comic_deleted_favorite">Fumetto tolto dalla lista dei preferiti.</string>
+
+    <string name="toast_no_connection">Problema alla connessione di rete: verifica la tua connettività.</string>
+    <string name="toast_fill_data_alert">Devi inserire il nome del fumetto!</string>
+
+    <string name="empty_list">La lista è vuota!</string>
+    <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>
+    <string name="empty_cart_list">La lista dei fumetti da comprare è vuota.\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>
+    <string name="empty_editor_list">La lista per questo editore è vuota.</string>
+
+    <string name="search_started">: ricerca in corso&#8230;</string>
+    <string name="search_completed">Ricerca terminata.</string>
+    <string name="search_editor_completed">: ricerca completata.</string>
+    <string name="search_failed">: la lista potrebbe essere incompleta. Puoi riprovare con uno swipe verso il basso.</string>
+
+    <string name="description_cover">This is the cover of the comic.</string>
+    <string name="description_opengeek_image">OpenGeek logo</string>
+    <string name="description_bitpurple_image">BitPurple logo</string>
+
+    <string name="calendar_release">Disponibile da oggi in edicola/libreria.</string>
+    <string name="calendar_error">Spiacente, non \è possibile inserire l\'evento nel calendario.</string>
+
+    <string name="title_section1">Lista preferiti</string>
+    <string name="title_section2">Da comprare</string>
+    <string name="title_section3">Marvel</string>
+    <string name="title_section4">Panini Comics</string>
+    <string name="title_section5">Planet Manga</string>
+    <string name="title_section6">Star Comics</string>
+    <string name="title_section7">Sergio Bonelli</string>
+    <string name="title_section8">RW Edizioni</string>
+    <string name="title_section9">Impostazioni</string>
+    <string name="title_section10">Segui su Google+</string>
+    <string name="title_section11">Guida</string>
+    <string name="title_section12">Info</string>
 
 </resources>

@@ -75,7 +75,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
                         mListFragment.setRefreshing(false);
                     Toast.makeText(getApplicationContext(), mCurrentEditor + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
                 } else if (resultCode == Constants.RESULT_NOT_CONNECTED)
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.no_connection), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_no_connection), Toast.LENGTH_LONG).show();
                 else if (resultCode == Constants.RESULT_DESTROYED)
                     Log.i(TAG, "Service destroyed");
             }

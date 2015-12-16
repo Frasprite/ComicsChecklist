@@ -58,7 +58,7 @@ public class NavigationDrawerFragment extends Fragment {
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mUserLearnedDrawer = sp.getBoolean(Constants.PREF_USER_LEARNED_DRAWER, false);
-        mNavDrawerTitles = getResources().getStringArray(R.array.nav_drawer_array);
+        mNavDrawerTitles = getResources().getStringArray(R.array.drawer_array);
 
         if (savedInstanceState != null) {
             mCurrentSelectedPosition = savedInstanceState.getInt(Constants.STATE_SELECTED_POSITION);
@@ -85,7 +85,7 @@ public class NavigationDrawerFragment extends Fragment {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter((new NavDrawerAdapter(getActivity(), R.layout.row_drawer_list_item, mNavDrawerTitles)));
+        mDrawerListView.setAdapter((new NavDrawerAdapter(getActivity(), R.layout.list_item_drawer, mNavDrawerTitles)));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }

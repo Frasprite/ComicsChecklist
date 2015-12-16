@@ -29,12 +29,12 @@
         </activity>
         <activity
             android:name=".ComicDetailActivity"
-            android:label="@string/title_comic_detail" >
+            android:label="@string/activity_title_comic_detail" >
         </activity>
 
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/help_settings" >
+            android:label="@string/dialog_help_settings" >
         </activity>
 
         <!-- Service which launch search & download data -->
