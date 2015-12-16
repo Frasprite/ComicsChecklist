@@ -177,9 +177,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         super.onStart();
         Log.v(TAG, "onStart");
         if (mTwoPane) {
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
-            //((ComicListFragment) getFragmentManager().findFragmentById(R.id.comic_list)).setActivateOnItemClick(true);
+            // In two-pane mode, list items should be given the 'activated' state when touched
             if (mListFragment != null)
                 mListFragment.setActivateOnItemClick(true);
         }
@@ -204,7 +202,6 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         Log.d(TAG, "onNavigationDrawerItemSelected position " + position);
         if (position <= 7) {
             // Update the main content by replacing fragments
-            //getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, ComicListFragment.newInstance(position + 1)).commit();
             mListFragment = ComicListFragment.newInstance(position + 1);
             getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, mListFragment).commit();
         } else {
@@ -262,7 +259,6 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
 
     public void restoreActionBar() {
         ActionBar actionBar = getSupportActionBar();
-        //actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setTitle(mTitle);

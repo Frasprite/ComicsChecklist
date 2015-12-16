@@ -116,8 +116,6 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         mEditor = findEditor(getArguments().getInt(Constants.ARG_SECTION_NUMBER));
         mEditorNumber = getArguments().getInt(Constants.ARG_SECTION_NUMBER);
         Log.d(TAG, "onCreate - " + mEditor);
-        // Retain this fragment across configuration changes.
-        //setRetainInstance(true); // NOT GOOD WITH LOADERS!!!
 
         fillData();
     }
@@ -166,14 +164,11 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         if (mEditor.equalsIgnoreCase(Constants.FAVORITE)) {
             emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
             emptyText.setText(getString(R.string.empty_favorite_list));
-            //setEmptyText(getResources().getString(R.string.empty_favorite_list));
         } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
             emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_shopping, 0, 0);
             emptyText.setText(getString(R.string.empty_cart_list));
-            //setEmptyText(getResources().getString(R.string.empty_cart_list));
         } else
             emptyText.setText(getString(R.string.empty_editor_list));
-            //setEmptyText(getResources().getString(R.string.empty_editor_list));
 
         ListView lv = (ListView) view.findViewById(android.R.id.list);
         lv.setEmptyView(emptyText);
@@ -433,16 +428,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
      * needed.
      */
     private static boolean canListViewScrollUp(ListView listView) {
-        if (android.os.Build.VERSION.SDK_INT >= 14) {
-            // For ICS and above we can call canScrollVertically() to determine this
-            return ViewCompat.canScrollVertically(listView, -1);
-        } else {
-            // Pre-ICS we need to manually check the first visible item and the child view's top
-            // value
-            return listView.getChildCount() > 0 &&
-                    (listView.getFirstVisiblePosition() > 0
-                            || listView.getChildAt(0).getTop() < listView.getPaddingTop());
-        }
+        return ViewCompat.canScrollVertically(listView, -1);
     }
 
     /**

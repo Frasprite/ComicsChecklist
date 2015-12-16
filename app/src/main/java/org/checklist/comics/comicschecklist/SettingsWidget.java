@@ -56,7 +56,7 @@ public class SettingsWidget extends ListActivity {
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
         Log.d(TAG, "SettingsWidget onListItemClick " + position);
         Context mContext = getApplicationContext();
-        // Take text reference of editor chosen: Preferiti Da comprare Marvel Panini Comics Planet Manga Star Comics Sergio Bonelli RW Edizioni
+        // Take text reference of editor chosen
         String editor, title;
         switch (position) {
             case 0:
@@ -108,11 +108,6 @@ public class SettingsWidget extends ListActivity {
         resultValue.putExtra(Constants.WIDGET_TITLE, title);
         resultValue.putExtra(Constants.WIDGET_EDITOR, editor);
         setResult(RESULT_OK, resultValue);
-
-        /** source code from stackoverflow
-        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE, null, this, WidgetProvider.class);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[] {mAppWidgetId});
-        sendBroadcast(intent);*/
 
         finish();
     }

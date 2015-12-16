@@ -36,20 +36,4 @@ public class BootReceiver extends BroadcastReceiver {
                     AlarmManager.INTERVAL_DAY, alarmIntent);
         }
     }
-
-    // Enabling receiver
-    /**ComponentName receiver = new ComponentName(context, SampleBootReceiver.class);
-     PackageManager pm = context.getPackageManager();
-
-     pm.setComponentEnabledSetting(receiver,
-     PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-     PackageManager.DONT_KILL_APP);*/
-
-    // Disabling receiver
-    /**ComponentName receiver = new ComponentName(context, SampleBootReceiver.class);
-     PackageManager pm = context.getPackageManager();
-
-     pm.setComponentEnabledSetting(receiver,
-     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-     PackageManager.DONT_KILL_APP);*/
 }

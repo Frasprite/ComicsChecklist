@@ -26,7 +26,7 @@ public class ComicContentProvider extends ContentProvider {
     // Database
     private ComicDatabaseHelper database;
 
-    // Used for the UriMacher
+    // Used for the UriMatcher
     private static final int COMICS = 10;
     private static final int COMIC_ID = 20;
 
@@ -34,9 +34,6 @@ public class ComicContentProvider extends ContentProvider {
 
     private static final String BASE_PATH = "comics";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
-
-    //public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/comics";
-    //public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/comic";
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     static {
@@ -92,7 +89,6 @@ public class ComicContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqlDB = database.getWritableDatabase();
-        //int rowsDeleted = 0;
         long id;
         switch (uriType) {
             case COMICS:

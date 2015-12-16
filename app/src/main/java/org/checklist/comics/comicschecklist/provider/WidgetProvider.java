@@ -24,8 +24,6 @@ public class WidgetProvider extends AppWidgetProvider {
 
     public static final String CLICK_ACTION = "CLICK_ACTION";
     public static final String COMIC_ID = "COMIC_ID";
-    /**public static final String TOAST_ACTION = "TOAST_ACTION";
-    public static final String EXTRA_ITEM = "EXTRA_ITEM";*/
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -37,7 +35,6 @@ public class WidgetProvider extends AppWidgetProvider {
             Intent intent = new Intent(context, WidgetService.class);
             // Add the app widget unique ID to the intent extras.
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            //Uri data = Uri.withAppendedPath(Uri.parse(Constants.URI_SCHEME + "://widget/id/"),  String.valueOf(appWidgetId));
             Log.d(TAG, "WidgetProvider onUpdate widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));//(data);
             // Instantiate the RemoteViews object for the app widget layout.
@@ -50,7 +47,6 @@ public class WidgetProvider extends AppWidgetProvider {
             // It should be in the same layout used to instantiate the RemoteViews object above.
             rv.setEmptyView(R.id.list, R.id.empty_view);
 
-            //
             // Do additional processing specific to this app widget...
             Intent clickIntent = new Intent(context, WidgetProvider.class);
             clickIntent.setAction(WidgetProvider.CLICK_ACTION);
@@ -58,7 +54,6 @@ public class WidgetProvider extends AppWidgetProvider {
 
             PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             rv.setPendingIntentTemplate(R.id.list, clickPendingIntent);
-            //
 
             appWidgetManager.updateAppWidget(appWidgetId, rv);
         }
@@ -69,7 +64,6 @@ public class WidgetProvider extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "WidgetProvider onReceive");
-        //AppWidgetManager mgr = AppWidgetManager.getInstance(context);
 
         /**if (intent.getAction().equals(TOAST_ACTION)) {
             int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -78,7 +72,6 @@ public class WidgetProvider extends AppWidgetProvider {
         }*/
 
         if (intent.getAction().equals(CLICK_ACTION)) {
-            //int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
             int comicID = intent.getIntExtra(COMIC_ID, 0);
 
             //Uri details = Uri.withAppendedPath(ComicContentProvider.CONTENT_URI, "" + empID);

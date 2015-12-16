@@ -42,9 +42,11 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
     private static final String TAG = ComicsChecklistDialogFragment.class.getSimpleName();
 
-    /* The activity that creates an instance of this dialog fragment must
-         * implement this interface in order to receive event callbacks.
-         * Each method passes the DialogFragment in case the host needs to query it. */
+    /**
+     * The activity that creates an instance of this dialog fragment must
+     * implement this interface in order to receive event callbacks.
+     * Each method passes the DialogFragment in case the host needs to query it.
+     **/
     public interface ComicsChecklistDialogListener {
         void onDialogPositiveClick(DialogFragment dialog, int dialogId);
         void onDialogNegativeClick(DialogFragment dialog, int dialogId);
@@ -121,7 +123,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
             case Constants.DIALOG_ADD_COMIC:
                 // Get the layout inflater
                 LayoutInflater inflater = getActivity().getLayoutInflater();
-                final View view = inflater.inflate(R.layout.dialog_add_comic, null);
+                View view = inflater.inflate(R.layout.dialog_add_comic, null);
 
                 mNameEditText = (EditText) view.findViewById(R.id.name_edit_text);
                 mInfoEditText = (EditText) view.findViewById(R.id.info_edit_text);
@@ -159,10 +161,10 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                                     values.put(ComicDatabase.COMICS_CART_KEY, "yes");
                                     values.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
 
-                                    view.getContext().getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
+                                    getActivity().getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
                                     mListener.onDialogPositiveClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_ADD_COMIC);
                                 } else {
-                                    Toast.makeText(view.getContext(), getResources().getString(R.string.toast_fill_data_alert), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity(), getResources().getString(R.string.toast_fill_data_alert), Toast.LENGTH_SHORT).show();
                                 }
                             }
                         })
