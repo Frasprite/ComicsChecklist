@@ -10,7 +10,7 @@
     <string name="dialog_bp_text">Realizzazione grafica, ottimizzazione, pubblicazione e promozione di Purple Soc. Coop. www.bitpurple.com .</string>
     <string name="dialog_disclaimer_text">Tutti i marchi, i loghi e i simboli presenti nell\'applicazione sono dei rispettivi proprietari.\nPurple Soc. Coop. non è in alcun modo affiliata ai siti utilizzati come feed di informazioni.\nL\'applicazione è da intendersi come metodo aggiuntivo per la fruizione dei contenuti diffusi dai rispettivi proprietari.</string>
     <string name="dialog_help_home">Home</string>
-    <string name="dialog_help_home_text">Clicca su l\'icona di Comics Checklist per aprire la schermata laterale e seleziona una delle opzioni per visualizzare le prossime uscite.</string>
+    <string name="dialog_help_home_text">Clicca su l\'icona nel menu in alto a sinistra per aprire la schermata laterale (oppure effettua uno swipe da sinistra verso destra) e seleziona una delle opzioni per visualizzare le prossime uscite.</string>
     <string name="dialog_help_list">Lista delle uscite</string>
     <string name="dialog_help_list_text">Clicca su un elemento della lista per avere più informazioni. Puoi aggiornare la lista di un editore facendo scorrere verso il basso la lista.</string>
     <string name="dialog_help_detail">Schermata dettagli</string>
@@ -18,10 +18,10 @@
     <string name="dialog_help_favorite">Lista preferiti</string>
     <string name="dialog_help_favorite_text">Questa sezione caricherà solo i fumetti che sono stati inseriti tra i preferiti. Puoi togliere i fumetti effettuando un long-click su un elemento.</string>
     <string name="dialog_help_buy">Da comprare</string>
-    <string name="dialog_help_buy_text">In questa sezione trovi tutti i fumetti da comprare. Puoi aggiungere manualmente uno o pi\ù fumetti alla lista, cliccando sull\'icona + dal menu. Puoi togliere i fumetti effettuando un long-click su un elemento.</string>
+    <string name="dialog_help_buy_text">In questa sezione trovi tutti i fumetti contrassegnati come "da comprare". Puoi aggiungere manualmente uno o pi\ù fumetti alla lista, cliccando sul bottone + presente in tutte le schermate. Puoi togliere i fumetti dalla lista effettuando un long-click su un elemento.</string>
     <string name="dialog_help_settings">Impostazioni</string>
-    <string name="dialog_help_settings_text">Nelle impostazioni potrai:\n - scegliere se visualizzare le notifiche durante la ricerca delle uscite;\n - impostare ogni quanto effettuare la ricerca automatica e dopo quanto tempo cancellare le uscite più vecchie;\n - scegliere l\'ordinamento delle uscite nella lista.\nPotrai sempre decidere se fare la ricerca manualmente e/o mantenere le uscite più vecchie.</string>
-    <string name="dialog_rate_text">Comics Checklist non usa nessun banner pubblicitario, è completamente gratuita e non richiede permessi particolari o superflui.\nSe l\'applicazione ti è stata utile lascia un commento su Google Play.\nGrazie per il tuo supporto!</string>
+    <string name="dialog_help_settings_text">Nelle impostazioni potrai:\n - scegliere se visualizzare le notifiche durante la ricerca delle uscite;\n - abilitare le notifiche push quando un fumetto tra i preferiti è disponibile in edicola o fumetteria;\n - impostare ogni quanto effettuare la ricerca automatica e dopo quanto tempo cancellare le uscite più vecchie;\n - scegliere l\'ordinamento delle uscite nella lista.\nPotrai sempre decidere se fare la ricerca manualmente e/o mantenere le uscite più vecchie.</string>
+    <string name="dialog_rate_text">Comics Checklist non usa nessun banner pubblicitario, è completamente gratuita e non richiede permessi invasivi.\nSe l\'applicazione ti è stata utile lascia un commento su Google Play.\nGrazie per il tuo supporto!</string>
     <string name="dialog_rate_button">Recensisci ora!</string>
     <string name="dialog_late_button">Più tardi</string>
     <string name="dialog_confirm_button">OK</string>
