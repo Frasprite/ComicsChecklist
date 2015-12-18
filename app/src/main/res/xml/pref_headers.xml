@@ -3,10 +3,12 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
+        android:id="@+id/notification"
         android:fragment="org.checklist.comics.comicschecklist.SettingsActivity$NotificationPreferenceFragment"
         android:title="@string/pref_header_notifications" />
 
     <header
+        android:id="@+id/data_sync"
         android:fragment="org.checklist.comics.comicschecklist.SettingsActivity$DataSyncPreferenceFragment"
         android:title="@string/pref_header_data_sync" />
 
