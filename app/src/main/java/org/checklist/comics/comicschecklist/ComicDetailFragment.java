@@ -93,6 +93,7 @@ public class ComicDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_comic_detail, container, false);
 
         // Show the comic contents.
+        // TODO change title UI, because with long title it is not visible
         if (mComicId > -1) {
             Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + mComicId);
             String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY,
