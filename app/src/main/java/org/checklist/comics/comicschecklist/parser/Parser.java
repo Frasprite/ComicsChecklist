@@ -355,6 +355,7 @@ public class Parser {
     }
 
     public boolean startParseBonelli() {
+        // TODO fix parser
         Log.d(TAG, "Inizio scansione Bonelli");
         comicErrorBonelli = false;
 
