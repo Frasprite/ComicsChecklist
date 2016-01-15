@@ -6,17 +6,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
+import android.view.MenuItem;
 
 import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
 import org.checklist.comics.comicschecklist.receiver.BootReceiver;
@@ -36,38 +34,7 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends PreferenceActivity {
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-
-        // Get the root container of the preferences list and insert toolbar
-        // TODO change start settings: no comics delete
-        LinearLayout root = (LinearLayout)findViewById(android.R.id.list).getParent().getParent().getParent();
-        Toolbar bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar_settings, root, false);
-        root.addView(bar, 0); // insert at top
-        bar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-    }
-
-    @Override
-    protected boolean isValidFragment(String fragmentName) {
-        return NotificationPreferenceFragment.class.getName().equals(fragmentName)
-                || DataSyncPreferenceFragment.class.getName().equals(fragmentName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.pref_headers, target);
-    }
+public class SettingsActivity extends AppCompatPreferenceActivity {
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -97,6 +64,65 @@ public class SettingsActivity extends PreferenceActivity {
             return true;
         }
     };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setupActionBar();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            //startActivity(new Intent(getActivity(), SettingsActivity.class));
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Set up the {@link android.app.ActionBar}, if the API is available.
+     */
+    private void setupActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // Show the Up button in the action bar
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onIsMultiPane() {
+        return isXLargeTablet(this);
+    }
+
+    /**
+     * Helper method to determine if the device has an extra-large screen. For
+     * example, 10" tablets are extra-large.
+     */
+    private static boolean isXLargeTablet(Context context) {
+        return (context.getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+    }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
+        return NotificationPreferenceFragment.class.getName().equals(fragmentName)
+                || DataSyncPreferenceFragment.class.getName().equals(fragmentName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onBuildHeaders(List<Header> target) {
+        loadHeadersFromResource(R.xml.pref_headers, target);
+    }
 
     /**
      * Binds a preference's summary to its value. More specifically, when the
@@ -130,6 +156,7 @@ public class SettingsActivity extends PreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_notification);
+            setHasOptionsMenu(true);
             findPreference(Constants.PREF_FAVORITE_NOTIFICATION).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -180,6 +207,17 @@ public class SettingsActivity extends PreferenceActivity {
                 }
             });
         }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                //startActivity(new Intent(getActivity(), SettingsActivity.class));
+                getActivity().onBackPressed();
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     /**
@@ -187,10 +225,12 @@ public class SettingsActivity extends PreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     public static class DataSyncPreferenceFragment extends PreferenceFragment {
+
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_data_sync);
+            setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
@@ -199,6 +239,17 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("sync_frequency"));
             bindPreferenceSummaryToValue(findPreference("delete_frequency"));
             bindPreferenceSummaryToValue(findPreference("data_order"));
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                //startActivity(new Intent(getActivity(), SettingsActivity.class));
+                getActivity().onBackPressed();
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
         }
     }
 }

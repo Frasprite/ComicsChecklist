@@ -103,16 +103,16 @@
         <item>-1</item>
     </string-array>
 
-    <string name="pref_title_delete_frequency">Elimina le uscite più vecchie di</string>
+    <string name="pref_title_delete_frequency">Elimina le uscite più vecchie</string>
     <string-array name="pref_delete_frequency_titles">
-        <item>1 giorno</item>
-        <item>2 giorni</item>
-        <item>3 giorni</item>
-        <item>4 giorni</item>
-        <item>5 giorni</item>
-        <item>6 giorni</item>
-        <item>1 settimana</item>
-        <item>Non cancellare i dati</item>
+        <item>di 1 giorno</item>
+        <item>di 2 giorni</item>
+        <item>di 3 giorni</item>
+        <item>di 4 giorni</item>
+        <item>di 5 giorni</item>
+        <item>di 6 giorni</item>
+        <item>di 1 settimana</item>
+        <item>Non cancellare mai i dati</item>
     </string-array>
     <string-array name="pref_delete_frequency_values">
         <item>1</item>
