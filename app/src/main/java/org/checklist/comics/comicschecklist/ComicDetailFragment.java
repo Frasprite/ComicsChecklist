@@ -1,5 +1,6 @@
 package org.checklist.comics.comicschecklist;
 
+import android.animation.ValueAnimator;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.ContentValues;
@@ -46,7 +47,7 @@ import java.util.Locale;
  * in two-pane mode (on tablets) or a {@link ComicDetailActivity}
  * on handsets.
  */
-public class ComicDetailFragment extends Fragment {
+public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayout.PanelSlideListener {
 
     private static final String TAG = ComicDetailFragment.class.getSimpleName();
 
@@ -63,6 +64,8 @@ public class ComicDetailFragment extends Fragment {
     private String mCart;
     private boolean mUserLearnedSliding;
     private long mComicId = -1;
+
+    private TextView titleTextView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -92,8 +95,7 @@ public class ComicDetailFragment extends Fragment {
         Log.d(TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_comic_detail, container, false);
 
-        // Show the comic contents.
-        // TODO change title UI, because with long title it is not visible
+        // Show the comic contents
         if (mComicId > -1) {
             Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + mComicId);
             String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY,
@@ -118,65 +120,57 @@ public class ComicDetailFragment extends Fragment {
             mCart = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY));
             mCursor.close();
             // Populating view
-            ((TextView) rootView.findViewById(R.id.title_text_view)).setText(mComicName);
+            titleTextView = ((TextView) rootView.findViewById(R.id.title_text_view));
+            titleTextView.setText(mComicName);
             ((TextView) rootView.findViewById(R.id.release_text_view)).setText(mComicRelease);
             ((TextView) rootView.findViewById(R.id.description_text_view)).setText(mComicDescription);
             ((TextView) rootView.findViewById(R.id.feature_text_view)).setText(mComicFeature);
             ((TextView) rootView.findViewById(R.id.price_text_view)).setText(mComicPrice);
             ImageView coverView = (ImageView) rootView.findViewById(R.id.cover_image_view);
             Picasso.with(getActivity())
-                   .load(mComicCover)
-                   .placeholder(R.drawable.comic_placeholder)
-                   .error(R.drawable.comic_placeholder)
-                   .resize(250,383)
-                   .into(coverView);
-        }
+                    .load(mComicCover)
+                    .placeholder(R.drawable.comic_placeholder)
+                    .error(R.drawable.comic_placeholder)
+                    .resize(250, 383)
+                    .into(coverView);
 
-        SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
-        layout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
+            layout.setPanelSlideListener(this);
 
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-                // Anything you put here is going to happen if user do a slide
+            ImageView arrowSx = (ImageView) rootView.findViewById(R.id.go_up_sx);
+            ImageView arrowDx = (ImageView) rootView.findViewById(R.id.go_up_dx);
+
+            if (!mUserLearnedSliding) {
+                int imagesToShow[] = {R.drawable.ic_action_drag_up, R.drawable.ic_action_orange_drag_up};
+
+                animate(arrowSx, imagesToShow, 0, true);
+                animate(arrowDx, imagesToShow, 0, true);
+            } else {
+                arrowDx.setVisibility(View.GONE);
+                arrowSx.setVisibility(View.GONE);
             }
-
-            @Override
-            public void onPanelCollapsed(View panel) {
-                // Anything you put here is going to happen if the view is closed
-            }
-
-            @Override
-            public void onPanelExpanded(View panel) {
-                // Anything you put here is going to happen if the view is open
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                sp.edit().putBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, true).apply();
-            }
-
-            @Override
-            public void onPanelAnchored(View panel) {
-                // Anything you put here is going to happen if the view is anchored
-            }
-
-            @Override
-            public void onPanelHidden(View view) {
-                // Anything you put here is going to happen if the view is hidden
-            }
-        });
-
-        ImageView arrowSx = (ImageView) rootView.findViewById(R.id.go_up_sx);
-        ImageView arrowDx = (ImageView) rootView.findViewById(R.id.go_up_dx);
-
-        if (!mUserLearnedSliding) {
-            int imagesToShow[] = {R.drawable.ic_action_drag_up, R.drawable.ic_action_orange_drag_up};
-
-            animate(arrowSx, imagesToShow, 0, true);
-            animate(arrowDx, imagesToShow, 0, true);
-        } else {
-            arrowDx.setVisibility(View.GONE);
-            arrowSx.setVisibility(View.GONE);
         }
 
         return rootView;
+    }
+
+    private void enlargeTextView(final TextView textView) {
+        final int startSize = 1;
+        final int endSize = 5;
+        final int animationDuration = 300; // Animation duration in ms
+
+        ValueAnimator animator = ValueAnimator.ofInt(startSize, endSize);
+        animator.setDuration(animationDuration);
+
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int animatedValue = (int) valueAnimator.getAnimatedValue();
+                textView.setMaxLines(animatedValue);
+            }
+        });
+
+        animator.start();
     }
 
     @Override
@@ -325,5 +319,34 @@ public class ComicDetailFragment extends Fragment {
 
             public void onAnimationStart(Animation animation) {}
         });
+    }
+
+    @Override
+    public void onPanelSlide(View panel, float slideOffset) {
+        // Anything you put here is going to happen if user do a slide
+    }
+
+    @Override
+    public void onPanelCollapsed(View panel) {
+        // Anything you put here is going to happen if the view is closed
+        titleTextView.setMaxLines(1);
+    }
+
+    @Override
+    public void onPanelExpanded(View panel) {
+        enlargeTextView(titleTextView);
+        // Anything you put here is going to happen if the view is open
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        sp.edit().putBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, true).apply();
+    }
+
+    @Override
+    public void onPanelAnchored(View panel) {
+        // Anything you put here is going to happen if the view is anchored
+    }
+
+    @Override
+    public void onPanelHidden(View panel) {
+        // Anything you put here is going to happen if the view is hidden
     }
 }
