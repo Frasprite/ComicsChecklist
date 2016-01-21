@@ -68,12 +68,15 @@
              android:layout_gravity="left" instead. -->
         <!-- The drawer is given a fixed width in dp and extends the full height of
              the container. -->
-        <fragment
+        <ListView
             android:id="@+id/navigation_drawer"
-            android:name="org.checklist.comics.comicschecklist.NavigationDrawerFragment"
             android:layout_width="240dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            tools:layout="@layout/fragment_navigation_drawer" />
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:background="@color/primary"
+            tools:context=".NavigationDrawerFragment" />
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>

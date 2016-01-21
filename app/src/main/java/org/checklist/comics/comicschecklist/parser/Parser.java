@@ -207,10 +207,10 @@ public class Parser {
                         // Check if we have more then one comic on <p> tag
                         if (checkForA.size() > 1) {
                             // More comic founded, insert only name, image, release and editor
-                            insertComic(pElement.select("span[style^=color: #ff0000]").first().text(), Constants.RW,
+                            insertComic(pElement.select("span[style^=color: #ff0000]").first().text(), Constants.Editors.RW.name(),
                                     description, releaseDate, myDate, checkForA.first().attr("href"), feature, price);
 
-                            insertComic(pElement.select("span[style^=color: #ff0000]").last().text(), Constants.RW,
+                            insertComic(pElement.select("span[style^=color: #ff0000]").last().text(), Constants.Editors.RW.name(),
                                     description, releaseDate, myDate, checkForA.last().attr("href"), feature, price);
                         } else {
                             // Only one comic founded: getting all junk data
@@ -263,7 +263,7 @@ public class Parser {
                                 description = "N.D.";
 
                             // Insert comic on database
-                            insertComic(name, Constants.RW, description, releaseDate, myDate, coverUrl, feature, price);
+                            insertComic(name, Constants.Editors.RW.name(), description, releaseDate, myDate, coverUrl, feature, price);
                         }
                     }
                 }
@@ -346,7 +346,7 @@ public class Parser {
                 DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date myDate = formatter.parse(releaseDate);
                 // Insert comic on database
-                insertComic(name, Constants.STAR, description, releaseDate, myDate, coverUrl, feature, price);
+                insertComic(name, Constants.Editors.STAR.name(), description, releaseDate, myDate, coverUrl, feature, price);
             } catch (Exception e) {
                 Log.w(TAG, "Error on parseUrlStarC comic id " + i + " " + e.toString());
                 comicErrorStar = true;
@@ -438,7 +438,7 @@ public class Parser {
                 Date myDate = formatter.parse(releaseDate);
 
                 // Insert comic on database
-                insertComic(name.toUpperCase(), Constants.BONELLI, description, releaseDate, myDate, coverUrl, feature, price);
+                insertComic(name.toUpperCase(), Constants.Editors.BONELLI.name(), description, releaseDate, myDate, coverUrl, feature, price);
             }
         } catch (Exception e) {
             Log.w(TAG, "Error during comic fetching " + url + " " + e.toString());

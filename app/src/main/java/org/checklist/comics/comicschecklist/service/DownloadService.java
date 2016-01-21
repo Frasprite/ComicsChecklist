@@ -79,7 +79,7 @@ public class DownloadService extends IntentService {
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
                     if (notificationPref)
                         createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.MARVEL);
+                    error = myParser.startParsePanini(Constants.Editors.MARVEL.name());
                     if (error) {
                         publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section3));
                         if (notificationPref)
@@ -95,7 +95,7 @@ public class DownloadService extends IntentService {
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
                     if (notificationPref)
                         createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.PANINI);
+                    error = myParser.startParsePanini(Constants.Editors.PANINI.name());
                     if (error) {
                         publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section4));
                         if (notificationPref)
@@ -111,7 +111,7 @@ public class DownloadService extends IntentService {
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
                     if (notificationPref)
                         createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.PLANET);
+                    error = myParser.startParsePanini(Constants.Editors.PLANET.name());
                     if (error) {
                         publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section5));
                         if (notificationPref)
@@ -173,7 +173,7 @@ public class DownloadService extends IntentService {
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
                         if (notificationPref)
                             createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.MARVEL);
+                        error = myParser.startParsePanini(Constants.Editors.MARVEL.name());
                         if (error) {
                             publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section3));
                             if (notificationPref)
@@ -189,7 +189,7 @@ public class DownloadService extends IntentService {
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
                         if (notificationPref)
                             createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.PANINI);
+                        error = myParser.startParsePanini(Constants.Editors.PANINI.name());
                         if (error) {
                             publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section4));
                             if (notificationPref)
@@ -205,7 +205,7 @@ public class DownloadService extends IntentService {
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
                         if (notificationPref)
                             createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.PLANET);
+                        error = myParser.startParsePanini(Constants.Editors.PLANET.name());
                         if (error) {
                             publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section5));
                             if (notificationPref)

@@ -44,8 +44,6 @@ import org.checklist.comics.comicschecklist.util.Constants;
  * 'activated' state upon selection. This helps indicate which item is
  * currently being viewed in a {@link ComicDetailFragment}.
  * <p>
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
  */
 public class ComicListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -100,7 +98,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
      * Returns a new instance of this fragment for the given section number.
      */
     public static ComicListFragment newInstance(int section) {
-        Log.v(TAG, "Creating new instance");
+        Log.v(TAG, "Creating new instance " + section);
         ComicListFragment fragment = new ComicListFragment();
         Bundle args = new Bundle();
         args.putInt(Constants.ARG_SECTION_NUMBER, section);
@@ -113,42 +111,11 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
 
         // Find editor
-        mEditor = findEditor(getArguments().getInt(Constants.ARG_SECTION_NUMBER));
         mEditorNumber = getArguments().getInt(Constants.ARG_SECTION_NUMBER);
+        mEditor = Constants.Editors.getName(mEditorNumber);
         Log.d(TAG, "onCreate - " + mEditor);
 
         fillData();
-    }
-
-    public String findEditor(int section) {
-        String result = Constants.FAVORITE;
-        switch (section) {
-            case 1:
-                result = Constants.FAVORITE;
-                break;
-            case 2:
-                result = Constants.CART;
-                break;
-            case 3:
-                result = Constants.MARVEL;
-                break;
-            case 4:
-                result = Constants.PANINI;
-                break;
-            case 5:
-                result = Constants.PLANET;
-                break;
-            case 6:
-                result = Constants.STAR;
-                break;
-            case 7:
-                result = Constants.BONELLI;
-                break;
-            case 8:
-                result = Constants.RW;
-                break;
-        }
-        return result;
     }
 
     @Override
@@ -161,10 +128,10 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
 
         TextView emptyText = (TextView)view.findViewById(android.R.id.empty);
 
-        if (mEditor.equalsIgnoreCase(Constants.FAVORITE)) {
+        if (mEditor.equalsIgnoreCase(Constants.Editors.FAVORITE.name())) {
             emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
             emptyText.setText(getString(R.string.empty_favorite_list));
-        } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
+        } else if (mEditor.equalsIgnoreCase(Constants.Editors.CART.name())) {
             emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_shopping, 0, 0);
             emptyText.setText(getString(R.string.empty_cart_list));
         } else
@@ -206,7 +173,9 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
             }
         });
 
-        if (mEditor.equalsIgnoreCase(Constants.FAVORITE) || mEditor.equalsIgnoreCase(Constants.CART))
+        getActivity().setTitle(Constants.Editors.getTitle(mEditorNumber));
+
+        if (mEditor.equalsIgnoreCase(Constants.Editors.FAVORITE.name()) || mEditor.equalsIgnoreCase(Constants.Editors.CART.name()))
             return listFragmentView;
         else {
             // Now create a SwipeRefreshLayout to wrap the fragment's content view
@@ -233,7 +202,6 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        ((ComicListActivity) context).onSectionAttached(getArguments().getInt(Constants.ARG_SECTION_NUMBER));
         // Activities containing this fragment must implement its callbacks.
         if (!(context instanceof Callbacks)) {
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
@@ -252,7 +220,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     @Override
     public void onActivityCreated(Bundle savedState) {
         super.onActivityCreated(savedState);
-        if (mEditor.equalsIgnoreCase(Constants.FAVORITE) || mEditor.equalsIgnoreCase(Constants.CART))
+        if (mEditor.equalsIgnoreCase(Constants.Editors.FAVORITE.name()) || mEditor.equalsIgnoreCase(Constants.Editors.CART.name()))
             registerForContextMenu(getListView());
     }
 
@@ -267,7 +235,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case DELETE_ID:
-                if (mEditor.equalsIgnoreCase(Constants.FAVORITE)) {
+                if (mEditor.equalsIgnoreCase(Constants.Editors.FAVORITE.name())) {
                     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
@@ -275,7 +243,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
                     updateWidget();
                     return true;
-                } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
+                } else if (mEditor.equalsIgnoreCase(Constants.Editors.CART.name())) {
                     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
@@ -284,7 +252,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     return true;
                 }
             case DELETE_ALL:
-                if (mEditor.equalsIgnoreCase(Constants.FAVORITE)) {
+                if (mEditor.equalsIgnoreCase(Constants.Editors.FAVORITE.name())) {
                     // Update all favorite
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
@@ -292,7 +260,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
                     updateWidget();
                     return true;
-                } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
+                } else if (mEditor.equalsIgnoreCase(Constants.Editors.CART.name())) {
                     // Update all comic on cart
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
@@ -450,17 +418,17 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
 
         // Update shared preference of editor as well
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (mEditor.equalsIgnoreCase(Constants.MARVEL))
+        if (mEditor.equalsIgnoreCase(Constants.Editors.MARVEL.name()))
             sp.edit().remove(Constants.PREF_MARVEL_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.PANINI))
+        else if (mEditor.equalsIgnoreCase(Constants.Editors.PANINI.name()))
             sp.edit().remove(Constants.PREF_PANINI_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.PLANET))
+        else if (mEditor.equalsIgnoreCase(Constants.Editors.PLANET.name()))
             sp.edit().remove(Constants.PREF_PLANET_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.BONELLI))
+        else if (mEditor.equalsIgnoreCase(Constants.Editors.BONELLI.name()))
             sp.edit().remove(Constants.PREF_BONELLI_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.STAR))
+        else if (mEditor.equalsIgnoreCase(Constants.Editors.STAR.name()))
             sp.edit().remove(Constants.PREF_STAR_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.RW))
+        else if (mEditor.equalsIgnoreCase(Constants.Editors.RW.name()))
             sp.edit().remove(Constants.PREF_RW_LAST_SCAN).apply();
 
         /**
@@ -491,10 +459,10 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String order = sharedPref.getString("data_order", "ASC");
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
-        if (mEditor.equalsIgnoreCase(Constants.FAVORITE)) {
+        if (mEditor.equalsIgnoreCase(Constants.Editors.FAVORITE.name())) {
             return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_FAVORITE_KEY + "=?", new String[]{"yes"},
                     ComicDatabase.COMICS_DATE_KEY + " " + order);
-        } else if (mEditor.equalsIgnoreCase(Constants.CART)) {
+        } else if (mEditor.equalsIgnoreCase(Constants.Editors.CART.name())) {
             return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
                     ComicDatabase.COMICS_DATE_KEY + " " + order);
         } else {

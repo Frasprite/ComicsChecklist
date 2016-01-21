@@ -60,39 +60,39 @@ public class SettingsWidget extends ListActivity {
         String editor, title;
         switch (position) {
             case 0:
-                editor = Constants.FAVORITE;
+                editor = Constants.Editors.FAVORITE.name();
                 title = mEditor[0];
                 break;
             case 1:
-                editor = Constants.CART;
+                editor = Constants.Editors.CART.name();
                 title = mEditor[1];
                 break;
             case 2:
-                editor = Constants.MARVEL;
+                editor = Constants.Editors.MARVEL.name();
                 title = mEditor[2];
                 break;
             case 3:
-                editor = Constants.PANINI;
+                editor = Constants.Editors.PANINI.name();
                 title = mEditor[3];
                 break;
             case 4:
-                editor = Constants.PLANET;
+                editor = Constants.Editors.PLANET.name();
                 title = mEditor[4];
                 break;
             case 5:
-                editor = Constants.STAR;
+                editor = Constants.Editors.STAR.name();
                 title = mEditor[5];
                 break;
             case 6:
-                editor = Constants.BONELLI;
+                editor = Constants.Editors.BONELLI.name();
                 title = mEditor[6];
                 break;
             case 7:
-                editor = Constants.RW;
+                editor = Constants.Editors.RW.name();
                 title = mEditor[7];
                 break;
             default:
-                editor = Constants.FAVORITE;
+                editor = Constants.Editors.FAVORITE.name();
                 title = mEditor[0];
                 break;
         }

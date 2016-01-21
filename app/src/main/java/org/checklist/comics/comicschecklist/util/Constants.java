@@ -1,5 +1,7 @@
 package org.checklist.comics.comicschecklist.util;
 
+import java.util.HashMap;
+
 /**
  * Created by Francesco Bevilacqua on 25/10/2014.
  * This code is part of ComicsChecklist project.
@@ -25,17 +27,44 @@ public class Constants {
     public final static int DAYS_UNTIL_PROMPT = 7;
     public final static int LAUNCHES_UNTIL_PROMPT = 7;
 
-    /* Parser */
-    public static final String MARVEL = "marvelitalia";
-    public static final String PANINI = "paninicomics";
-    public static final String PLANET = "planetmanga";
-    public static final String BONELLI = "bonelli";
-    public static final String STAR = "star";
-    public static final String RW = "rw";
+    /* Enum of editors and list created by user */
+    public enum Editors {
+        FAVORITE(0, "preferiti", "Lista preferiti"),
+        CART    (1, "da comprare", "Da comprare"),
+        MARVEL  (2, "marvelitalia", "Marvel"),
+        PANINI  (3, "paninicomics", "Panini Comics"),
+        PLANET  (4, "planetmanga", "Planet Manga"),
+        STAR    (5, "star", "Star Comics"),
+        BONELLI (6, "bonelli", "Sergio Bonelli"),
+        RW      (7, "rw", "RW Edizioni");
 
-    /* List created/searched by user */
-    public static final String FAVORITE = "preferiti";
-    public static final String CART = "da comprare";
+        private static HashMap<Integer, Editors> map;
+
+        static {
+            map = new HashMap<>();
+            for (Editors editor : Editors.values()) {
+                map.put(editor.code, editor);
+            }
+        }
+
+        private int code;
+        private String name;
+        private String title;
+
+        Editors(int code, String name, String title) {
+            this.code = code;
+            this.name = name;
+            this.title = title;
+        }
+
+        public static String getName(int position) {
+            return map.get(position).name;
+        }
+
+        public static String getTitle(int position) {
+            return map.get(position).title;
+        }
+    }
 
     /* Preference last scan */
     public static final String PREF_MARVEL_LAST_SCAN = "marvel_lastscan";

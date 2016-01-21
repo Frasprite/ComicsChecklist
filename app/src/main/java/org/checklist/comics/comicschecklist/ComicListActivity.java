@@ -7,16 +7,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
@@ -37,23 +44,31 @@ import org.checklist.comics.comicschecklist.util.Constants;
  * {@link ComicListFragment} and the item details
  * (if present) is a {@link ComicDetailFragment}.
  * <p>
- * This activity also implements the required
- * {@link ComicListFragment.Callbacks} interface
  * to listen for item selections.
  */
-public class ComicListActivity extends AppCompatActivity implements ComicListFragment.Callbacks, NavigationDrawerFragment.NavigationDrawerCallbacks,
-                                                                   ComicsChecklistDialogFragment.ComicsChecklistDialogListener {
+public class ComicListActivity extends AppCompatActivity implements ComicListFragment.Callbacks,
+                                                                    ComicsChecklistDialogFragment.ComicsChecklistDialogListener {
 
     private static final String TAG = ComicListActivity.class.getSimpleName();
 
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
     private boolean mTwoPane;
-    private CharSequence mTitle;
     // Other interface fragments.
     private ComicDetailFragment mDetailFragment;
     private ComicListFragment mListFragment;
-    // Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-    private NavigationDrawerFragment mNavigationDrawerFragment;
+
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+
+    private CharSequence mDrawerTitle;
+    private CharSequence mTitle;
+    private String[] mNavDrawerTitles;
+
+    private ActionBar mActionBar;
+
+    private boolean mUserLearnedDrawer;
+    private boolean mFromSavedInstanceState;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -86,6 +101,11 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.v(TAG, "onCreate");
+        // Read in the flag indicating whether or not the user has demonstrated awareness of the
+        // drawer. See PREF_USER_LEARNED_DRAWER for details.
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        mUserLearnedDrawer = sp.getBoolean(Constants.PREF_USER_LEARNED_DRAWER, false);
+
         setContentView(R.layout.activity_comic_list);
         if (findViewById(R.id.comic_detail_container) != null) {
             // The detail container view will be present only in the
@@ -94,16 +114,75 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             // activity should be in two-pane mode.
             mTwoPane = true;
         }
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setElevation(5);
+
+        mTitle = mDrawerTitle = getTitle();
+        mNavDrawerTitles = getResources().getStringArray(R.array.drawer_array);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerList = (ListView) findViewById(R.id.navigation_drawer);
+
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+        // Set up the drawer's list view with items and click listener
+        mDrawerList.setAdapter((new NavDrawerAdapter(this, R.layout.list_item_drawer, mNavDrawerTitles)));
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectItem(position);
+            }
+        });
+        //mDrawerList.setItemChecked(mCurrentSelectedPosition, true);
+
+        // Set action bar
+        mActionBar = getSupportActionBar();
+        if (mActionBar != null) {
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setHomeButtonEnabled(true);
         }
 
-        mNavigationDrawerFragment = (NavigationDrawerFragment) getFragmentManager().findFragmentById(R.id.navigation_drawer);
-        mTitle = getTitle();
+        // ActionBarDrawerToggle ties together the the proper interactions
+        // between the sliding drawer and the action bar app icon
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.string.drawer_open,  /* "open drawer" description for accessibility */
+                R.string.drawer_close  /* "close drawer" description for accessibility */
+        ) {
+            public void onDrawerClosed(View view) {
+                if (mActionBar != null) {
+                    mActionBar.setTitle(mTitle);
+                }
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
 
-        // Set up the drawer.
-        mNavigationDrawerFragment.setUp(R.id.navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), actionBar);
+            public void onDrawerOpened(View drawerView) {
+                if (mActionBar != null) {
+                    mActionBar.setTitle(mDrawerTitle);
+                }
+
+                if (!mUserLearnedDrawer) {
+                    // The user manually opened the drawer; store this flag to prevent auto-showing
+                    // the navigation drawer automatically in the future.
+                    mUserLearnedDrawer = true;
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ComicListActivity.this);
+                    sp.edit().putBoolean(Constants.PREF_USER_LEARNED_DRAWER, true).apply();
+                }
+
+                invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
+            }
+        };
+        // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer,
+        // per the navigation drawer design guidelines.
+        if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
+            mDrawerLayout.openDrawer(mDrawerList);
+        }
+
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+        if (savedInstanceState == null) {
+            selectItem(0);
+        } else {
+            mFromSavedInstanceState = true;
+        }
 
         Intent intent = new Intent(this, DownloadService.class);
         startService(intent);
@@ -198,11 +277,59 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     }
 
     @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        Log.d(TAG, "onNavigationDrawerItemSelected position " + position);
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
+            // Get the SearchView and set the searchable configuration
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+            // Assumes current activity is the searchable activity
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+
+            return true;
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // If the nav drawer is open, hide action items related to the content view
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        // Hide detail buttons
+        if (mTwoPane && mDetailFragment != null) {
+            menu.findItem(R.id.calendar).setVisible(!drawerOpen);
+            menu.findItem(R.id.favorite).setVisible(!drawerOpen);
+            menu.findItem(R.id.buy).setVisible(!drawerOpen);
+            menu.findItem(R.id.search).setVisible(!drawerOpen);
+        } else {
+            menu.findItem(R.id.search).setVisible(!drawerOpen);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // The action bar home/up action should open or close the drawer.
+        // ActionBarDrawerToggle will take care of this.
+        return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
+    }
+
+    private void selectItem(int position) {
+        Log.d(TAG, "selectItem " + position);
+        if (mDrawerList != null) {
+            mDrawerList.setItemChecked(position, true);
+            if (mDrawerLayout != null) {
+                if (position < 8) {
+                    // Update selected item title, then close the drawer
+                    setTitle(mNavDrawerTitles[position]);
+                    mDrawerLayout.closeDrawer(mDrawerList);
+                }
+            }
+        }
         if (position <= 7) {
             // Update the main content by replacing fragments
-            mListFragment = ComicListFragment.newInstance(position + 1);
+            mListFragment = ComicListFragment.newInstance(position);
             getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, mListFragment).commit();
         } else {
             switch (position) {
@@ -228,77 +355,31 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         }
     }
 
-    public void onSectionAttached(int section) {
-        switch (section) {
-            case 1:
-                mTitle = getString(R.string.title_section1);
-                break;
-            case 2:
-                mTitle = getString(R.string.title_section2);
-                break;
-            case 3:
-                mTitle = getString(R.string.title_section3);
-                break;
-            case 4:
-                mTitle = getString(R.string.title_section4);
-                break;
-            case 5:
-                mTitle = getString(R.string.title_section5);
-                break;
-            case 6:
-                mTitle = getString(R.string.title_section6);
-                break;
-            case 7:
-                mTitle = getString(R.string.title_section7);
-                break;
-            case 8:
-                mTitle = getString(R.string.title_section8);
-                break;
+    @Override
+    public void setTitle(CharSequence title) {
+        mTitle = title;
+        if (mActionBar != null) {
+            mActionBar.setTitle(mTitle);
         }
     }
 
-    public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(mTitle);
-        }
+    /**
+     * When using the ActionBarDrawerToggle, you must call it during
+     * onPostCreate() and onConfigurationChanged()...
+     */
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.menu_main, menu);
-            restoreActionBar();
-
-            // Get the SearchView and set the searchable configuration
-            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-            // Assumes current activity is the searchable activity
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
-
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = mNavigationDrawerFragment.isDrawerOpen();
-        // Hide detail buttons
-        if (mTwoPane && mDetailFragment != null) {
-            menu.findItem(R.id.calendar).setVisible(!drawerOpen);
-            menu.findItem(R.id.favorite).setVisible(!drawerOpen);
-            menu.findItem(R.id.buy).setVisible(!drawerOpen);
-            menu.findItem(R.id.search).setVisible(!drawerOpen);
-        } else
-            menu.findItem(R.id.search).setVisible(!drawerOpen);
-        return super.onPrepareOptionsMenu(menu);
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Pass any configuration change to the drawer toggles
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     /**
@@ -337,6 +418,10 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             startActivity(detailIntent);
         }
     }
+
+    /******************************************************************************************
+     * DIALOG CALLBACK
+     ******************************************************************************************/
 
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, int dialogId) {
