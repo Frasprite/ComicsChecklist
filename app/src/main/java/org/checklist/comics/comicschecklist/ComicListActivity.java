@@ -407,7 +407,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             arguments.putString(ComicDetailFragment.ARG_SECTION, section);
             mDetailFragment = new ComicDetailFragment();
             mDetailFragment.setArguments(arguments);
-            // TODO warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
+            // Warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
             getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commitAllowingStateLoss();
         } else {
             // In single-pane mode, simply start the detail activity
