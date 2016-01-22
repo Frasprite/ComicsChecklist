@@ -11,6 +11,7 @@ import android.widget.RemoteViews;
 
 import org.checklist.comics.comicschecklist.ComicListActivity;
 import org.checklist.comics.comicschecklist.R;
+import org.checklist.comics.comicschecklist.SettingsWidget;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 
@@ -27,38 +28,10 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-
-        // Perform this loop procedure for each App Widget that belongs to this provider
+        // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
-            // Set up the intent that starts the StackViewService, which will
-            // provide the views for this collection.
-            Intent intent = new Intent(context, WidgetService.class);
-            // Add the app widget unique ID to the intent extras.
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-            Log.d(TAG, "WidgetProvider onUpdate widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
-            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));//(data);
-            // Instantiate the RemoteViews object for the app widget layout.
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
-            // Set up the RemoteViews object to use a RemoteViews adapter.
-            // This adapter connects to a RemoteViewsService  through the specified intent.
-            // This is how you populate the data.
-            rv.setRemoteAdapter(R.id.list, intent);
-            // The empty view is displayed when the collection has no items.
-            // It should be in the same layout used to instantiate the RemoteViews object above.
-            rv.setEmptyView(R.id.list, R.id.empty_view);
-
-            // Do additional processing specific to this app widget...
-            Intent clickIntent = new Intent(context, WidgetProvider.class);
-            clickIntent.setAction(WidgetProvider.CLICK_ACTION);
-            clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-
-            PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            rv.setPendingIntentTemplate(R.id.list, clickPendingIntent);
-
-            appWidgetManager.updateAppWidget(appWidgetId, rv);
+            updateAppWidget(context, appWidgetManager, appWidgetId);
         }
-
-        super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
     @Override
@@ -81,22 +54,58 @@ public class WidgetProvider extends AppWidgetProvider {
             detailsIntent.putExtra(Constants.COMIC_ID_FROM_WIDGET, comicID);
             context.startActivity(detailsIntent);
         }
-
-        super.onReceive(context, intent);
     }
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
-        super.onDeleted(context, appWidgetIds);
-    }
-
-    @Override
-    public void onDisabled(Context context) {
-        super.onDisabled(context);
+        // When the user deletes the widget, delete the preference associated with it.
+        for (int appWidgetId : appWidgetIds) {
+            SettingsWidget.deleteTitlePref(context, appWidgetId);
+        }
     }
 
     @Override
     public void onEnabled(Context context) {
-        super.onEnabled(context);
+        // Enter relevant functionality for when the first widget is created
+    }
+
+    @Override
+    public void onDisabled(Context context) {
+        // Enter relevant functionality for when the last widget is disabled
+    }
+
+    public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+                                int appWidgetId) {
+
+        CharSequence widgetText = SettingsWidget.loadTitlePref(context, appWidgetId);
+        // Construct the RemoteViews object
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
+        views.setTextViewText(R.id.widgetTextView, widgetText);
+
+        // Set up the intent that starts the StackViewService, which will
+        // provide the views for this collection.
+        Intent intent = new Intent(context, WidgetService.class);
+        // Add the app widget unique ID to the intent extras.
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        Log.d(TAG, "WidgetProvider onUpdate widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
+        // Set up the RemoteViews object to use a RemoteViews adapter.
+        // This adapter connects to a RemoteViewsService  through the specified intent.
+        // This is how you populate the data.
+        views.setRemoteAdapter(R.id.list, intent);
+        // The empty view is displayed when the collection has no items.
+        // It should be in the same layout used to instantiate the RemoteViews object above.
+        views.setEmptyView(R.id.list, R.id.empty_view);
+
+        // Do additional processing specific to this app widget...
+        Intent clickIntent = new Intent(context, WidgetProvider.class);
+        clickIntent.setAction(WidgetProvider.CLICK_ACTION);
+        clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+
+        PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setPendingIntentTemplate(R.id.list, clickPendingIntent);
+
+        // Instruct the widget manager to update the widget
+        appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 }

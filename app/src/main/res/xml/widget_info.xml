@@ -1,4 +1,5 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="org.checklist.comics.comicschecklist.SettingsWidget"
     android:minWidth="250dp"
     android:minHeight="110dp"
     android:minResizeWidth="250dp"

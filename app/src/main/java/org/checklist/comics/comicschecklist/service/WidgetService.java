@@ -45,10 +45,9 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     private Cursor mCursor;
 
     public ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {
-        // TODO show any editor / favorite / cart
         mContext = applicationContext;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-        mEditor = Constants.Editors.FAVORITE.name();//intent.getStringExtra(Constants.WIDGET_EDITOR);
+        mEditor = intent.getStringExtra(Constants.WIDGET_EDITOR);
         mTitle = intent.getStringExtra(Constants.WIDGET_TITLE);
     }
 
@@ -84,7 +83,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
             mCursor = mContext.getContentResolver().query(uri, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
                     ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
         } else {
-            Log.d(TAG, "Editor founded, query database.");
+            Log.d(TAG, "Editor founded, query database " + mEditor);
             Uri uri = ComicContentProvider.CONTENT_URI;
             String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                     ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,

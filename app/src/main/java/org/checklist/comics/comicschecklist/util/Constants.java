@@ -72,6 +72,10 @@ public class Constants {
         public static String getTitle(int position) {
             return map.get(position).title;
         }
+
+        public static String getTitle(Editors editor) {
+            return editor.title;
+        }
     }
 
     /* Preference last scan */

@@ -46,7 +46,7 @@
         <provider
             android:authorities="org.checklist.comics.comicschecklist.contentprovider"
             android:name=".provider.ComicContentProvider"
-            android:exported="false"
+            android:exported="true"
             android:multiprocess="true" >
         </provider>
 
@@ -66,12 +66,14 @@
             android:permission="android.permission.BIND_REMOTEVIEWS"
             android:exported="false" />
 
-        <!--<activity
-            android:name=".SettingsWidget">
+        <activity
+            android:name=".SettingsWidget"
+            android:theme="@android:style/Theme.Dialog"
+            android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
-        </activity> -->
+        </activity>
 
         <!-- Alarm stuff -->
         <service android:name=".service.AlarmService"

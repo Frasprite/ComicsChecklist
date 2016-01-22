@@ -4,12 +4,13 @@ import android.app.ListActivity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.RemoteViews;
 
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
@@ -22,9 +23,10 @@ public class SettingsWidget extends ListActivity {
 
     private static final String TAG = SettingsWidget.class.getSimpleName();
 
-    String[] mEditor;
-    ArrayAdapter<String> mAdapter;
     int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
+
+    private static final String PREFS_NAME = "AppWidget";
+    private static final String PREF_PREFIX_KEY = "appwidget";
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -35,80 +37,81 @@ public class SettingsWidget extends ListActivity {
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
 
+        // Set layout size of activity
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+        // Defined array values to show in ListView
+        String[] values = getResources().getStringArray(R.array.widget_editors_array);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+
+        getListView().setAdapter(adapter);
+
+        // Find the widget id from the intent.
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if (extras != null) {
             mAppWidgetId = extras.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         }
 
-        // If they gave us an intent without the widget id, just bail.
+        // If this activity was started with an intent without an app widget ID, finish with an error.
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
-
-        // Set list of editors
-        mEditor = getResources().getStringArray(R.array.widget_editors_array);
-        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, android.R.id.text1, mEditor);
-        getListView().setAdapter(mAdapter);
     }
 
     @Override
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
         Log.d(TAG, "SettingsWidget onListItemClick " + position);
-        Context mContext = getApplicationContext();
-        // Take text reference of editor chosen
-        String editor, title;
-        switch (position) {
-            case 0:
-                editor = Constants.Editors.FAVORITE.name();
-                title = mEditor[0];
-                break;
-            case 1:
-                editor = Constants.Editors.CART.name();
-                title = mEditor[1];
-                break;
-            case 2:
-                editor = Constants.Editors.MARVEL.name();
-                title = mEditor[2];
-                break;
-            case 3:
-                editor = Constants.Editors.PANINI.name();
-                title = mEditor[3];
-                break;
-            case 4:
-                editor = Constants.Editors.PLANET.name();
-                title = mEditor[4];
-                break;
-            case 5:
-                editor = Constants.Editors.STAR.name();
-                title = mEditor[5];
-                break;
-            case 6:
-                editor = Constants.Editors.BONELLI.name();
-                title = mEditor[6];
-                break;
-            case 7:
-                editor = Constants.Editors.RW.name();
-                title = mEditor[7];
-                break;
-            default:
-                editor = Constants.Editors.FAVORITE.name();
-                title = mEditor[0];
-                break;
-        }
+        Context context = SettingsWidget.this;
+        Constants.Editors editor = Constants.Editors.getEditor(position);
+        // Take name and title reference of editor chosen
+        String title = Constants.Editors.getTitle(editor);
+        String name = Constants.Editors.getName(editor);
+        // Create widget
+        createWidget(context, title, name);
+    }
 
-        // Update the widget
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(mContext);
-        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.widget);
-        appWidgetManager.updateAppWidget(mAppWidgetId, views);
+    private void createWidget(Context context, String title, String name) {
+        // Store the string locally
+        saveTitlePref(context, mAppWidgetId, title);
 
-        // Return intent
-        Intent resultValue = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE, null, this, WidgetProvider.class);//new Intent();
+        // It is the responsibility of the configuration activity to update the app widget
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        WidgetProvider.updateAppWidget(context, appWidgetManager, mAppWidgetId);
+
+        // Make sure we pass back the original appWidgetId
+        Intent resultValue = new Intent();
         resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
         resultValue.putExtra(Constants.WIDGET_TITLE, title);
-        resultValue.putExtra(Constants.WIDGET_EDITOR, editor);
+        resultValue.putExtra(Constants.WIDGET_EDITOR, name);
         setResult(RESULT_OK, resultValue);
-
         finish();
+    }
+
+    // Write the prefix to the SharedPreferences object for this widget
+    public static void saveTitlePref(Context context, int appWidgetId, String text) {
+        SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
+        prefs.putString(PREF_PREFIX_KEY + appWidgetId, text);
+        prefs.apply();
+    }
+
+    // Read the prefix from the SharedPreferences object for this widget.
+    // If there is no preference saved, get the default from a resource
+    public static String loadTitlePref(Context context, int appWidgetId) {
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
+        String titleValue = prefs.getString(PREF_PREFIX_KEY + appWidgetId, null);
+        if (titleValue != null) {
+            return titleValue;
+        } else {
+            return context.getString(R.string.app_name);
+        }
+    }
+
+    public static void deleteTitlePref(Context context, int appWidgetId) {
+        SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
+        prefs.remove(PREF_PREFIX_KEY + appWidgetId);
+        prefs.apply();
     }
 }
