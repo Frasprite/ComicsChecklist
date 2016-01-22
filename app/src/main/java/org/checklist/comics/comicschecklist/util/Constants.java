@@ -57,8 +57,16 @@ public class Constants {
             this.title = title;
         }
 
+        public static Editors getEditor(int position) {
+            return map.get(position);
+        }
+
         public static String getName(int position) {
             return map.get(position).name;
+        }
+
+        public static String getName(Editors editor) {
+            return editor.name;
         }
 
         public static String getTitle(int position) {
@@ -75,6 +83,7 @@ public class Constants {
     public static final String PREF_RW_LAST_SCAN = "rw_lastscan";
 
     /* Service & Notification */
+    public static final String MANUAL_SEARCH = "manual_search";
     public static final int RESULT_START = 304;
     public static final int RESULT_CANCELED = 303;
     public static final int RESULT_FINISHED = 302;

@@ -49,13 +49,15 @@ public class DownloadService extends IntentService {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String syncPref = sharedPref.getString("sync_frequency", "3");
         int frequency = Integer.parseInt(syncPref);
+        boolean manualSearch = intent.getBooleanExtra(Constants.MANUAL_SEARCH, false);
 
         ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         if (isConnected) {
-            if (frequency > -1) {
+            Log.d(TAG, "Checking if search is manual or automatic " + frequency);
+            if (frequency > -1 && !manualSearch) {
                 Log.i(TAG, "Automatic search launched");
                 boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);
                 if (calculateDayDifference(Constants.PREF_RW_LAST_SCAN) >= frequency) {
@@ -79,7 +81,7 @@ public class DownloadService extends IntentService {
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
                     if (notificationPref)
                         createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.Editors.MARVEL.name());
+                    error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.MARVEL));
                     if (error) {
                         publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section3));
                         if (notificationPref)
@@ -95,7 +97,7 @@ public class DownloadService extends IntentService {
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
                     if (notificationPref)
                         createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.Editors.PANINI.name());
+                    error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PANINI));
                     if (error) {
                         publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section4));
                         if (notificationPref)
@@ -111,7 +113,7 @@ public class DownloadService extends IntentService {
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
                     if (notificationPref)
                         createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.Editors.PLANET.name());
+                    error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PLANET));
                     if (error) {
                         publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section5));
                         if (notificationPref)
@@ -162,18 +164,19 @@ public class DownloadService extends IntentService {
                 }
             } else {
                 Log.i(TAG, "Manual search for section n. " + intent.getIntExtra(Constants.ARG_SECTION_NUMBER, 0));
-                int section = intent.getIntExtra(Constants.ARG_SECTION_NUMBER, 0);
+                int section = intent.getIntExtra(Constants.ARG_SECTION_NUMBER, -1);
+                Constants.Editors editor = Constants.Editors.getEditor(section);
                 boolean notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true);
 
                 searchNecessary = true;
 
-                switch (section) {
-                    case 3:
+                switch (editor) {
+                    case MARVEL:
                         // Marvel
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
                         if (notificationPref)
                             createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.Editors.MARVEL.name());
+                        error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.MARVEL));
                         if (error) {
                             publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section3));
                             if (notificationPref)
@@ -184,12 +187,12 @@ public class DownloadService extends IntentService {
                                 createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_editor_completed), true);
                         }
                         break;
-                    case 4:
+                    case PANINI:
                         // Panini
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
                         if (notificationPref)
                             createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.Editors.PANINI.name());
+                        error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PANINI));
                         if (error) {
                             publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section4));
                             if (notificationPref)
@@ -200,12 +203,12 @@ public class DownloadService extends IntentService {
                                 createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_editor_completed), true);
                         }
                         break;
-                    case 5:
+                    case PLANET:
                         // Planet
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
                         if (notificationPref)
                             createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.Editors.PLANET.name());
+                        error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PLANET));
                         if (error) {
                             publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section5));
                             if (notificationPref)
@@ -216,7 +219,7 @@ public class DownloadService extends IntentService {
                                 createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_editor_completed), true);
                         }
                         break;
-                    case 6:
+                    case STAR:
                         // Star
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
                         if (notificationPref)
@@ -232,7 +235,7 @@ public class DownloadService extends IntentService {
                                 createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_editor_completed), true);
                         }
                         break;
-                    case 7:
+                    case BONELLI:
                         // Bonelli
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
                         if (notificationPref)
@@ -248,7 +251,7 @@ public class DownloadService extends IntentService {
                                 createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_editor_completed), true);
                         }
                         break;
-                    case 8:
+                    case RW:
                         // RW
                         publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
                         if (notificationPref)
@@ -352,7 +355,7 @@ public class DownloadService extends IntentService {
     }
 
     private long calculateDayDifference(String editorLastScan) {
-        Log.v(TAG, "calculateDayDifference");
+        Log.v(TAG, "calculateDayDifference " + editorLastScan + " - start");
         long result; // If result is 3, we need a refresh
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -379,6 +382,7 @@ public class DownloadService extends IntentService {
         } catch (Exception e) {
             result = 3;
         }
+        Log.v(TAG, "calculateDayDifference " + result + " - end");
 
         return result;
     }

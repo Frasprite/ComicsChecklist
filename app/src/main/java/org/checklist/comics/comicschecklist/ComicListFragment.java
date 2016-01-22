@@ -404,7 +404,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
      * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
      */
     private void initiateRefresh() {
-        Log.i(TAG, "initiateRefresh");
+        Log.i(TAG, "initiateRefresh for " + mEditor + " " + mEditorNumber);
         // Defines selection criteria for the rows to delete
         String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
         String[] mSelectionArgs = {mEditor};
@@ -436,6 +436,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
          */
         Intent intent = new Intent(getActivity(), DownloadService.class);
         intent.putExtra(Constants.ARG_SECTION_NUMBER, mEditorNumber);
+        intent.putExtra(Constants.MANUAL_SEARCH, true);
         getActivity().startService(intent);
         setRefreshing(true);
     }

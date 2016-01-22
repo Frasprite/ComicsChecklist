@@ -46,7 +46,7 @@
         <provider
             android:authorities="org.checklist.comics.comicschecklist.contentprovider"
             android:name=".provider.ComicContentProvider"
-            android:exported="true"
+            android:exported="false"
             android:multiprocess="true" >
         </provider>
 
