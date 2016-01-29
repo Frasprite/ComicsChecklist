@@ -68,7 +68,7 @@
 
         <activity
             android:name=".SettingsWidget"
-            android:theme="@android:style/Theme.Dialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
             android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>

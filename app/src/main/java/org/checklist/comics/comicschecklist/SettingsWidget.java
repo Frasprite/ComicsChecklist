@@ -32,7 +32,6 @@ public class SettingsWidget extends ListActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // TODO improve settings UI
         // TODO widget relaunch detail with same comic id
         // TODO widget not updated after reinstall of app
 
