@@ -32,6 +32,10 @@ public class SettingsWidget extends ListActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // TODO improve settings UI
+        // TODO widget relaunch detail with same comic id
+        // TODO widget not updated after reinstall of app
+
         Log.d(TAG, "onCreate");
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
@@ -102,6 +106,7 @@ public class SettingsWidget extends ListActivity {
     public static String loadTitlePref(Context context, int appWidgetId) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
         String titleValue = prefs.getString(PREF_PREFIX_KEY + appWidgetId, null);
+        Log.d(TAG, "loadTitlePref " + PREF_PREFIX_KEY + appWidgetId + " return " + titleValue);
         if (titleValue != null) {
             return titleValue;
         } else {

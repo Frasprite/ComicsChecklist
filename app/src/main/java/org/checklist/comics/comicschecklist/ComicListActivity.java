@@ -399,6 +399,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
      */
     public void launchDetailView(long id, String section) {
         if (mTwoPane) {
+            Log.d(TAG, "Launching detail view in two pane mode");
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
@@ -410,6 +411,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             // Warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
             getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commitAllowingStateLoss();
         } else {
+            Log.d(TAG, "Launching detail view in single pane mode");
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
             Intent detailIntent = new Intent(this, ComicDetailActivity.class);

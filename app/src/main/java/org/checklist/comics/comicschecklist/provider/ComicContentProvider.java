@@ -50,7 +50,7 @@ public class ComicContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Log.v(TAG, "Ricerca " + selection + selectionArgs[0]);
+        Log.v(TAG, "query " + uri);
         // Using SQLiteQueryBuilder instead of query() method
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 
@@ -162,7 +162,7 @@ public class ComicContentProvider extends ContentProvider {
     }
 
     private void checkColumns(String[] projection) {
-        Log.v(TAG, "Controllo delle colonne");
+        Log.v(TAG, "checkColumns");
         String[] available = {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.ID,
                 ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,

@@ -110,6 +110,8 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // TODO use same line height on list
+
         // Find editor
         mEditorNumber = getArguments().getInt(Constants.ARG_SECTION_NUMBER);
         mEditor = Constants.Editors.getName(mEditorNumber);

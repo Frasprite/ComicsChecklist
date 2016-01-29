@@ -39,11 +39,14 @@ public class Constants {
         RW      (7, "rw", "RW Edizioni");
 
         private static HashMap<Integer, Editors> map;
+        private static HashMap<String, Editors> titleMap;
 
         static {
             map = new HashMap<>();
+            titleMap = new HashMap<>();
             for (Editors editor : Editors.values()) {
                 map.put(editor.code, editor);
+                titleMap.put(editor.title, editor);
             }
         }
 
@@ -75,6 +78,10 @@ public class Constants {
 
         public static String getTitle(Editors editor) {
             return editor.title;
+        }
+
+        public static String getName(String title) {
+            return titleMap.get(title).name;
         }
     }
 

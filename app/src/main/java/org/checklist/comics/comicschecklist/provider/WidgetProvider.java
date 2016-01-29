@@ -28,6 +28,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        Log.d(TAG, "onUpdate");
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
@@ -87,7 +88,9 @@ public class WidgetProvider extends AppWidgetProvider {
         Intent intent = new Intent(context, WidgetService.class);
         // Add the app widget unique ID to the intent extras.
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-        Log.d(TAG, "WidgetProvider onUpdate widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
+        intent.putExtra(Constants.WIDGET_TITLE, widgetText);
+        intent.putExtra(Constants.WIDGET_EDITOR, Constants.Editors.getName((String) widgetText));
+        Log.d(TAG, "updateAppWidget widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         // Set up the RemoteViews object to use a RemoteViews adapter.
         // This adapter connects to a RemoteViewsService  through the specified intent.
