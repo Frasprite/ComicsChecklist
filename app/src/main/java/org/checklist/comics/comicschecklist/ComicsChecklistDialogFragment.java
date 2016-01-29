@@ -1,7 +1,6 @@
 package org.checklist.comics.comicschecklist;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.ContentValues;
@@ -12,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,7 +89,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
         int type = getArguments().getInt("type");
         Log.d(TAG, "Creating " + type + "(0 help, 1 guide, 2 add, 3 rater, 4 search result)");
         // Use the Builder class for convenient dialog construction
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppCompatAlertDialogStyle);
 
         switch (type) {
             case Constants.DIALOG_GUIDE:
