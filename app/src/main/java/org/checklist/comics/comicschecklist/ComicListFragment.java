@@ -18,6 +18,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -109,8 +110,6 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // TODO use same line height on list
 
         // Find editor
         mEditorNumber = getArguments().getInt(Constants.ARG_SECTION_NUMBER);
@@ -451,8 +450,16 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         int[] to = new int[] {android.R.id.text1, android.R.id.text2};
 
         getLoaderManager().initLoader(0, null, this);
-        adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_activated_2, null, from, to, 0);
-
+        adapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_activated_2, null, from, to, 0) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                text1.setMaxLines(1);
+                text1.setEllipsize(TextUtils.TruncateAt.END);
+                return view;
+            }
+        };
         setListAdapter(adapter);
     }
 
