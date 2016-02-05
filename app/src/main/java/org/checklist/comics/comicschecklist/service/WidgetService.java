@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -17,7 +16,6 @@ import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.WidgetItem;
-import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,10 +131,8 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         rv.setTextViewText(R.id.widget_tv1, mWidgetItems.get(position)._name);
         rv.setTextViewText(R.id.widget_tv2, mWidgetItems.get(position)._release);
 
-        Bundle extras = new Bundle();
-        extras.putInt(WidgetProvider.COMIC_ID, mWidgetItems.get(position)._comicID);
         Intent fillInIntent = new Intent();
-        fillInIntent.putExtras(extras);
+        fillInIntent.putExtra(Constants.COMIC_ID_FROM_WIDGET, mWidgetItems.get(position)._comicID);
         rv.setOnClickFillInIntent(R.id.widget_layout, fillInIntent);
 
         return rv;

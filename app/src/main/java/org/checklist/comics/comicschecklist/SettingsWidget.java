@@ -33,7 +33,6 @@ public class SettingsWidget extends ListActivity {
         super.onCreate(savedInstanceState);
 
         // TODO widget relaunch detail with same comic id
-        // TODO widget not updated after reinstall of app
 
         Log.d(TAG, "onCreate");
         // Set the result to CANCELED.  This will cause the widget host to cancel

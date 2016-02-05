@@ -23,37 +23,11 @@ public class WidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = WidgetProvider.class.getSimpleName();
 
-    public static final String CLICK_ACTION = "CLICK_ACTION";
-    public static final String COMIC_ID = "COMIC_ID";
-
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.d(TAG, "onUpdate");
         // There may be multiple widgets active, so update all of them
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
-        }
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, "WidgetProvider onReceive");
-
-        /**if (intent.getAction().equals(TOAST_ACTION)) {
-            int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
-            int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);
-            Toast.makeText(context, "Touched view " + viewIndex, Toast.LENGTH_SHORT).show();
-        }*/
-
-        if (intent.getAction().equals(CLICK_ACTION)) {
-            int comicID = intent.getIntExtra(COMIC_ID, 0);
-
-            //Uri details = Uri.withAppendedPath(ComicContentProvider.CONTENT_URI, "" + empID);
-            Intent detailsIntent = new Intent(context, ComicListActivity.class);
-            detailsIntent.setAction(Constants.ACTION_COMIC_WIDGET);
-            detailsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            detailsIntent.putExtra(Constants.COMIC_ID_FROM_WIDGET, comicID);
-            context.startActivity(detailsIntent);
         }
     }
 
@@ -79,6 +53,7 @@ public class WidgetProvider extends AppWidgetProvider {
                                 int appWidgetId) {
 
         CharSequence widgetText = SettingsWidget.loadTitlePref(context, appWidgetId);
+        Log.d(TAG, "onUpdate - editor " + widgetText + " id " + appWidgetId);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
         views.setTextViewText(R.id.widgetTextView, widgetText);
@@ -100,15 +75,13 @@ public class WidgetProvider extends AppWidgetProvider {
         // It should be in the same layout used to instantiate the RemoteViews object above.
         views.setEmptyView(R.id.list, R.id.empty_view);
 
-        // Do additional processing specific to this app widget...
-        Intent clickIntent = new Intent(context, WidgetProvider.class);
-        clickIntent.setAction(WidgetProvider.CLICK_ACTION);
-        clickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        // Redirect on click event on list item to activity
+        Intent startActivityIntent = new Intent(context, ComicListActivity.class);
+        startActivityIntent.setAction(Constants.ACTION_COMIC_WIDGET);
+        startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent startActivityPendingIntent = PendingIntent.getActivity(context, 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setPendingIntentTemplate(R.id.list, startActivityPendingIntent);
 
-        PendingIntent clickPendingIntent = PendingIntent.getBroadcast(context, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        views.setPendingIntentTemplate(R.id.list, clickPendingIntent);
-
-        // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 }
