@@ -109,7 +109,7 @@ public class SettingsWidget extends ListActivity {
         if (titleValue != null) {
             return titleValue;
         } else {
-            return context.getString(R.string.app_name);
+            return Constants.Editors.getTitle(Constants.Editors.FAVORITE);
         }
     }
 

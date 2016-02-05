@@ -216,6 +216,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_COMIC_WIDGET)) {
             int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
             Log.d(TAG, "Comic id is " + comicId);
+            // TODO check if "preferiti" will let widget work
             launchDetailView(comicId, "preferiti");
         }
     }
