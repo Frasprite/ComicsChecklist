@@ -10,8 +10,6 @@ public class Constants {
 
     /* The fragment argument representing the section number for this fragment. */
     public static final String ARG_SECTION_NUMBER = "section_number";
-    /* Remember the position of the selected item */
-    public static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
     /**
      * Flag used to show the drawer on launch until the user manually
      * expands it. This shared preference tracks this.
@@ -112,6 +110,7 @@ public class Constants {
     public static final String WIDGET_EDITOR = "WIDGET_EDITOR";
     public static final String WIDGET_TITLE = "WIDGET_TITLE";
     public static final String COMIC_ID_FROM_WIDGET = "COMIC_ID_FROM_WIDGET";
+    public static final String COMIC_EDITOR_FROM_WIDGET = "COMIC_EDITOR_FROM_WIDGET";
     public static final String ACTION_COMIC_WIDGET = "comic_widget";
 
     /* Search */

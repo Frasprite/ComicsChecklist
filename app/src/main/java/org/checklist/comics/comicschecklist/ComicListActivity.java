@@ -215,9 +215,12 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             doMySearch(query);
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_COMIC_WIDGET)) {
             int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
+            String editor = intent.getStringExtra(Constants.COMIC_EDITOR_FROM_WIDGET);
+            if (editor == null) {
+                editor = Constants.Editors.getName(Constants.Editors.FAVORITE);
+            }
             Log.d(TAG, "Comic id is " + comicId);
-            // TODO check if "preferiti" will let widget work
-            launchDetailView(comicId, "preferiti");
+            launchDetailView(comicId, editor);
         }
     }
 

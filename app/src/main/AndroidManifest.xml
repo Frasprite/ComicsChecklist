@@ -14,8 +14,10 @@
         android:theme="@style/AppTheme.Base" >
         <activity
             android:name=".ComicListActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop">
+            android:label="@string/app_name" >
+            <!-- android:launchMode="singleTop" was previously used there before widget list: this tag
+                 can lead to a problem if user click one item on list and again, comic detail will not
+                 be update; check if this is not important to have it -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -133,6 +133,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
         Intent fillInIntent = new Intent();
         fillInIntent.putExtra(Constants.COMIC_ID_FROM_WIDGET, mWidgetItems.get(position)._comicID);
+        fillInIntent.putExtra(Constants.COMIC_EDITOR_FROM_WIDGET, mEditor);
         rv.setOnClickFillInIntent(R.id.widget_layout, fillInIntent);
 
         return rv;
