@@ -78,6 +78,7 @@ public class WidgetProvider extends AppWidgetProvider {
         // Redirect on click event on list item to activity
         Intent startActivityIntent = new Intent(context, ComicListActivity.class);
         startActivityIntent.setAction(Constants.ACTION_COMIC_WIDGET);
+        startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent startActivityPendingIntent = PendingIntent.getActivity(context, 0, startActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setPendingIntentTemplate(R.id.list, startActivityPendingIntent);
 
