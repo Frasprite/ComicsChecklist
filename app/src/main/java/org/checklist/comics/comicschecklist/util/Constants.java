@@ -147,5 +147,5 @@ public class Constants {
     public static final String PROSSIMAMENTE_INEDITI = "http://www.sergiobonelli.it/sezioni/1026/inediti";
     public static final String PROSSIMAMENTE_RISTAMPE = "http://www.sergiobonelli.it/sezioni/1018/ristampe";
     public static final String PROSSIMAMENTE_RACCOLTE = "http://www.sergiobonelli.it/sezioni/1019/raccolte";
-    public static final String COVER_PART = "http://www.sergiobonelli.it/";
+    public static final String MAIN_URL = "http://www.sergiobonelli.it/";
 }

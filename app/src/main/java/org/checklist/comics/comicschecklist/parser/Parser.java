@@ -164,6 +164,7 @@ public class Parser {
     }
 
     public boolean startParseRW() {
+        // TODO fix parser
         Log.d(TAG, "Inizio scansione RW");
         comicErrorRw = false;
 
@@ -355,7 +356,6 @@ public class Parser {
     }
 
     public boolean startParseBonelli() {
-        // TODO fix parser
         Log.d(TAG, "Inizio scansione Bonelli");
         comicErrorBonelli = false;
 
@@ -394,8 +394,9 @@ public class Parser {
                     moreInfoUrl, periodicityTag, title = "N.D.";
             for (int i = 0; i < spanRelease.size(); i++) {
                 name = spanTitle.get(i).text();
-                moreInfoUrl = spanOther.get(i).text();
-                //Log.i("Parser", name + " " + moreInfoUrl);
+                moreInfoUrl = spanOther.get(i).text().replace(Constants.MAIN_URL, "");
+                moreInfoUrl = Constants.MAIN_URL + moreInfoUrl;
+                Log.v("Parser", name + " " + moreInfoUrl);
                 try {
                     // Creating doc file from URL
                     Document docMoreInfo = Jsoup.parse(new URL(moreInfoUrl).openStream(), "UTF-8", moreInfoUrl);
@@ -420,7 +421,7 @@ public class Parser {
 
                     // Finding cover image
                     Elements linkPathImg = docMoreInfo.select("div.bk-cover img[src]");
-                    coverUrl = Constants.COVER_PART + linkPathImg.attr("src");
+                    coverUrl = Constants.MAIN_URL + linkPathImg.attr("src");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
