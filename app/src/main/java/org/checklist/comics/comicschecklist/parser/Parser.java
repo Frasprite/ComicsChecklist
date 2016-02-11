@@ -244,7 +244,7 @@ public class Parser {
 
                 if (coverList.size() == titleList.size() && featureList.size() == priceList.size()) {
                     for (int i = 0; i < coverList.size(); i++) {
-                        insertComic(titleList.get(i), Constants.Editors.RW.name(), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i));
+                        insertComic(titleList.get(i), Constants.Editors.getName(Constants.Editors.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i));
                     }
                 }
             } catch (Exception e) {
@@ -327,7 +327,7 @@ public class Parser {
                 DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date myDate = formatter.parse(releaseDate);
                 // Insert comic on database
-                insertComic(name, Constants.Editors.STAR.name(), description, releaseDate, myDate, coverUrl, feature, price);
+                insertComic(name, Constants.Editors.getName(Constants.Editors.STAR), description, releaseDate, myDate, coverUrl, feature, price);
             } catch (Exception e) {
                 Log.w(TAG, "Error on parseUrlStarC comic id " + i + " " + e.toString());
                 comicErrorStar = true;
@@ -351,6 +351,7 @@ public class Parser {
 
     /** Metodo che raccoglie i dati dall'url fornito. */
     private void parseUrlBonelli(String url) {
+        // TODO fix parser
         Log.v(TAG, "Inizio scansione URL Bonelli " + url);
         try {
             // Creating doc file from URL
@@ -419,7 +420,7 @@ public class Parser {
                 Date myDate = formatter.parse(releaseDate);
 
                 // Insert comic on database
-                insertComic(name.toUpperCase(), Constants.Editors.BONELLI.name(), description, releaseDate, myDate, coverUrl, feature, price);
+                insertComic(name.toUpperCase(), Constants.Editors.getName(Constants.Editors.BONELLI), description, releaseDate, myDate, coverUrl, feature, price);
             }
         } catch (Exception e) {
             Log.w(TAG, "Error during comic fetching " + url + " " + e.toString());
