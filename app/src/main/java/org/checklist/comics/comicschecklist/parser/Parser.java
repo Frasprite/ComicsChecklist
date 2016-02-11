@@ -164,7 +164,6 @@ public class Parser {
     }
 
     public boolean startParseRW() {
-        // TODO fix parser
         Log.d(TAG, "Inizio scansione RW");
         comicErrorRw = false;
 
@@ -175,7 +174,7 @@ public class Parser {
         String month = DateFormatSymbols.getInstance(Locale.ITALIAN).getMonths()[monthInt];
         String url;
         for (int i = 1; i < day + 3; i++) {
-            url = Constants.FIRSTRW + i + Constants.MIDDLERW + month + Constants.MIDDLERW + year + Constants.ENDRW;
+            url = Constants.FIRSTRW + Constants.MIDDLERW + i + Constants.MIDDLERW + month + Constants.MIDDLERW + year + Constants.ENDRW;
             parseUrlRW(url, i + "/" + (monthInt + 1) + "/" + year);
         }
 
@@ -183,97 +182,78 @@ public class Parser {
     }
 
     /** Metodo che raccoglie i dati dall'url fornito. */
-    private void parseUrlRW(String url, String releaseDate) {
-        Log.v(TAG, "Inizio scansione URL RW " + url);
+    private void parseUrlRW(String siteUrl, String releaseDate) {
+        Log.v(TAG, "Inizio scansione URL RW " + siteUrl);
         try {
             // Prendo solo la parte di codice che mi interessa
-            Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
+            Document doc = Jsoup.parse(new URL(siteUrl).openStream(), "UTF-8", siteUrl);
             Element content = doc.getElementById("content");
 
             // Ogni tag p contiene un fumetto
             Elements pElements = content.select("p");
-            String name, description = "N.D.", price = "N.D.", feature = "N.D.", coverUrl = "N.D.";
+            String description = "N.D.", coverUrl, title;
+            // Calculating date for sql
+            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date myDate = formatter.parse(releaseDate);
+
+            ArrayList<String> coverList = new ArrayList<>();
+            ArrayList<String> titleList = new ArrayList<>();
+            ArrayList<String> featureList = new ArrayList<>();
+            ArrayList<String> priceList = new ArrayList<>();
 
             try {
-                // Calculating date for sql
-                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                Date myDate = formatter.parse(releaseDate);
-
-                // Detecting all p tag
-                for (Element pElement : pElements) {
-                    Elements checkForA = pElement.getElementsByTag("a");
-                    Elements checkForImg = pElement.getElementsByTag("img");
-                    if (!checkForA.isEmpty() || !checkForImg.isEmpty()) {
-
-                        // Check if we have more then one comic on <p> tag
-                        if (checkForA.size() > 1) {
-                            // More comic founded, insert only name, image, release and editor
-                            insertComic(pElement.select("span[style^=color: #ff0000]").first().text(), Constants.Editors.RW.name(),
-                                    description, releaseDate, myDate, checkForA.first().attr("href"), feature, price);
-
-                            insertComic(pElement.select("span[style^=color: #ff0000]").last().text(), Constants.Editors.RW.name(),
-                                    description, releaseDate, myDate, checkForA.last().attr("href"), feature, price);
-                        } else {
-                            // Only one comic founded: getting all junk data
-                            Elements innerP = pElement.getElementsByTag("strong");
-                            name = pElement.select("span[style^=color: #ff0000]").last().text();
-                            if (innerP.size() > 1) {
-                                price = innerP.last().text();
-                                feature = innerP.get(innerP.size() - 2).text();
-                            } else {
-                                price = "N.D.";
-                                feature = "N.D.";
-                            }
-                            //Log.i(Constants.LOG_TAG, "Comic founded " + name + " " + price + " " + feature);
-
-                            // Getting image URL
-                            if (!checkForA.isEmpty()) {
-                                for (Element link : checkForA) {
-                                    if (link.attr("href").startsWith(Constants.MEDIARW)) {
-                                        coverUrl = link.attr("href");
-                                        //Log.i(Constants.LOG_TAG, "Comic img path: " + coverUrl);
-                                    }
-                                }
-                            } else if (!checkForImg.isEmpty()) {
-                                for (Element link : checkForImg) {
-                                    if (link.attr("src").startsWith(Constants.MEDIARW)) {
-                                        coverUrl = link.attr("src");
-                                    }
-                                }
-                            } else
-                                coverUrl = "unknown";
-
-                            // Finding description
-                            Elements innerStrong = pElement.select("strong");
-                            Elements innerSpan = pElement.select("span");
-                            for (Element inS2 : innerStrong) {
-                                inS2.remove();
-                            }
-                            for (Element inSpan : innerSpan) {
-                                inSpan.remove();
-                            }
-                            Elements innerA = pElement.getElementsByTag("a");
-                            for (Element inA2 : innerA) {
-                                inA2.remove();
-                            }
-
-                            // Clean description from html code
-                            description = pElement.toString();
-                            description = description.replace("<b>", "").replace("</b>", "").replace("<br>", "").replace("<p>", "").replace("<br />", "").replace("</p>", "").trim();
-                            if (description.length() == 0)
-                                description = "N.D.";
-
-                            // Insert comic on database
-                            insertComic(name, Constants.Editors.RW.name(), description, releaseDate, myDate, coverUrl, feature, price);
+                // Insert comic on database
+                for (Element element : pElements) {
+                    Elements checkForImg = element.getElementsByTag("img");
+                    if (!checkForImg.isEmpty()) {
+                        Element src = checkForImg.get(0);
+                        coverUrl = src.attr("src");
+                        if (coverUrl.startsWith(Constants.MEDIARW)) {
+                            // Saving cover
+                            Log.d(TAG, "Cover " + coverUrl);
+                            coverList.add(coverUrl);
+                            title = coverUrl.replace(Constants.MEDIARW, "").replace("_", " ").replace(".jpg", "").toUpperCase();
+                            // Title elaborated
+                            Log.v(TAG, "Title " + title);
+                            titleList.add(title);
                         }
+                    }
+
+                    String elementText = element.text();
+                    if (!elementText.equalsIgnoreCase("dc") && !elementText.equalsIgnoreCase("rw-lion")
+                            && !elementText.equalsIgnoreCase("lineachiara") && !elementText.equalsIgnoreCase("goen")
+                            && !elementText.equalsIgnoreCase(" ") && !elementText.equalsIgnoreCase("vertigo presenta")
+                            && !elementText.equalsIgnoreCase("dc deluxe") && !elementText.equalsIgnoreCase("vertigo")
+                            && !elementText.equalsIgnoreCase("vertigo deluxe") && !elementText.equalsIgnoreCase("rw-goen")
+                            && !elementText.equalsIgnoreCase("DC Universe Presenta") && !elementText.equalsIgnoreCase("DC Presenta")
+                            && !elementText.equalsIgnoreCase("dc all star presenta") && elementText.length() > 1) {
+
+                        if (elementText.contains("col.") || elementText.contains("b/n")) {
+                            // Found a <p> with more info
+                            Log.v(TAG, "Feature " + elementText);
+                            featureList.add(elementText);
+                        }
+
+                        if (elementText.contains("€")) {
+                            // Found price text on <p>
+                            Log.v(TAG, "Price " + elementText);
+                            priceList.add(elementText);
+                        }
+                    }
+                }
+
+                if (coverList.size() == titleList.size() && featureList.size() == priceList.size()) {
+                    for (int i = 0; i < coverList.size(); i++) {
+                        insertComic(titleList.get(i), Constants.Editors.RW.name(), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i));
                     }
                 }
             } catch (Exception e) {
                 Log.w(TAG, "Error during comic fetching " + e.toString());
+                e.printStackTrace();
                 comicErrorRw = true;
             }
         } catch (Exception e) {
-            Log.w(TAG, "This url does not exists " + url + " " + e.toString());
+            Log.w(TAG, "This url does not exists " + siteUrl + " " + e.toString());
         }
     }
 

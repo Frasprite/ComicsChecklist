@@ -131,11 +131,11 @@ public class Constants {
     public static final String SECONDPANINI = "/checklist?year=";
     public static final String THIRDPANINI = "&weekOfYear=";
     public static final String URLPANINI = "http://www.paninicomics.it";
-    // RWEdizioni ex.: http://www.rwedizioni.it/news/rw-edizioni-uscite-del-10-maggio/
-    public static final String FIRSTRW = "http://www.rwedizioni.it/news/rw-edizioni-uscite-del-";
+    // RWEdizioni ex.: http://www.rwedizioni.it/news/uscite-9-gennaio-2016/
+    public static final String FIRSTRW = "http://www.rwedizioni.it/news/uscite";
     public static final String MIDDLERW = "-";
     public static final String ENDRW = "/";
-    public static final String MEDIARW = "http://www.rwedizioni.it/media";
+    public static final String MEDIARW = "http://www.rwedizioni.it/media/";
     // Star Comics
     public static final String ROOT = "http://www.starcomics.com/UsciteMensili.aspx";
     public static final String COMIC_ROOT = "http://www.starcomics.com/fumetto.aspx?Fumetto=";
