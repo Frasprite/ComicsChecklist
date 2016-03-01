@@ -351,8 +351,7 @@ public class Parser {
 
     /** Metodo che raccoglie i dati dall'url fornito. */
     private void parseUrlBonelli(String url) {
-        // TODO fix parser
-        Log.v(TAG, "Inizio scansione URL Bonelli " + url);
+        Log.d(TAG, "Inizio scansione URL Bonelli " + url);
         try {
             // Creating doc file from URL
             Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
@@ -368,16 +367,15 @@ public class Parser {
             // Finding link for other info and title ig needed
             Elements spanOther = doc.select("span._url");
 
-            //Log.i(Constants.LOG_TAG, "Title, info and release array length : " + spanTitle.size() + " " + spanOther.size() + " " + spanRelease.size());
-
             // Iterate all elements founded
             String name, releaseDate, description = "N.D.", price = "N.D.", feature = "N.D.", coverUrl = "N.D.",
                     moreInfoUrl, periodicityTag, title = "N.D.";
+            Log.d(TAG, "Span release size " + spanRelease.size() + " title size " + spanTitle.size() + " other size " + spanOther.size());
             for (int i = 0; i < spanRelease.size(); i++) {
                 name = spanTitle.get(i).text();
                 moreInfoUrl = spanOther.get(i).text().replace(Constants.MAIN_URL, "");
                 moreInfoUrl = Constants.MAIN_URL + moreInfoUrl;
-                Log.v("Parser", name + " " + moreInfoUrl);
+                Log.v(TAG, name + " " + moreInfoUrl);
                 try {
                     // Creating doc file from URL
                     Document docMoreInfo = Jsoup.parse(new URL(moreInfoUrl).openStream(), "UTF-8", moreInfoUrl);
@@ -386,41 +384,49 @@ public class Parser {
                     periodicityTag = docMoreInfo.select("p.tag_3").html();
                     Document periodicityPart = Jsoup.parse(periodicityTag);
                     Elements spanPeriod = periodicityPart.select("span.valore");
-                    if (!spanPeriod.isEmpty())
+                    if (!spanPeriod.isEmpty()) {
                         feature = spanPeriod.get(0).text();
+                        Log.v(TAG, "Comic feature: " + feature);
+                    }
 
                     // Finding comic title
                     Elements titleIte = docMoreInfo.select("h1");
-                    if (!titleIte.isEmpty())
+                    if (!titleIte.isEmpty()) {
                         title = titleIte.get(0).text();
-                    //Log.i(Constants.LOG_TAG, "Comic title: " + titleIte.get(0).text());
+                        Log.v(TAG, "Comic title: " + title);
+                    }
 
                     // Finding comic description
-                    Elements desc = docMoreInfo.select("div.testo_articolo");
-                    if (!desc.isEmpty())
+                    Elements desc = docMoreInfo.select("div[class=testo_articolo testo testoResize]");
+                    if (!desc.isEmpty()) {
                         description = desc.get(0).text();
+                        Log.v(TAG, "Comic description: " + description);
+                    }
 
                     // Finding cover image
                     Elements linkPathImg = docMoreInfo.select("div.bk-cover img[src]");
                     coverUrl = Constants.MAIN_URL + linkPathImg.attr("src");
+                    Log.v(TAG, "Comic cover: " + coverUrl);
+
+                    // Defining comic name
+                    if (name.startsWith("N°.")) {
+                        name = title.trim().replace("n°", "");
+                    } else {
+                        name = name.substring(0, name.indexOf("-")).trim().replace("N°.", "");
+                    }
+                    Log.v(TAG, "Comic name: " + name);
+
+                    // Calculating date for sql
+                    releaseDate = spanRelease.get(i).text();
+                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    Date myDate = formatter.parse(releaseDate);
+
+                    // Insert comic on database
+                    String editor = Constants.Editors.getName(Constants.Editors.BONELLI);
+                    insertComic(name.toUpperCase(), editor, description, releaseDate, myDate, coverUrl, feature, price);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.w(TAG, "Can't take more info from " + moreInfoUrl + " " + e.toString() + " comic not fetched");
                 }
-
-                // Defining comic name
-                //Log.i(Constants.LOG_TAG, "name = " + name + " title = " + title);
-                if (name.startsWith("N°.")) {
-                    name = title.trim().replace("n°", "");
-                } else
-                    name = name.substring(0, name.indexOf("-")).trim().replace("N°.", "");
-
-                // Calculating date for sql
-                releaseDate = spanRelease.get(i).text();
-                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                Date myDate = formatter.parse(releaseDate);
-
-                // Insert comic on database
-                insertComic(name.toUpperCase(), Constants.Editors.getName(Constants.Editors.BONELLI), description, releaseDate, myDate, coverUrl, feature, price);
             }
         } catch (Exception e) {
             Log.w(TAG, "Error during comic fetching " + url + " " + e.toString());
