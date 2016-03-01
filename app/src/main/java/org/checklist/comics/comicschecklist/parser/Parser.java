@@ -26,7 +26,7 @@ import java.util.StringTokenizer;
 
 /**
  * Created by Francesco Bevilacqua on 20/10/2014.
- * This code is part of ParserTest project.
+ * This code is part of ComicsChecklist project.
  */
 public class Parser {
 
@@ -39,14 +39,19 @@ public class Parser {
     private boolean comicErrorStar;
 
     /**
-     * Costruttore della classe.
+     * Class constructor.
      */
     public Parser(Context context) {
         mContext = context;
     }
 
+    /**
+     * Method used to search Panini comics.
+     * @param editor the editor to search
+     * @return true if search was successful, false otherwise
+     */
     public boolean startParsePanini(String editor) {
-        Log.d(TAG, "Inizio scansione Panini");
+        Log.i(TAG, "Start searching for Panini comics");
         comicErrorPanini = false;
 
         Calendar calendar = new GregorianCalendar();
@@ -87,16 +92,19 @@ public class Parser {
                 parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 3, editor);
             }
         } catch (ParseException e) {
-            Log.w(TAG, "Can't compute date: search Panini interrupted");
-            e.printStackTrace();
+            Log.w(TAG, "Can't compute date: search Panini interrupted " + e.toString());
         }
 
         return comicErrorPanini;
     }
 
-    // Metodo che raccoglie i dati dall'url fornito.
+    /**
+     * Private method used to parse a Panini URL
+     * @param url the URL to parse
+     * @param editor the editor of URL
+     */
     private void parsePaniniUrl(String url, String editor) {
-        Log.v(TAG, "Inizio scansione URL " + editor + " " + url);
+        Log.d(TAG, "Parsing " + editor + " " + url);
         ArrayList<String> arrayCoverUrl = new ArrayList<>();
         ArrayList<String> arrayName = new ArrayList<>();
         ArrayList<String> arrayFeature = new ArrayList<>();
@@ -104,22 +112,24 @@ public class Parser {
         ArrayList<String> arrayReleaseDate = new ArrayList<>();
         ArrayList<String> arrayDescription = new ArrayList<>();
         try {
-            // Prendo solo la parte di codice che mi interessa
+            // Take data and save it on document
             Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
 
-            // Aggiungo all'array le url delle cover
+            // Create array of cover
             String docPath = doc.select("div.cover").html();
             Document divPath = Jsoup.parse(docPath);
             for (Element element5 : divPath.select("img")) arrayCoverUrl.add(element5.attr("src"));
-            // Aggiungo il titolo del fumetto e le feature
+            // Create array of title and features
             String docTitle = doc.select("div.title").html();
             Document divTitle = Jsoup.parse(docTitle);
-            for (Element element4 : divTitle.select("h3")) arrayName.add(element4.text());
+            for (Element element4 : divTitle.select("h3")) {
+                arrayName.add(element4.text());
+            }
             for (Element element3 : divTitle.select("p.features")) {
                 String feature = element3.text();
                 arrayFeature.add(feature);
             }
-            // Calcolo il prezzo del fumetto
+            // Compute comic price
             String docPrice = doc.select("div.price").html();
             Document divPrice = Jsoup.parse(docPrice);
             for (Element element2 : divPrice.select("h4")) {
@@ -131,19 +141,19 @@ public class Parser {
                 }
                 arrayPrice.add(price.trim());
             }
-            // Parte di codice che prende la data d'uscita del fumetto
+            // Compute date release
             String docDR = doc.select("div.logo_brand").html();
             Document divDR = Jsoup.parse(docDR);
             for (Element element1 : divDR.select("span")) arrayReleaseDate.add(element1.text());
-            // Parte di codice che prende la descrizione del fumetto
+            // Take comic description
             String docDesc = doc.select("div.desc").html();
             Document divDesc = Jsoup.parse(docDesc);
             for (Element element : divDesc.select("p")) arrayDescription.add(element.text());
         } catch (Exception e) {
-            Log.d(TAG, "Something is wrong with parsePaniniUrl " + url + " " + e.toString());
+            Log.w(TAG, "Error while comic fetching " + url + " " + e.toString());
         }
 
-        // Unisco tutti i dati e li inserisco nel com.example.fra.parsertest.database
+        // Insert data on database
         for (int i = 0; i < arrayCoverUrl.size(); i++) {
             StringTokenizer tokenizer = new StringTokenizer(arrayName.get(i));
             String title = tokenizer.nextToken();
@@ -155,7 +165,7 @@ public class Parser {
                     insertComic(arrayName.get(i), editor, arrayDescription.get(i), arrayReleaseDate.get(i),
                             myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i));
                 } catch (Exception e) {
-                    // Error during fetching of a comic
+                    // Error while comic fetching
                     Log.w(TAG, title + " " + e.toString());
                     comicErrorPanini = true;
                 }
@@ -163,8 +173,12 @@ public class Parser {
         }
     }
 
+    /**
+     * Method used to search RW comics.
+     * @return true if search was successful, false otherwise
+     */
     public boolean startParseRW() {
-        Log.d(TAG, "Inizio scansione RW");
+        Log.i(TAG, "Start searching for RW comics");
         comicErrorRw = false;
 
         Calendar calendar = new GregorianCalendar();
@@ -181,18 +195,22 @@ public class Parser {
         return comicErrorRw;
     }
 
-    /** Metodo che raccoglie i dati dall'url fornito. */
+    /**
+     * Method used to search data from RW URL.
+     * @param siteUrl the URL to parse
+     * @param releaseDate the date of comic release
+     */
     private void parseUrlRW(String siteUrl, String releaseDate) {
-        Log.v(TAG, "Inizio scansione URL RW " + siteUrl);
+        Log.d(TAG, "Parsing " + siteUrl);
         try {
-            // Prendo solo la parte di codice che mi interessa
+            // Take data and save it on document
             Document doc = Jsoup.parse(new URL(siteUrl).openStream(), "UTF-8", siteUrl);
             Element content = doc.getElementById("content");
 
-            // Ogni tag p contiene un fumetto
+            // Take every potential comic
             Elements pElements = content.select("p");
             String description = "N.D.", coverUrl, title;
-            // Calculating date for sql
+            // Compute release date
             DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             Date myDate = formatter.parse(releaseDate);
 
@@ -210,7 +228,7 @@ public class Parser {
                         coverUrl = src.attr("src");
                         if (coverUrl.startsWith(Constants.MEDIARW)) {
                             // Saving cover
-                            Log.d(TAG, "Cover " + coverUrl);
+                            Log.v(TAG, "Cover " + coverUrl);
                             coverList.add(coverUrl);
                             title = coverUrl.replace(Constants.MEDIARW, "").replace("_", " ").replace(".jpg", "").toUpperCase();
                             // Title elaborated
@@ -248,8 +266,7 @@ public class Parser {
                     }
                 }
             } catch (Exception e) {
-                Log.w(TAG, "Error during comic fetching " + e.toString());
-                e.printStackTrace();
+                Log.w(TAG, "Error while comic fetching " + e.toString());
                 comicErrorRw = true;
             }
         } catch (Exception e) {
@@ -257,8 +274,12 @@ public class Parser {
         }
     }
 
+    /**
+     * Method used to start search for SC comics.
+     * @return true if search was successful, false otherwise
+     */
     public boolean startParseStarC() {
-        Log.d(TAG, "Inizio scansione Star Comics");
+        Log.i(TAG, "Start searching Star Comics comics");
         comicErrorStar = false;
 
         int from = 0, to = 0;
@@ -273,7 +294,7 @@ public class Parser {
             to = Integer.parseInt(myLink) + 40;
         } catch (Exception e) {
             // Unable to find data for Star Comics
-            Log.w(TAG, "Error on startParseStarC " + e.toString());
+            Log.w(TAG, "Error while searching data from Star Comics site " + e.toString());
         }
 
         if (from != 0 && to != 0 && from < to)
@@ -282,19 +303,24 @@ public class Parser {
         return comicErrorStar;
     }
 
+    /**
+     * Method used to search comic from Star Comics URL.
+     * @param from the beginning
+     * @param to to the end
+     */
     private void parseUrlStarC(int from, int to) {
-        Log.v(TAG, "Inizio scansione URL Star comics da " + from + " to " + to);
-        // Parte di codice che cerca tutti i fumetti
+        Log.d(TAG, "Parsing from " + from + " to " + to);
+        // Start parsing every potential URL
         Document doc;
         String name, releaseDate = "", description, price, feature = "N.D.", coverUrl, testata = "", number = "";
         for (int i = from; i <= to; i++) {
-            //Log.i(Constants.LOG_TAG, "Comic number = " + i);
-            // Blocco di codice che cercherà di aprire l'url e ricercare i dati richiesti
+            Log.v(TAG, "Search for comic number " + i);
+            // Try to open computed URL
             try {
-                // Recupero i dati del fumetto (ISO-8859-1 CP1252 UTF-8)
+                // Create doc (ISO-8859-1 CP1252 UTF-8)
                 doc = Jsoup.parse(new URL(Constants.COMIC_ROOT + i).openStream(), "UTF-8", Constants.COMIC_ROOT + i);
                 Element content = doc.getElementsByTag("article").first();
-                // Info varie
+                // Take various info (name, release date and number)
                 Elements li = content.select("li"); // select all li
                 for (Element aLi : li) {
                     if (aLi.text().startsWith("Testata")) {
@@ -308,12 +334,12 @@ public class Parser {
                     }
                 }
                 name = testata + " " + number;
-                //Log.i(Constants.LOG_TAG, testata + " " + releaseDate + " " + name + " ");
-                // Parte di codice recupera l'indirizzo della copertina
+                Log.v(TAG, "Data found " + testata + " " + releaseDate + " " + name + " ");
+                // Take cover URL
                 Element linkPathImg = content.select("img").first();
                 coverUrl = Constants.IMG_URL + linkPathImg.attr("src");
-                //Log.i(Constants.LOG_TAG, coverUrl);
-                // Desc and price
+                Log.v(TAG, "Cover " + coverUrl);
+                // Take description and price
                 Elements pList = content.select("p");
                 description = pList.get(1).text();
                 try {
@@ -321,7 +347,7 @@ public class Parser {
                 } catch (IndexOutOfBoundsException e) {
                     price = "N.D.";
                 }
-                //Log.i(Constants.LOG_TAG, price + " " + description);
+                Log.v(TAG, "Price " + price + " description " + description);
 
                 // Calculating date for sql
                 DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -329,14 +355,18 @@ public class Parser {
                 // Insert comic on database
                 insertComic(name, Constants.Editors.getName(Constants.Editors.STAR), description, releaseDate, myDate, coverUrl, feature, price);
             } catch (Exception e) {
-                Log.w(TAG, "Error on parseUrlStarC comic id " + i + " " + e.toString());
+                Log.w(TAG, "Error while searching data for comic id " + i + " " + e.toString());
                 comicErrorStar = true;
             }
         }
     }
 
+    /**
+     * Method used to start search for Bonneli comics.
+     * @return true if search was successful, false otherwise
+     */
     public boolean startParseBonelli() {
-        Log.d(TAG, "Inizio scansione Bonelli");
+        Log.i(TAG, "Start searching Bonelli comics");
         comicErrorBonelli = false;
 
         parseUrlBonelli(Constants.EDICOLA_INEDITI);
@@ -349,9 +379,12 @@ public class Parser {
         return comicErrorBonelli;
     }
 
-    /** Metodo che raccoglie i dati dall'url fornito. */
+    /**
+     * Method used to parse data from Bonelli URL.
+     * @param url where to find comics
+     */
     private void parseUrlBonelli(String url) {
-        Log.d(TAG, "Inizio scansione URL Bonelli " + url);
+        Log.d(TAG, "Parsing Bonelli URL " + url);
         try {
             // Creating doc file from URL
             Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
@@ -368,9 +401,8 @@ public class Parser {
             Elements spanOther = doc.select("span._url");
 
             // Iterate all elements founded
-            String name, releaseDate, description = "N.D.", price = "N.D.", feature = "N.D.", coverUrl = "N.D.",
+            String name, releaseDate, description = "N.D.", price = "N.D.", feature = "N.D.", coverUrl,
                     moreInfoUrl, periodicityTag, title = "N.D.";
-            Log.d(TAG, "Span release size " + spanRelease.size() + " title size " + spanTitle.size() + " other size " + spanOther.size());
             for (int i = 0; i < spanRelease.size(); i++) {
                 name = spanTitle.get(i).text();
                 moreInfoUrl = spanOther.get(i).text().replace(Constants.MAIN_URL, "");
@@ -429,7 +461,7 @@ public class Parser {
                 }
             }
         } catch (Exception e) {
-            Log.w(TAG, "Error during comic fetching " + url + " " + e.toString());
+            Log.w(TAG, "Error while comic fetching " + url + " " + e.toString());
             comicErrorBonelli = true;
         }
     }
