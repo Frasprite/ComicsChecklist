@@ -327,7 +327,7 @@ public class DownloadService extends IntentService {
 
     private void deleteOldRows() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String deletePref = sharedPref.getString("delete_frequency", "7");
+        String deletePref = sharedPref.getString("delete_frequency", "-1");
         int frequency = Integer.parseInt(deletePref);
         if (frequency > -1) {
             Calendar calendar = Calendar.getInstance();
@@ -341,6 +341,11 @@ public class DownloadService extends IntentService {
                     mSelectionClause,                   // the column to select on
                     mSelectionArgs                      // the value to compare to
             );
+
+            // Update widgets as well
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+            int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(this, WidgetProvider.class));
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
 
             Log.d(TAG, "Entries deleted: " + rowsDeleted);
         }
