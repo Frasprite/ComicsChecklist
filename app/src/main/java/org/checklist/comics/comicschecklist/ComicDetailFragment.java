@@ -181,6 +181,8 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
+        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.calendar:
@@ -237,8 +239,6 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
                 }
 
-                AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
-                int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
                 appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
                 return true;
             case R.id.buy:
@@ -267,6 +267,8 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
 
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
                 }
+
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

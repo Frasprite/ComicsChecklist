@@ -151,7 +151,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                                     // Set the format to sql date time
                                     ContentValues values = new ContentValues();
                                     values.put(ComicDatabase.COMICS_NAME_KEY, name);
-                                    values.put(ComicDatabase.COMICS_EDITOR_KEY, Constants.Editors.CART.name());
+                                    values.put(ComicDatabase.COMICS_EDITOR_KEY, Constants.Editors.getName(Constants.Editors.CART));
                                     values.put(ComicDatabase.COMICS_DESCRIPTION_KEY, info);
                                     values.put(ComicDatabase.COMICS_RELEASE_KEY, date);
                                     values.put(ComicDatabase.COMICS_DATE_KEY, myDate.getTime());
