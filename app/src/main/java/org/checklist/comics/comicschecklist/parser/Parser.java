@@ -32,7 +32,7 @@ public class Parser {
 
     private static final String TAG = Parser.class.getSimpleName();
 
-    private Context mContext;
+    private final Context mContext;
     private boolean comicErrorBonelli;
     private boolean comicErrorPanini;
     private boolean comicErrorRw;

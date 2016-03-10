@@ -70,7 +70,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     private boolean mUserLearnedDrawer;
     private boolean mFromSavedInstanceState;
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    final private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
@@ -401,7 +401,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
      * @param id the comic id
      * @param section is the editor of the comic
      */
-    public void launchDetailView(long id, String section) {
+    private void launchDetailView(long id, String section) {
         if (mTwoPane) {
             Log.d(TAG, "Launching detail view in two pane mode");
             // In two-pane mode, show the detail view in this activity by

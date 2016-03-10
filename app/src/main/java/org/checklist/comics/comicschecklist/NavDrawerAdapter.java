@@ -11,8 +11,8 @@ import android.widget.TextView;
  * Adapter used for the list in DrawerLayout.
  **/
 public class NavDrawerAdapter extends ArrayAdapter<String> {
-    private int resource;
-    private LayoutInflater inflater;
+    private final int resource;
+    private final LayoutInflater inflater;
 
     public NavDrawerAdapter(Context context, int resourceId, String[] mEditorTitles) {
         super(context, resourceId, mEditorTitles);
@@ -55,7 +55,7 @@ public class NavDrawerAdapter extends ArrayAdapter<String> {
     /**
      * This method set the icon for a specific section.
      */
-    public int setIcon(String editorName) {
+    private int setIcon(String editorName) {
         int resId = R.drawable.ic_action_book;
         if (editorName.equalsIgnoreCase(getContext().getResources().getString(R.string.title_section1)))
             resId = R.drawable.ic_action_star_10;

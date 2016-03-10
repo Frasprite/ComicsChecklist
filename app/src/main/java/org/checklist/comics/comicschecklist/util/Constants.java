@@ -36,8 +36,8 @@ public class Constants {
         BONELLI (6, "bonelli", "Sergio Bonelli"),
         RW      (7, "rw", "RW Edizioni");
 
-        private static HashMap<Integer, Editors> map;
-        private static HashMap<String, Editors> titleMap;
+        private static final HashMap<Integer, Editors> map;
+        private static final HashMap<String, Editors> titleMap;
 
         static {
             map = new HashMap<>();
@@ -48,9 +48,9 @@ public class Constants {
             }
         }
 
-        private int code;
-        private String name;
-        private String title;
+        private final int code;
+        private final String name;
+        private final String title;
 
         Editors(int code, String name, String title) {
             this.code = code;

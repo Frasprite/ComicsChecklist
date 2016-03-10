@@ -55,7 +55,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
     }
 
     // Use this instance of the interface to deliver action events
-    ComicsChecklistDialogListener mListener;
+    private ComicsChecklistDialogListener mListener;
     private EditText mNameEditText;
     private EditText mInfoEditText;
     private DatePicker mDatePicker;

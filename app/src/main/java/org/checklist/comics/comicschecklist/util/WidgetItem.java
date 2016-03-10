@@ -5,9 +5,9 @@ package org.checklist.comics.comicschecklist.util;
  * This code is part of Comics Checklist project.
  */
 public class WidgetItem {
-    public Integer _comicID;
-    public String _name;
-    public String _release;
+    public final Integer _comicID;
+    public final String _name;
+    public final String _release;
 
     public WidgetItem(Integer _comicID, String _name, String _release) {
         this._comicID = _comicID;

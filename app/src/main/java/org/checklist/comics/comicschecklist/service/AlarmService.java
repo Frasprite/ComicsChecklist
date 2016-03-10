@@ -28,7 +28,7 @@ public class AlarmService extends IntentService {
 
     private static final String TAG = AlarmService.class.getSimpleName();
 
-    public static final int NOTIFICATION_ID = 1;
+    private static final int NOTIFICATION_ID = 1;
 
     public AlarmService() {
         super("AlarmService");

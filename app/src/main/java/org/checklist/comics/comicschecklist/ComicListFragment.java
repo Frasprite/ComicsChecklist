@@ -90,7 +90,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
      * An implementation of the {@link Callbacks} interface that does
      * nothing. Used only when this fragment is not attached to an activity.
      */
-    private static Callbacks sComicCallbacks = new Callbacks() {
+    private static final Callbacks sComicCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(long id, String mEditor) {}
     };
@@ -326,7 +326,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
      *
      * @see android.support.v4.widget.SwipeRefreshLayout#setOnRefreshListener(android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener)
      */
-    public void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
+    private void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
         if (mSwipeRefreshLayout != null)
             mSwipeRefreshLayout.setOnRefreshListener(listener);
     }
