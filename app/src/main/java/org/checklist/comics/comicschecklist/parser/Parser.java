@@ -1,11 +1,9 @@
 package org.checklist.comics.comicschecklist.parser;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.util.Log;
 
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -162,8 +160,8 @@ public class Parser {
                     // Calculating date for sql
                     DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     Date myDate = formatter.parse(arrayReleaseDate.get(i));
-                    insertComic(arrayName.get(i), editor, arrayDescription.get(i), arrayReleaseDate.get(i),
-                            myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i));
+                    ComicDatabaseManager.insert(mContext, arrayName.get(i), editor, arrayDescription.get(i), arrayReleaseDate.get(i),
+                            myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i), "no", "no");
                 } catch (Exception e) {
                     // Error while comic fetching
                     Log.w(TAG, title + " " + e.toString());
@@ -262,7 +260,7 @@ public class Parser {
 
                 if (coverList.size() == titleList.size() && featureList.size() == priceList.size()) {
                     for (int i = 0; i < coverList.size(); i++) {
-                        insertComic(titleList.get(i), Constants.Editors.getName(Constants.Editors.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i));
+                        ComicDatabaseManager.insert(mContext, titleList.get(i), Constants.Editors.getName(Constants.Editors.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i), "no", "no");
                     }
                 }
             } catch (Exception e) {
@@ -353,7 +351,7 @@ public class Parser {
                 DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                 Date myDate = formatter.parse(releaseDate);
                 // Insert comic on database
-                insertComic(name, Constants.Editors.getName(Constants.Editors.STAR), description, releaseDate, myDate, coverUrl, feature, price);
+                ComicDatabaseManager.insert(mContext, name, Constants.Editors.getName(Constants.Editors.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no");
             } catch (Exception e) {
                 Log.w(TAG, "Error while searching data for comic id " + i + " " + e.toString());
                 comicErrorStar = true;
@@ -455,7 +453,7 @@ public class Parser {
 
                     // Insert comic on database
                     String editor = Constants.Editors.getName(Constants.Editors.BONELLI);
-                    insertComic(name.toUpperCase(), editor, description, releaseDate, myDate, coverUrl, feature, price);
+                    ComicDatabaseManager.insert(mContext, name.toUpperCase(), editor, description, releaseDate, myDate, coverUrl, feature, price, "no", "no");
                 } catch (Exception e) {
                     Log.w(TAG, "Can't take more info from " + moreInfoUrl + " " + e.toString() + " comic not fetched");
                 }
@@ -464,23 +462,5 @@ public class Parser {
             Log.w(TAG, "Error while comic fetching " + url + " " + e.toString());
             comicErrorBonelli = true;
         }
-    }
-
-    private void insertComic(String name, String editor, String description, String releaseDate,
-                             Date date, String coverUrl, String feature, String price) {
-        Log.v(TAG, "Insert comic " + name + " " + editor + " " + releaseDate);
-        ContentValues values = new ContentValues();
-        values.put(ComicDatabase.COMICS_NAME_KEY, name);
-        values.put(ComicDatabase.COMICS_EDITOR_KEY, editor);
-        values.put(ComicDatabase.COMICS_DESCRIPTION_KEY, description);
-        values.put(ComicDatabase.COMICS_RELEASE_KEY, releaseDate);
-        values.put(ComicDatabase.COMICS_DATE_KEY, date.getTime());
-        values.put(ComicDatabase.COMICS_COVER_KEY, coverUrl);
-        values.put(ComicDatabase.COMICS_FEATURE_KEY, feature);
-        values.put(ComicDatabase.COMICS_PRICE_KEY, price);
-        values.put(ComicDatabase.COMICS_CART_KEY, "no");
-        values.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-
-        mContext.getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
     }
 }

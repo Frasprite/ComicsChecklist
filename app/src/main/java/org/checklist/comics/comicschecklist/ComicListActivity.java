@@ -27,6 +27,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
@@ -230,7 +231,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
      */
     private void doMySearch(String query) {
         Log.d(TAG, "Searching " + query);
-        Cursor cursor = this.getContentResolver().query(ComicContentProvider.CONTENT_URI, null, ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
+        Cursor cursor = ComicDatabaseManager.query(this, ComicContentProvider.CONTENT_URI, null, ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
                 new String[] {"%" + query + "%"}, null);
 
         if (cursor != null && cursor.getCount() == 0) {

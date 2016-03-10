@@ -12,6 +12,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import org.checklist.comics.comicschecklist.R;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -42,6 +43,8 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     private String mEditor, mTitle;
     private Cursor mCursor;
 
+    // TODO create an unique method which will update widgets
+
     public ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {
         mContext = applicationContext;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -70,7 +73,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
                     ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
                     ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
 
-            mCursor = mContext.getContentResolver().query(uri, projection, ComicDatabase.COMICS_FAVORITE_KEY + "=?", new String[]{"yes"},
+            mCursor = ComicDatabaseManager.query(mContext, uri, projection, ComicDatabase.COMICS_FAVORITE_KEY + "=?", new String[]{"yes"},
                     ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
         } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
             Uri uri = ComicContentProvider.CONTENT_URI;
@@ -78,7 +81,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
                     ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
                     ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
 
-            mCursor = mContext.getContentResolver().query(uri, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
+            mCursor = ComicDatabaseManager.query(mContext, uri, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
                     ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
         } else {
             Log.d(TAG, "Editor founded, query database " + mEditor);
@@ -87,7 +90,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
                     ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
                     ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
 
-            mCursor = mContext.getContentResolver().query(uri, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
+            mCursor = ComicDatabaseManager.query(mContext, uri, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
                     ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
         }
         int mID;

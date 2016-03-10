@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
@@ -102,7 +103,7 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
                     ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY, ComicDatabase.COMICS_EDITOR_KEY,
                     ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
-            Cursor mCursor = getActivity().getContentResolver().query(uri, projection, null, null, null);
+            Cursor mCursor = ComicDatabaseManager.query(getActivity(), uri, projection);
             mCursor.moveToFirst();
             mComicName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
             mComicRelease = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY));
@@ -224,7 +225,9 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     // Defines selection criteria for the rows you want to update
                     String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
                     String[] mSelectionArgs = {mComicName};
-                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
+                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO In order to avoid conflict while deleting comics save a copy of comic with a new editor name
+
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.i(TAG, "Delete from favorite");
@@ -235,7 +238,9 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     // Defines selection criteria for the rows you want to update
                     String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
                     String[] mSelectionArgs = {mComicName};
-                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
+                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO delete the copy with the different editor
+
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
                 }
 
@@ -251,7 +256,8 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     // Defines selection criteria for the rows you want to update
                     String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
                     String[] mSelectionArgs = {mComicName};
-                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
+                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO In order to avoid conflict while deleting comics save a copy of comic with a new editor name
 
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
@@ -263,7 +269,8 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     // Defines selection criteria for the rows you want to update
                     String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
                     String[] mSelectionArgs = {mComicName};
-                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
+                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO delete the copy with the different editor
 
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
                 }

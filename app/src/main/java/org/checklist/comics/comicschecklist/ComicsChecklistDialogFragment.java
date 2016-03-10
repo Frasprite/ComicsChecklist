@@ -3,7 +3,6 @@ package org.checklist.comics.comicschecklist;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -25,6 +24,7 @@ import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
 
@@ -148,20 +148,8 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                                         e.printStackTrace();
                                         myDate = new Date();
                                     }
-                                    // Set the format to sql date time
-                                    ContentValues values = new ContentValues();
-                                    values.put(ComicDatabase.COMICS_NAME_KEY, name);
-                                    values.put(ComicDatabase.COMICS_EDITOR_KEY, Constants.Editors.getName(Constants.Editors.CART));
-                                    values.put(ComicDatabase.COMICS_DESCRIPTION_KEY, info);
-                                    values.put(ComicDatabase.COMICS_RELEASE_KEY, date);
-                                    values.put(ComicDatabase.COMICS_DATE_KEY, myDate.getTime());
-                                    values.put(ComicDatabase.COMICS_COVER_KEY, "error");
-                                    values.put(ComicDatabase.COMICS_FEATURE_KEY, "N.D.");
-                                    values.put(ComicDatabase.COMICS_PRICE_KEY, "N.D.");
-                                    values.put(ComicDatabase.COMICS_CART_KEY, "yes");
-                                    values.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
 
-                                    getActivity().getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
+                                    ComicDatabaseManager.insert(getActivity(), name, Constants.Editors.getName(Constants.Editors.CART), info, date, myDate, "error", "N.D", "N.D.", "yes", "no");
                                     mListener.onDialogPositiveClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_ADD_COMIC);
                                 } else {
                                     Toast.makeText(getActivity(), getResources().getString(R.string.toast_fill_data_alert), Toast.LENGTH_SHORT).show();
@@ -215,7 +203,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 String mQuery = sp.getString(Constants.PREF_SEARCH_QUERY, "error");
-                final Cursor cursor = getActivity().getContentResolver().query(ComicContentProvider.CONTENT_URI, null, ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
+                final Cursor cursor = ComicDatabaseManager.query(getActivity(), ComicContentProvider.CONTENT_URI, null, ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
                         new String[] {"%" + mQuery + "%"}, null);
                 final ListView mList = (ListView)listView.findViewById(R.id.searchListView);
 

@@ -16,9 +16,10 @@ import android.util.Log;
 
 import org.checklist.comics.comicschecklist.ComicListActivity;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.parser.Parser;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
 
@@ -329,6 +330,7 @@ public class DownloadService extends IntentService {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String deletePref = sharedPref.getString("delete_frequency", "-1");
         int frequency = Integer.parseInt(deletePref);
+        int rowsDeleted = 0;
         if (frequency > -1) {
             Calendar calendar = Calendar.getInstance();
             int x = frequency * -1;
@@ -337,17 +339,20 @@ public class DownloadService extends IntentService {
             // Defines selection criteria for the rows to delete
             String mSelectionClause = ComicDatabase.COMICS_DATE_KEY + "<?";
             String[] mSelectionArgs = {"" + sevenDaysAgo.getTime()};
-            int rowsDeleted = this.getContentResolver().delete(ComicContentProvider.CONTENT_URI,   // the comic content URI
+            rowsDeleted = ComicDatabaseManager.delete(this,
+                    ComicContentProvider.CONTENT_URI,   // the comic content URI
                     mSelectionClause,                   // the column to select on
                     mSelectionArgs                      // the value to compare to
             );
 
+            Log.d(TAG, "Entries deleted: " + rowsDeleted);
+        }
+
+        if (rowsDeleted > 0) {
             // Update widgets as well
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
             int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(this, WidgetProvider.class));
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
-
-            Log.d(TAG, "Entries deleted: " + rowsDeleted);
         }
     }
 

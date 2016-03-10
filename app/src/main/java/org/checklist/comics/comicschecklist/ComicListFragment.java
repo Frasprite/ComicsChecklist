@@ -33,6 +33,7 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
@@ -242,6 +243,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
+                    // TODO delete the copy with the different editor
                     updateWidget();
                     return true;
                 } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
@@ -250,6 +252,8 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
+                    // TODO delete the copy with the different editor
+                    updateWidget();
                     return true;
                 }
             case DELETE_ALL:
@@ -258,6 +262,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, null, null);
+                    // TODO delete all copies with the different editor
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
                     updateWidget();
                     return true;
@@ -266,7 +271,9 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, null, null);
+                    // TODO delete all copies with the different editor
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
+                    updateWidget();
                     return true;
                 }
         }
@@ -411,7 +418,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         String[] mSelectionArgs = {mEditor};
 
         // Deletes the entries that match the selection criteria
-        getActivity().getContentResolver().delete(
+        ComicDatabaseManager.delete(getActivity(),
                 ComicContentProvider.CONTENT_URI,   // the comic content URI
                 mSelectionClause,                   // the column to select on
                 mSelectionArgs                      // the value to compare to

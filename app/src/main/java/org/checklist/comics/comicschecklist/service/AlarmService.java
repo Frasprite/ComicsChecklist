@@ -13,6 +13,7 @@ import android.util.Log;
 import org.checklist.comics.comicschecklist.ComicListActivity;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
 
@@ -45,7 +46,7 @@ public class AlarmService extends IntentService {
         String selection = ComicDatabase.COMICS_RELEASE_KEY + " LIKE ? AND " + ComicDatabase.COMICS_FAVORITE_KEY + " LIKE ?";
         String[] selectionArguments = new String[]{formattedDate, "yes"};
         String order = ComicDatabase.COMICS_DATE_KEY + " " + "ASC";
-        Cursor cursor = this.getContentResolver().query(ComicContentProvider.CONTENT_URI, columns, selection,
+        Cursor cursor = ComicDatabaseManager.query(this, ComicContentProvider.CONTENT_URI, columns, selection,
                 selectionArguments, order);
         if (cursor != null) {
             if (cursor.getCount() == 1) {
