@@ -1,6 +1,7 @@
 package org.checklist.comics.comicschecklist.service;
 
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.WidgetItem;
 
@@ -30,6 +32,16 @@ public class WidgetService extends RemoteViewsService {
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         return new ComicsRemoteViewsFactory(this.getApplicationContext(), intent);
     }
+
+    /**
+     * Method used to update widget used on home screen.
+     * @param context the context caller
+     */
+    public static void updateWidget(Context context) {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(context, WidgetProvider.class));
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
+    }
 }
 
 class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
@@ -42,8 +54,6 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     private int mAppWidgetId;
     private String mEditor, mTitle;
     private Cursor mCursor;
-
-    // TODO create an unique method which will update widgets
 
     public ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {
         mContext = applicationContext;

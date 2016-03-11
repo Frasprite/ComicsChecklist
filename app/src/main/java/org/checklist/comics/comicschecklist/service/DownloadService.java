@@ -278,9 +278,7 @@ public class DownloadService extends IntentService {
                     if (notificationPref) {
                         createNotification(getResources().getString(R.string.search_completed), false);
                         // Favorite data may have changed, update widget as well
-                        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-                        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(this, WidgetProvider.class));
-                        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
+                        WidgetService.updateWidget(this);
                     }
                 }
             }
@@ -350,9 +348,7 @@ public class DownloadService extends IntentService {
 
         if (rowsDeleted > 0) {
             // Update widgets as well
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
-            int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(this, WidgetProvider.class));
-            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
+            WidgetService.updateWidget(this);
         }
     }
 

@@ -1,8 +1,6 @@
 package org.checklist.comics.comicschecklist;
 
 import android.app.DialogFragment;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -36,8 +34,8 @@ import android.widget.Toast;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
+import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 /**
@@ -243,7 +241,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
-                    updateWidget();
+                    WidgetService.updateWidget(getActivity());
                     return true;
                 } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
                     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -251,7 +249,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
-                    updateWidget();
+                    WidgetService.updateWidget(getActivity());
                     return true;
                 }
             case DELETE_ALL:
@@ -272,7 +270,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                             mSelectionArgs                      // the value to compare to
                     );
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
-                    updateWidget();
+                    WidgetService.updateWidget(getActivity());
                     return true;
                 } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
                     // Update all comic on cart
@@ -291,18 +289,11 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                             mSelectionArgs                      // the value to compare to
                     );
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
-                    updateWidget();
+                    WidgetService.updateWidget(getActivity());
                     return true;
                 }
         }
         return super.onContextItemSelected(item);
-    }
-
-    private void updateWidget() {
-        // Favorite data may have changed, update widget as well
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
-        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
     }
 
     @Override

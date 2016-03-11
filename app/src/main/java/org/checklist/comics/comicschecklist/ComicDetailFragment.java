@@ -1,8 +1,6 @@
 package org.checklist.comics.comicschecklist;
 
 import android.animation.ValueAnimator;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,7 +32,7 @@ import com.squareup.picasso.Picasso;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.provider.WidgetProvider;
+import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 import java.text.ParseException;
@@ -180,8 +178,6 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
-        int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
         String mSelectionClause;
         String[] mSelectionArgs;
         // Handle item selection
@@ -247,7 +243,7 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
                 }
 
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
+                WidgetService.updateWidget(getActivity());
                 return true;
             case R.id.buy:
                 if (mCart.equalsIgnoreCase("no")) {
@@ -281,7 +277,7 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
                 }
 
-                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.list);
+                WidgetService.updateWidget(getActivity());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
