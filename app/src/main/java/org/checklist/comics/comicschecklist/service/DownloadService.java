@@ -3,8 +3,6 @@ package org.checklist.comics.comicschecklist.service;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,7 +18,6 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.parser.Parser;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 import java.text.SimpleDateFormat;

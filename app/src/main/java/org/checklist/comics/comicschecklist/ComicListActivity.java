@@ -177,7 +177,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             mDrawerLayout.openDrawer(mDrawerList);
         }
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
             selectItem(0);
