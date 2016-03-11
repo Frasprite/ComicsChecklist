@@ -37,6 +37,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -59,10 +60,7 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
     public static final String ARG_SECTION = "section";
 
     // The comic content this fragment is presenting.
-    private String mComicName;
-    private String mComicRelease;
-    private String mFavorite;
-    private String mCart;
+    private String mComicName, mComicDescription, mComicCover, mComicFeature, mComicPrice, mComicRelease, mFavorite, mCart;
     private boolean mUserLearnedSliding;
     private long mComicId = -1;
 
@@ -103,20 +101,20 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
                     ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY, ComicDatabase.COMICS_EDITOR_KEY,
                     ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
-            Cursor mCursor = ComicDatabaseManager.query(getActivity(), uri, projection);
+            Cursor mCursor = ComicDatabaseManager.query(getActivity(), uri, projection, null, null, null);
             mCursor.moveToFirst();
             mComicName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
             mComicRelease = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY));
-            String mComicDescription = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY));
+            mComicDescription = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY));
             if (mComicDescription.length() == 0)
                 mComicDescription = "N.D";
-            String mComicPrice = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY));
+            mComicPrice = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY));
             if (mComicPrice.length() == 0)
                 mComicPrice = "N.D.";
-            String mComicFeature = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY));
+            mComicFeature = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY));
             if (mComicFeature.length() == 0)
                 mComicFeature = "N.D.";
-            String mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
+            mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
             mFavorite = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FAVORITE_KEY));
             mCart = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY));
             mCursor.close();
@@ -184,6 +182,8 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
     public boolean onOptionsItemSelected(MenuItem item) {
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(getActivity());
         int appWidgetIds[] = appWidgetManager.getAppWidgetIds(new ComponentName(getActivity(), WidgetProvider.class));
+        String mSelectionClause;
+        String[] mSelectionArgs;
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.calendar:
@@ -196,7 +196,7 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     intent.putExtra(CalendarContract.Events.DESCRIPTION, getString(R.string.calendar_release));
 
                     // Setting dates
-                    Date date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(mComicRelease);
+                    Date date = elaborateDate(mComicRelease);
                     GregorianCalendar calDate = new GregorianCalendar();
                     calDate.setTime(date);
                     intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
@@ -223,11 +223,11 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "yes");
                     mFavorite = "yes";
                     // Defines selection criteria for the rows you want to update
-                    String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
-                    String[] mSelectionArgs = {mComicName};
+                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
+                    mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // TODO In order to avoid conflict while deleting comics save a copy of comic with a new editor name
-
+                    // In order to avoid conflict while deleting comics save a copy of comic with a new editor name
+                    ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.FAVORITE), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.i(TAG, "Delete from favorite");
@@ -236,11 +236,14 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     mFavorite = "no";
                     // Defines selection criteria for the rows you want to update
-                    String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
-                    String[] mSelectionArgs = {mComicName};
+                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
+                    mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // TODO delete the copy with the different editor
-
+                    // Delete the copy with the different editor
+                    // Defines selection criteria for the rows to delete
+                    mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=? AND " + ComicDatabase.COMICS_NAME_KEY + "=?";
+                    mSelectionArgs = new String[]{Constants.Editors.getName(Constants.Editors.FAVORITE), mComicName};
+                    ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
                 }
 
@@ -254,11 +257,11 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "yes");
                     mCart = "yes";
                     // Defines selection criteria for the rows you want to update
-                    String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
-                    String[] mSelectionArgs = {mComicName};
+                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
+                    mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // TODO In order to avoid conflict while deleting comics save a copy of comic with a new editor name
-
+                    // In order to avoid conflict while deleting comics save a copy of comic with a new editor name
+                    ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.CART), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.i(TAG, "Update entry on comic database: remove from chart");
@@ -267,11 +270,14 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     mCart = "no";
                     // Defines selection criteria for the rows you want to update
-                    String mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
-                    String[] mSelectionArgs = {mComicName};
+                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
+                    mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // TODO delete the copy with the different editor
-
+                    // Delete the copy with the different editor
+                    // Defines selection criteria for the rows to delete
+                    mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=? AND " + ComicDatabase.COMICS_NAME_KEY + "=?";
+                    mSelectionArgs = new String[]{Constants.Editors.getName(Constants.Editors.CART), mComicName};
+                    ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
                 }
 
@@ -280,6 +286,21 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private Date elaborateDate(String releaseDate) {
+        Date date = null;
+        try {
+            date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(releaseDate);
+        } catch (ParseException e) {
+            Log.w(TAG, "Error while elaborating Date from " + mComicRelease + " " + e.toString());
+        } finally {
+            if (date == null) {
+                date = new Date();
+                date.setTime(System.currentTimeMillis());
+            }
+        }
+        return date;
     }
 
     /**

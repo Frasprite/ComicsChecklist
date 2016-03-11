@@ -67,32 +67,16 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
         String sortOrder = sharedPref.getString("data_order", "ASC");
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE))) {
-            Uri uri = ComicContentProvider.CONTENT_URI;
-            String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
-                    ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
-                    ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
 
-            mCursor = ComicDatabaseManager.query(mContext, uri, projection, ComicDatabase.COMICS_FAVORITE_KEY + "=?", new String[]{"yes"},
-                    ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
-        } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
-            Uri uri = ComicContentProvider.CONTENT_URI;
-            String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
-                    ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
-                    ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
+        Log.d(TAG, "Editor founded, query database " + mEditor);
+        Uri uri = ComicContentProvider.CONTENT_URI;
+        String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
+                ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
+                ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
 
-            mCursor = ComicDatabaseManager.query(mContext, uri, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
-                    ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
-        } else {
-            Log.d(TAG, "Editor founded, query database " + mEditor);
-            Uri uri = ComicContentProvider.CONTENT_URI;
-            String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
-                    ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
-                    ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
+        mCursor = ComicDatabaseManager.query(mContext, uri, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
+                ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
 
-            mCursor = ComicDatabaseManager.query(mContext, uri, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
-                    ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
-        }
         int mID;
         String mName;
         String mRelease;

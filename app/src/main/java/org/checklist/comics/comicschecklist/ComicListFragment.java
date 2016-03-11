@@ -243,7 +243,6 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
-                    // TODO delete the copy with the different editor
                     updateWidget();
                     return true;
                 } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
@@ -252,7 +251,6 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
-                    // TODO delete the copy with the different editor
                     updateWidget();
                     return true;
                 }
@@ -262,7 +260,17 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, null, null);
-                    // TODO delete all copies with the different editor
+                    // Delete all copies with the different editor
+                    // Defines selection criteria for the rows to delete
+                    String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
+                    String[] mSelectionArgs = {Constants.Editors.getName(Constants.Editors.FAVORITE)};
+
+                    // Deletes the entries that match the selection criteria
+                    ComicDatabaseManager.delete(getActivity(),
+                            ComicContentProvider.CONTENT_URI,   // the comic content URI
+                            mSelectionClause,                   // the column to select on
+                            mSelectionArgs                      // the value to compare to
+                    );
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
                     updateWidget();
                     return true;
@@ -271,7 +279,17 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, null, null);
-                    // TODO delete all copies with the different editor
+                    // Delete all copies with the different editor
+                    // Defines selection criteria for the rows to delete
+                    String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
+                    String[] mSelectionArgs = {Constants.Editors.getName(Constants.Editors.CART)};
+
+                    // Deletes the entries that match the selection criteria
+                    ComicDatabaseManager.delete(getActivity(),
+                            ComicContentProvider.CONTENT_URI,   // the comic content URI
+                            mSelectionClause,                   // the column to select on
+                            mSelectionArgs                      // the value to compare to
+                    );
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
                     updateWidget();
                     return true;
@@ -476,16 +494,8 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String order = sharedPref.getString("data_order", "ASC");
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE))) {
-            return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_FAVORITE_KEY + "=?", new String[]{"yes"},
+        return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
                     ComicDatabase.COMICS_DATE_KEY + " " + order);
-        } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
-            return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_CART_KEY + "=?", new String[]{"yes"},
-                    ComicDatabase.COMICS_DATE_KEY + " " + order);
-        } else {
-            return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
-                    ComicDatabase.COMICS_DATE_KEY + " " + order);
-        }
     }
 
     @Override
