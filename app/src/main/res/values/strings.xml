@@ -32,23 +32,26 @@
     <string name="dialog_preview_release">Data d\'uscita (facoltatita)</string>
     <string name="dialog_preview_other">Altre info, es.: editore, numeri mancanti</string>
 
-    <!-- Navigation drawer test -->
-    <string-array name="drawer_array">
-        <item>Lista preferiti</item>
-        <item>Da comprare</item>
-        <item>Marvel</item>
-        <item>Panini Comics</item>
-        <item>Planet Manga</item>
-        <item>Star Comics</item>
-        <item>Sergio Bonelli</item>
-        <item>RW Edizioni</item>
-        <item>Impostazioni</item>
-        <item>Segui su Google+</item>
-        <item>Guida</item>
-        <item>Info</item>
-    </string-array>
+    <!-- Navigation drawer text -->
     <string name="drawer_open">Apri la barra di navigazione</string>
     <string name="drawer_close">Chiudi la barra di navigazione</string>
+    <string name="header_background_img">Header background image</string>
+    <string name="drawer_title_1">Le tue liste</string>
+    <string name="drawer_title_2">Editori disponibili</string>
+    <string name="drawer_title_3">Varie</string>
+    <string name="title_section1">Lista preferiti</string>
+    <string name="title_section2">Da comprare</string>
+    <string name="title_section3">Marvel</string>
+    <string name="title_section4">Panini Comics</string>
+    <string name="title_section5">Planet Manga</string>
+    <string name="title_section6">Star Comics</string>
+    <string name="title_section7">Sergio Bonelli</string>
+    <string name="title_section8">RW Edizioni</string>
+    <string name="title_section9">Impostazioni</string>
+    <string name="title_section10">Segui su Google+</string>
+    <string name="title_section11">Guida</string>
+    <string name="title_section12">Info</string>
+
 
     <!-- Widget text -->
     <string-array name="widget_editors_array">
@@ -175,18 +178,5 @@
 
     <string name="calendar_release">Disponibile da oggi in edicola/libreria.</string>
     <string name="calendar_error">Spiacente, non \è possibile inserire l\'evento nel calendario.</string>
-
-    <string name="title_section1">Lista preferiti</string>
-    <string name="title_section2">Da comprare</string>
-    <string name="title_section3">Marvel</string>
-    <string name="title_section4">Panini Comics</string>
-    <string name="title_section5">Planet Manga</string>
-    <string name="title_section6">Star Comics</string>
-    <string name="title_section7">Sergio Bonelli</string>
-    <string name="title_section8">RW Edizioni</string>
-    <string name="title_section9">Impostazioni</string>
-    <string name="title_section10">Segui su Google+</string>
-    <string name="title_section11">Guida</string>
-    <string name="title_section12">Info</string>
 
 </resources>

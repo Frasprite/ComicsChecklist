@@ -5,18 +5,18 @@
 	    android:id="@+id/calendar"
 	    android:title="@string/menu_calendar"
 	    app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_calendar_day">
+        android:icon="@drawable/ic_insert_invitation">
     </item>
 	<item
 	    android:id="@+id/favorite"
 	    android:title="@string/menu_favorites"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_star_10">
+        android:icon="@drawable/ic_grade">
 	</item>
     <item
         android:id="@+id/buy"
         android:title="@string/menu_wishlist"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_action_cart">
+        android:icon="@drawable/ic_cart">
     </item>
 </menu>

@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -22,8 +23,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
@@ -48,23 +47,24 @@ import org.checklist.comics.comicschecklist.util.Constants;
  * to listen for item selections.
  */
 public class ComicListActivity extends AppCompatActivity implements ComicListFragment.Callbacks,
-                                                                    ComicsChecklistDialogFragment.ComicsChecklistDialogListener {
+                                                                    ComicsChecklistDialogFragment.ComicsChecklistDialogListener,
+                                                                    NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = ComicListActivity.class.getSimpleName();
 
-    // Whether or not the activity is in two-pane mode, i.e. running on a tablet device.
+    // Whether or not the activity is in two-pane mode, i.e. running on a tablet device
     private boolean mTwoPane;
-    // Other interface fragments.
+
+    // Other interface fragments
     private ComicDetailFragment mDetailFragment;
     private ComicListFragment mListFragment;
 
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
+    private NavigationView mNavigationView;
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-    private String[] mNavDrawerTitles;
 
     private ActionBar mActionBar;
 
@@ -117,21 +117,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         }
 
         mTitle = mDrawerTitle = getTitle();
-        mNavDrawerTitles = getResources().getStringArray(R.array.drawer_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.navigation_drawer);
-
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-
-        // Set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter((new NavDrawerAdapter(this, R.layout.list_item_drawer, mNavDrawerTitles)));
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
-            }
-        });
-        //mDrawerList.setItemChecked(mCurrentSelectedPosition, true);
 
         // Set action bar
         mActionBar = getSupportActionBar();
@@ -171,10 +157,14 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
             }
         };
-        // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer,
-        // per the navigation drawer design guidelines.
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+        mNavigationView = (NavigationView) findViewById(R.id.navigation_drawer);
+        mNavigationView.setNavigationItemSelectedListener(this);
+
+        // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer
         if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
-            mDrawerLayout.openDrawer(mDrawerList);
+            mDrawerLayout.openDrawer(mNavigationView);
         }
 
         mDrawerLayout.addDrawerListener(mDrawerToggle);
@@ -194,6 +184,15 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         // Handle search intent
         if (getIntent() != null) {
             handleIntent(getIntent());
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -284,7 +283,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        if (!mDrawerLayout.isDrawerOpen(mDrawerList)) {
+        if (!mDrawerLayout.isDrawerOpen(mNavigationView)) {
             // Get the SearchView and set the searchable configuration
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
             SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
@@ -300,7 +299,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // If the nav drawer is open, hide action items related to the content view
-        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mNavigationView);
         // Hide detail buttons
         if (mTwoPane && mDetailFragment != null) {
             menu.findItem(R.id.calendar).setVisible(!drawerOpen);
@@ -320,46 +319,6 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
-    private void selectItem(int position) {
-        Log.d(TAG, "selectItem " + position);
-        if (mDrawerList != null) {
-            mDrawerList.setItemChecked(position, true);
-            if (mDrawerLayout != null) {
-                if (position < 8) {
-                    // Update selected item title, then close the drawer
-                    setTitle(mNavDrawerTitles[position]);
-                    mDrawerLayout.closeDrawer(mDrawerList);
-                }
-            }
-        }
-        if (position <= 7) {
-            // Update the main content by replacing fragments
-            mListFragment = ComicListFragment.newInstance(position);
-            getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, mListFragment).commit();
-        } else {
-            switch (position) {
-                case 8:
-                    // Open settings
-                    Intent launchPreferencesIntent = new Intent().setClass(this, SettingsActivity.class);
-                    startActivity(launchPreferencesIntent);
-                    break;
-                case 9:
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
-                    break;
-                case 10:
-                    // Open help dialog
-                    DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_GUIDE);
-                    helpDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
-                    break;
-                case 11:
-                    // Open info dialog
-                    DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_INFO);
-                    infoDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
-                    break;
-            }
-        }
-    }
-
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
@@ -372,7 +331,6 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
      * When using the ActionBarDrawerToggle, you must call it during
      * onPostCreate() and onConfigurationChanged()...
      */
-
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
@@ -424,6 +382,95 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             detailIntent.putExtra(ComicDetailFragment.ARG_SECTION, section);
             startActivity(detailIntent);
         }
+    }
+
+    private void selectItem(int position) {
+        Log.d(TAG, "selectItem " + position);
+        if (mNavigationView != null) {
+            if (mDrawerLayout != null) {
+                if (position < 8) {
+                    // Update selected item title, then close the drawer
+                    setTitle(mNavigationView.getMenu().getItem(position).getTitle());
+                    mDrawerLayout.closeDrawer(mNavigationView);
+                }
+            }
+        }
+        if (position <= 7) {
+            // Update the main content by replacing fragments
+            mListFragment = ComicListFragment.newInstance(position);
+            getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, mListFragment).commit();
+        } else {
+            switch (position) {
+                case 8:
+                    // Open settings
+                    Intent launchPreferencesIntent = new Intent().setClass(this, SettingsActivity.class);
+                    startActivity(launchPreferencesIntent);
+                    break;
+                case 9:
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
+                    break;
+                case 10:
+                    // Open help dialog
+                    DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_GUIDE);
+                    helpDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+                    break;
+                case 11:
+                    // Open info dialog
+                    DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_INFO);
+                    infoDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+                    break;
+            }
+        }
+    }
+
+    /******************************************************************************************
+     * NAVIGATION VIEW CALLBACK
+     ******************************************************************************************/
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        item.getTitle();
+        int position = 0;
+        switch (item.getItemId()) {
+            case R.id.list_favorite:
+                position = 0;
+                break;
+            case R.id.list_cart:
+                position = 1;
+                break;
+            case R.id.list_marvel:
+                position = 2;
+                break;
+            case R.id.list_panini:
+                position = 3;
+                break;
+            case R.id.list_planet:
+                position = 4;
+                break;
+            case R.id.list_star:
+                position = 5;
+                break;
+            case R.id.list_bonelli:
+                position = 6;
+                break;
+            case R.id.list_rw:
+                position = 7;
+                break;
+            case R.id.action_settings:
+                position = 8;
+                break;
+            case R.id.action_social:
+                position = 9;
+                break;
+            case R.id.action_help:
+                position = 10;
+                break;
+            case R.id.action_info:
+                position = 11;
+                break;
+        }
+        selectItem(position);
+        return position <= 7;
     }
 
     /******************************************************************************************

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/list_favorite"
+            android:icon="@drawable/ic_grade"
+            android:title="@string/title_section1" />
+        <item
+            android:id="@+id/list_cart"
+            android:icon="@drawable/ic_cart"
+            android:title="@string/title_section2" />
+
+        <item android:title="@string/drawer_title_2">
+            <menu>
+                <item
+                    android:id="@+id/list_marvel"
+                    android:icon="@drawable/ic_comic"
+                    android:title="@string/title_section3" />
+                <item
+                    android:id="@+id/list_panini"
+                    android:icon="@drawable/ic_comic"
+                    android:title="@string/title_section4" />
+                <item
+                    android:id="@+id/list_planet"
+                    android:icon="@drawable/ic_comic"
+                    android:title="@string/title_section5" />
+                <item
+                    android:id="@+id/list_star"
+                    android:icon="@drawable/ic_comic"
+                    android:title="@string/title_section6" />
+                <item
+                    android:id="@+id/list_bonelli"
+                    android:icon="@drawable/ic_comic"
+                    android:title="@string/title_section7" />
+                <item
+                    android:id="@+id/list_rw"
+                    android:icon="@drawable/ic_comic"
+                    android:title="@string/title_section8" />
+            </menu>
+        </item>
+
+        <item android:title="@string/drawer_title_3">
+            <menu>
+                <item
+                    android:id="@+id/action_settings"
+                    android:icon="@drawable/ic_settings"
+                    android:title="@string/title_section9" />
+                <item
+                    android:id="@+id/action_social"
+                    android:icon="@drawable/ic_social"
+                    android:title="@string/title_section10" />
+                <item
+                    android:id="@+id/action_help"
+                    android:icon="@drawable/ic_help"
+                    android:title="@string/title_section11" />
+                <item
+                    android:id="@+id/action_info"
+                    android:icon="@drawable/ic_info"
+                    android:title="@string/title_section12" />
+            </menu>
+        </item>
+    </group>
+
+</menu>

@@ -5,13 +5,13 @@
     <header
         android:id="@+id/notification"
         android:fragment="org.checklist.comics.comicschecklist.SettingsActivity$NotificationPreferenceFragment"
-        android:icon="@drawable/ic_action_social_notifications"
+        android:icon="@drawable/ic_notifications"
         android:title="@string/pref_header_notifications" />
 
     <header
         android:id="@+id/data_sync"
         android:fragment="org.checklist.comics.comicschecklist.SettingsActivity$DataSyncPreferenceFragment"
-        android:icon="@drawable/ic_action_notification_sync"
+        android:icon="@drawable/ic_cached"
         android:title="@string/pref_header_data_sync" />
 
 </preference-headers>
