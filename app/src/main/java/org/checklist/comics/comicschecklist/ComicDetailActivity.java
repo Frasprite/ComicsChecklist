@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 /**
@@ -22,11 +23,14 @@ public class ComicDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_detail);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeButtonEnabled(true);
-            actionBar.setElevation(5);
         }
 
         // savedInstanceState is non-null when there is fragment state
@@ -45,7 +49,7 @@ public class ComicDetailActivity extends AppCompatActivity {
             arguments.putString(ComicDetailFragment.ARG_SECTION, getIntent().getStringExtra(ComicDetailFragment.ARG_SECTION));
             ComicDetailFragment fragment = new ComicDetailFragment();
             fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction().add(R.id.comic_detail_container, fragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
         }
     }
 

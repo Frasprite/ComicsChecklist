@@ -5,11 +5,15 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -138,10 +142,20 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
             ImageView arrowDx = (ImageView) rootView.findViewById(R.id.go_up_dx);
 
             if (!mUserLearnedSliding) {
-                int imagesToShow[] = {R.drawable.ic_action_drag_up, R.drawable.ic_action_orange_drag_up};
+                Drawable image1 = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_upward, null);
+                Drawable image2 = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_upward, null);
+                if (image1 != null && image2 != null) {
+                    image1.setColorFilter(ContextCompat.getColor(getContext(), R.color.divider), PorterDuff.Mode.MULTIPLY);
+                    image2.setColorFilter(ContextCompat.getColor(getContext(), R.color.primary), PorterDuff.Mode.MULTIPLY);
 
-                animate(arrowSx, imagesToShow, 0, true);
-                animate(arrowDx, imagesToShow, 0, true);
+                    Drawable imagesToShow[] = {image1, image2};
+
+                    animate(arrowSx, imagesToShow, 0, true);
+                    animate(arrowDx, imagesToShow, 0, true);
+                } else {
+                    arrowDx.setVisibility(View.GONE);
+                    arrowSx.setVisibility(View.GONE);
+                }
             } else {
                 arrowDx.setVisibility(View.GONE);
                 arrowSx.setVisibility(View.GONE);
@@ -306,14 +320,14 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
      * @param imageIndex index of the first image to show in images[]
      * @param forever If true then after the last image it starts all over again with the first image resulting in an infinite loop
      */
-    private void animate(final ImageView imageView, final int images[], final int imageIndex, final boolean forever) {
+    private void animate(final ImageView imageView, final Drawable images[], final int imageIndex, final boolean forever) {
 
         int fadeInDuration = 500; // Configure time values
         int timeBetween = 3000;
         int fadeOutDuration = 1000;
 
         imageView.setVisibility(View.INVISIBLE);    // Visible or invisible by default - this will apply when the animation ends
-        imageView.setImageResource(images[imageIndex]);
+        imageView.setImageDrawable(images[imageIndex]);
 
         Animation fadeIn = new AlphaAnimation(0, 1);
         fadeIn.setInterpolator(new DecelerateInterpolator());

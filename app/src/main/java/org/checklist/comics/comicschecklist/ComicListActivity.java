@@ -7,11 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,10 +22,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
@@ -108,6 +113,19 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         mUserLearnedDrawer = sp.getBoolean(Constants.PREF_USER_LEARNED_DRAWER, false);
 
         setContentView(R.layout.activity_comic_list);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Open add dialog
+                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_ADD_COMIC);
+                addDialog.show(ComicListActivity.this.getFragmentManager(), "ComicsChecklistDialogFragment");
+            }
+        });
+
         if (findViewById(R.id.comic_detail_container) != null) {
             // The detail container view will be present only in the
             // large-screen layouts (res/values-large and
@@ -161,6 +179,17 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
 
         mNavigationView = (NavigationView) findViewById(R.id.navigation_drawer);
         mNavigationView.setNavigationItemSelectedListener(this);
+        View headerLayout = mNavigationView.getHeaderView(0);
+        TextView versionTextView = (TextView) headerLayout.findViewById(R.id.versionTextView);
+        PackageInfo pInfo;
+        String version = "";
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.w(TAG, "Can't find app version!", e);
+        }
+        versionTextView.setText(version);
 
         // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer
         if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
@@ -261,8 +290,9 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         Log.v(TAG, "onStart");
         if (mTwoPane) {
             // In two-pane mode, list items should be given the 'activated' state when touched
-            if (mListFragment != null)
+            if (mListFragment != null) {
                 mListFragment.setActivateOnItemClick(true);
+            }
         }
     }
 
@@ -398,7 +428,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         if (position <= 7) {
             // Update the main content by replacing fragments
             mListFragment = ComicListFragment.newInstance(position);
-            getSupportFragmentManager().beginTransaction().replace(R.id.comic_list_container, mListFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, mListFragment).commit();
         } else {
             switch (position) {
                 case 8:
@@ -524,7 +554,10 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
 
     @Override
     public void onDialogListItemClick(DialogFragment dialog, int dialogId, long id, String search) {
-        dialog.dismiss();
-        launchDetailView(id, search);
+        switch (dialogId) {
+            case Constants.DIALOG_RESULT_LIST:
+                dialog.dismiss();
+                launchDetailView(id, search);
+        }
     }
 }

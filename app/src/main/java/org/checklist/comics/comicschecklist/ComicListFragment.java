@@ -1,6 +1,5 @@
 package org.checklist.comics.comicschecklist;
 
-import android.app.DialogFragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -162,16 +160,6 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Create the list fragment's content view by calling the super method
         final View listFragmentView = inflater.inflate(R.layout.fragment_list, container, false);//super.onCreateView(inflater, container, savedInstanceState);
-
-        FloatingActionButton fab = (FloatingActionButton) listFragmentView.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Open add dialog
-                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_ADD_COMIC);
-                addDialog.show(getActivity().getFragmentManager(), "ComicsChecklistDialogFragment");
-            }
-        });
 
         getActivity().setTitle(Constants.Editors.getTitle(mEditorNumber));
 

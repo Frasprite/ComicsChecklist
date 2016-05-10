@@ -35,8 +35,6 @@
     <!-- Navigation drawer text -->
     <string name="drawer_open">Apri la barra di navigazione</string>
     <string name="drawer_close">Chiudi la barra di navigazione</string>
-    <string name="header_background_img">Header background image</string>
-    <string name="drawer_title_1">Le tue liste</string>
     <string name="drawer_title_2">Editori disponibili</string>
     <string name="drawer_title_3">Varie</string>
     <string name="title_section1">Lista preferiti</string>
