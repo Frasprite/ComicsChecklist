@@ -14,10 +14,9 @@ import android.provider.CalendarContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,8 +86,6 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mUserLearnedSliding = sp.getBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, false);
-
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -162,6 +159,18 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             }
         }
 
+        // Create detail toolbar
+        Toolbar toolbarDetail = (Toolbar) getActivity().findViewById(R.id.toolbarDetail);
+        // Inflate a menu to be displayed in the toolbar
+        toolbarDetail.inflateMenu(R.menu.menu_detail);
+
+        toolbarDetail.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                return manageItemSelected(item);
+            }
+        });
+
         return rootView;
     }
 
@@ -184,14 +193,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
         animator.start();
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_preview, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    private boolean manageItemSelected(MenuItem item) {
         String mSelectionClause;
         String[] mSelectionArgs;
         // Handle item selection

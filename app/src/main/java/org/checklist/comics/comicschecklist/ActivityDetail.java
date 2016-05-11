@@ -24,7 +24,6 @@ public class ActivityDetail extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_detail);
 
-        // TODO manage detail toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
         setSupportActionBar(toolbar);
 
@@ -50,7 +49,7 @@ public class ActivityDetail extends AppCompatActivity {
             arguments.putString(FragmentDetail.ARG_SECTION, getIntent().getStringExtra(FragmentDetail.ARG_SECTION));
             FragmentDetail fragment = new FragmentDetail();
             fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.comic_detail_container, fragment).commit();
         }
     }
 

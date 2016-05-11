@@ -60,8 +60,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device
     private boolean mTwoPane;
 
-    // Other interface fragments
-    private FragmentDetail mDetailFragment;
     private FragmentList mListFragment;
 
     private DrawerLayout mDrawerLayout;
@@ -112,7 +110,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         mUserLearnedDrawer = sp.getBoolean(Constants.PREF_USER_LEARNED_DRAWER, false);
 
-        setContentView(R.layout.activity_comic_single_pane);
+        setContentView(R.layout.activity_comic_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -128,12 +126,10 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
 
         if (findViewById(R.id.comic_detail_container) != null) {
             // The detail container view will be present only in the
-            // large-screen layouts (res/values-large and
-            // res/values-sw600dp). If this view is present, then the
+            // large-screen layouts (res/values-large-land and
+            // res/values-sw600dp-land). If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
-            // TODO manage detail toolbar
-            Toolbar toolbarDetail = (Toolbar) findViewById(R.id.toolbarDetail);
         }
 
         mTitle = mDrawerTitle = getTitle();
@@ -333,14 +329,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         // If the nav drawer is open, hide action items related to the content view
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mNavigationView);
         // Hide detail buttons
-        if (mTwoPane && mDetailFragment != null) {
-            menu.findItem(R.id.calendar).setVisible(!drawerOpen);
-            menu.findItem(R.id.favorite).setVisible(!drawerOpen);
-            menu.findItem(R.id.buy).setVisible(!drawerOpen);
-            menu.findItem(R.id.search).setVisible(!drawerOpen);
-        } else {
-            menu.findItem(R.id.search).setVisible(!drawerOpen);
-        }
+        menu.findItem(R.id.search).setVisible(!drawerOpen);
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -401,7 +391,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             Bundle arguments = new Bundle();
             arguments.putLong(FragmentDetail.ARG_COMIC_ID, id);
             arguments.putString(FragmentDetail.ARG_SECTION, section);
-            mDetailFragment = new FragmentDetail();
+            FragmentDetail mDetailFragment = new FragmentDetail();
             mDetailFragment.setArguments(arguments);
             // Warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
             getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commitAllowingStateLoss();
@@ -455,6 +445,10 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         }
     }
 
+    public boolean isTwoPane() {
+        return mTwoPane;
+    }
+
     /******************************************************************************************
      * NAVIGATION VIEW CALLBACK
      ******************************************************************************************/
@@ -464,6 +458,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         item.getTitle();
         int position = 0;
         switch (item.getItemId()) {
+            // TODO not every case work well
             case R.id.list_favorite:
                 position = 0;
                 break;
