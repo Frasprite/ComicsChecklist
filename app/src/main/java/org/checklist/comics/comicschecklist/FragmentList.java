@@ -40,12 +40,12 @@ import org.checklist.comics.comicschecklist.util.Constants;
  * A list fragment representing a list of Comics. This fragment
  * also supports tablet devices by allowing list items to be given an
  * 'activated' state upon selection. This helps indicate which item is
- * currently being viewed in a {@link ComicDetailFragment}.
+ * currently being viewed in a {@link FragmentDetail}.
  * <p>
  */
-public class ComicListFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FragmentList extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String TAG = ComicListFragment.class.getSimpleName();
+    private static final String TAG = FragmentList.class.getSimpleName();
 
     private SimpleCursorAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -95,9 +95,9 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     /**
      * Returns a new instance of this fragment for the given section number.
      */
-    public static ComicListFragment newInstance(int section) {
+    public static FragmentList newInstance(int section) {
         Log.v(TAG, "Creating new instance " + section);
-        ComicListFragment fragment = new ComicListFragment();
+        FragmentList fragment = new FragmentList();
         Bundle args = new Bundle();
         args.putInt(Constants.ARG_SECTION_NUMBER, section);
         fragment.setArguments(args);
@@ -159,7 +159,7 @@ public class ComicListFragment extends ListFragment implements LoaderManager.Loa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Create the list fragment's content view by calling the super method
-        final View listFragmentView = inflater.inflate(R.layout.fragment_list, container, false);//super.onCreateView(inflater, container, savedInstanceState);
+        final View listFragmentView = inflater.inflate(R.layout.fragment_main, container, false);//super.onCreateView(inflater, container, savedInstanceState);
 
         getActivity().setTitle(Constants.Editors.getTitle(mEditorNumber));
 

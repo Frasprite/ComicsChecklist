@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import org.checklist.comics.comicschecklist.ComicListActivity;
+import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
@@ -68,7 +68,7 @@ public class AlarmService extends IntentService {
     private void createNotification(String message, boolean bool) {
         Log.d(TAG, "Creating notification for favorite alert");
         // Prepare intent which is triggered if the notification is selected
-        Intent intent = new Intent(this, ComicListActivity.class);
+        Intent intent = new Intent(this, ActivityMain.class);
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         // Add a sound to notification

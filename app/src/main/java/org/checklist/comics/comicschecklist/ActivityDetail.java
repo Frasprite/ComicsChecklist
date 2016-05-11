@@ -12,19 +12,20 @@ import android.view.MenuItem;
  * An activity representing a single Comic detail screen. This
  * activity is only used on handset devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link ComicListActivity}.
+ * in a {@link ActivityMain}.
  * <p>
  * This activity is mostly just a 'shell' activity containing nothing
- * more than a {@link ComicDetailFragment}.
+ * more than a {@link FragmentDetail}.
  */
-public class ComicDetailActivity extends AppCompatActivity {
+public class ActivityDetail extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_detail);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        // TODO manage detail toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -45,9 +46,9 @@ public class ComicDetailActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putLong(ComicDetailFragment.ARG_COMIC_ID, getIntent().getLongExtra(ComicDetailFragment.ARG_COMIC_ID, 0));
-            arguments.putString(ComicDetailFragment.ARG_SECTION, getIntent().getStringExtra(ComicDetailFragment.ARG_SECTION));
-            ComicDetailFragment fragment = new ComicDetailFragment();
+            arguments.putLong(FragmentDetail.ARG_COMIC_ID, getIntent().getLongExtra(FragmentDetail.ARG_COMIC_ID, 0));
+            arguments.putString(FragmentDetail.ARG_SECTION, getIntent().getStringExtra(FragmentDetail.ARG_SECTION));
+            FragmentDetail fragment = new FragmentDetail();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).commit();
         }
@@ -64,7 +65,7 @@ public class ComicDetailActivity extends AppCompatActivity {
             //
             // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             //
-            NavUtils.navigateUpTo(this, new Intent(this, ComicListActivity.class));
+            NavUtils.navigateUpTo(this, new Intent(this, ActivityMain.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

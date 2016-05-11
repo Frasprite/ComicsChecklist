@@ -1,6 +1,6 @@
 package org.checklist.comics.comicschecklist.util;
 
-import org.checklist.comics.comicschecklist.ComicListActivity;
+import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.ComicsChecklistDialogFragment;
 
 import android.app.DialogFragment;
@@ -40,7 +40,7 @@ public class AppRater {
         if (launch_count >= Constants.LAUNCHES_UNTIL_PROMPT) {
             if (System.currentTimeMillis() >= date_firstLaunch +
                     (Constants.DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000)) {
-                FragmentManager fm = ((ComicListActivity) mContext).getFragmentManager();
+                FragmentManager fm = ((ActivityMain) mContext).getFragmentManager();
                 DialogFragment rateDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_RATE);
                 rateDialog.show(fm, "ComicsChecklistDialogFragment");
             }

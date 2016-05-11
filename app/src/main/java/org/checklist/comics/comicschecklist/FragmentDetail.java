@@ -47,13 +47,13 @@ import java.util.Locale;
 
 /**
  * A fragment representing a single Comic detail screen.
- * This fragment is either contained in a {@link ComicListActivity}
- * in two-pane mode (on tablets) or a {@link ComicDetailActivity}
+ * This fragment is either contained in a {@link ActivityMain}
+ * in two-pane mode (on tablets) or a {@link ActivityDetail}
  * on handsets.
  */
-public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayout.PanelSlideListener {
+public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.PanelSlideListener {
 
-    private static final String TAG = ComicDetailFragment.class.getSimpleName();
+    private static final String TAG = FragmentDetail.class.getSimpleName();
 
     /**
      * The fragment arguments representing the item ID that this fragment represents.
@@ -72,7 +72,7 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ComicDetailFragment() {}
+    public FragmentDetail() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,7 +94,7 @@ public class ComicDetailFragment extends Fragment implements SlidingUpPanelLayou
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
-        View rootView = inflater.inflate(R.layout.fragment_comic_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         // Show the comic contents
         if (mComicId > -1) {

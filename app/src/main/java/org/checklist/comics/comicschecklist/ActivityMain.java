@@ -41,28 +41,28 @@ import org.checklist.comics.comicschecklist.util.Constants;
  * An activity representing a list of Comics. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link ComicDetailActivity} representing
+ * lead to a {@link ActivityDetail} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  * <p>
  * The activity makes heavy use of fragments. The list of items is a
- * {@link ComicListFragment} and the item details
- * (if present) is a {@link ComicDetailFragment}.
+ * {@link FragmentList} and the item details
+ * (if present) is a {@link FragmentDetail}.
  * <p>
  * to listen for item selections.
  */
-public class ComicListActivity extends AppCompatActivity implements ComicListFragment.Callbacks,
+public class ActivityMain extends AppCompatActivity implements FragmentList.Callbacks,
                                                                     ComicsChecklistDialogFragment.ComicsChecklistDialogListener,
                                                                     NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = ComicListActivity.class.getSimpleName();
+    private static final String TAG = ActivityMain.class.getSimpleName();
 
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device
     private boolean mTwoPane;
 
     // Other interface fragments
-    private ComicDetailFragment mDetailFragment;
-    private ComicListFragment mListFragment;
+    private FragmentDetail mDetailFragment;
+    private FragmentList mListFragment;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -112,7 +112,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         mUserLearnedDrawer = sp.getBoolean(Constants.PREF_USER_LEARNED_DRAWER, false);
 
-        setContentView(R.layout.activity_comic_list);
+        setContentView(R.layout.activity_comic_single_pane);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -122,7 +122,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             public void onClick(View v) {
                 // Open add dialog
                 DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_ADD_COMIC);
-                addDialog.show(ComicListActivity.this.getFragmentManager(), "ComicsChecklistDialogFragment");
+                addDialog.show(ActivityMain.this.getFragmentManager(), "ComicsChecklistDialogFragment");
             }
         });
 
@@ -132,6 +132,8 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             // res/values-sw600dp). If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
+            // TODO manage detail toolbar
+            Toolbar toolbarDetail = (Toolbar) findViewById(R.id.toolbarDetail);
         }
 
         mTitle = mDrawerTitle = getTitle();
@@ -168,7 +170,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
                     // The user manually opened the drawer; store this flag to prevent auto-showing
                     // the navigation drawer automatically in the future.
                     mUserLearnedDrawer = true;
-                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ComicListActivity.this);
+                    SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ActivityMain.this);
                     sp.edit().putBoolean(Constants.PREF_USER_LEARNED_DRAWER, true).apply();
                 }
 
@@ -376,7 +378,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
     }
 
     /**
-     * Callback method from {@link ComicListFragment.Callbacks}
+     * Callback method from {@link FragmentList.Callbacks}
      * indicating that the comic was selected.
      */
     @Override
@@ -397,9 +399,9 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             // adding or replacing the detail fragment using a
             // fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putLong(ComicDetailFragment.ARG_COMIC_ID, id);
-            arguments.putString(ComicDetailFragment.ARG_SECTION, section);
-            mDetailFragment = new ComicDetailFragment();
+            arguments.putLong(FragmentDetail.ARG_COMIC_ID, id);
+            arguments.putString(FragmentDetail.ARG_SECTION, section);
+            mDetailFragment = new FragmentDetail();
             mDetailFragment.setArguments(arguments);
             // Warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
             getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commitAllowingStateLoss();
@@ -407,9 +409,9 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
             Log.d(TAG, "Launching detail view in single pane mode");
             // In single-pane mode, simply start the detail activity
             // for the selected item ID.
-            Intent detailIntent = new Intent(this, ComicDetailActivity.class);
-            detailIntent.putExtra(ComicDetailFragment.ARG_COMIC_ID, id);
-            detailIntent.putExtra(ComicDetailFragment.ARG_SECTION, section);
+            Intent detailIntent = new Intent(this, ActivityDetail.class);
+            detailIntent.putExtra(FragmentDetail.ARG_COMIC_ID, id);
+            detailIntent.putExtra(FragmentDetail.ARG_SECTION, section);
             startActivity(detailIntent);
         }
     }
@@ -427,7 +429,7 @@ public class ComicListActivity extends AppCompatActivity implements ComicListFra
         }
         if (position <= 7) {
             // Update the main content by replacing fragments
-            mListFragment = ComicListFragment.newInstance(position);
+            mListFragment = FragmentList.newInstance(position);
             getSupportFragmentManager().beginTransaction().replace(R.id.container, mListFragment).commit();
         } else {
             switch (position) {
