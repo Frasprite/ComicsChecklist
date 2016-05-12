@@ -32,7 +32,7 @@ public class SettingsWidget extends ListActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate - start");
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
@@ -59,21 +59,25 @@ public class SettingsWidget extends ListActivity {
         if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
             finish();
         }
+
+        Log.v(TAG, "onCreate - end");
     }
 
     @Override
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
-        Log.d(TAG, "SettingsWidget onListItemClick " + position);
+        Log.d(TAG, "onListItemClick - start - position " + position);
         Context context = SettingsWidget.this;
         Constants.Editors editor = Constants.Editors.getEditor(position);
         // Take name and title reference of editor chosen
         String title = Constants.Editors.getTitle(editor);
         String name = Constants.Editors.getName(editor);
         // Create widget
+        Log.v(TAG, "onListItemClick - end - title " + title + " name " + name);
         createWidget(context, title, name);
     }
 
     private void createWidget(Context context, String title, String name) {
+        Log.i(TAG, "createWidget - title " + title + " name " + name);
         // Store the string locally
         saveTitlePref(context, mAppWidgetId, title);
 
@@ -92,6 +96,7 @@ public class SettingsWidget extends ListActivity {
 
     // Write the prefix to the SharedPreferences object for this widget
     private static void saveTitlePref(Context context, int appWidgetId, String text) {
+        Log.d(TAG, "saveTitlePref " + PREF_PREFIX_KEY + appWidgetId + " text " + text);
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
         prefs.putString(PREF_PREFIX_KEY + appWidgetId, text);
         prefs.apply();
@@ -111,6 +116,7 @@ public class SettingsWidget extends ListActivity {
     }
 
     public static void deleteTitlePref(Context context, int appWidgetId) {
+        Log.d(TAG, "deleteTitlePref " + PREF_PREFIX_KEY + appWidgetId);
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
         prefs.remove(PREF_PREFIX_KEY + appWidgetId);
         prefs.apply();

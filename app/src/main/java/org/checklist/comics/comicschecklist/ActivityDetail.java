@@ -6,6 +6,7 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 
 /**
@@ -19,9 +20,12 @@ import android.view.MenuItem;
  */
 public class ActivityDetail extends AppCompatActivity {
 
+    private static final String TAG = ActivityDetail.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate - start");
         setContentView(R.layout.activity_comic_detail);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
@@ -51,6 +55,8 @@ public class ActivityDetail extends AppCompatActivity {
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().add(R.id.comic_detail_container, fragment).commit();
         }
+
+        Log.v(TAG, "onCreate - end");
     }
 
     @Override

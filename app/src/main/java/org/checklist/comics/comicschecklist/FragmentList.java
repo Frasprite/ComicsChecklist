@@ -80,7 +80,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         /**
          * Callback for when an item has been selected.
          */
-        void onItemSelected(long id, String mEditor);
+        void onItemSelected(long id);
     }
 
     /**
@@ -89,7 +89,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      */
     private static final Callbacks sComicCallbacks = new Callbacks() {
         @Override
-        public void onItemSelected(long id, String mEditor) {}
+        public void onItemSelected(long id) {}
     };
 
     /**
@@ -111,61 +111,23 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         // Find editor
         mEditorNumber = getArguments().getInt(Constants.ARG_SECTION_NUMBER);
         mEditor = Constants.Editors.getName(mEditorNumber);
-        Log.d(TAG, "onCreate - " + mEditor);
+        Log.d(TAG, "onCreate - " + mEditorNumber + " name " + mEditor);
 
         fillData();
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        // Restore the previously serialized activated item position.
-        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
-            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
-        }
-
-        TextView emptyText = (TextView)view.findViewById(android.R.id.empty);
-
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE))) {
-            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
-            emptyText.setText(getString(R.string.empty_favorite_list));
-        } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
-            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_shopping, 0, 0);
-            emptyText.setText(getString(R.string.empty_cart_list));
-        } else
-            emptyText.setText(getString(R.string.empty_editor_list));
-
-        ListView lv = (ListView) view.findViewById(android.R.id.list);
-        lv.setEmptyView(emptyText);
-        if (mEditorNumber == 1 || mEditorNumber == 2)
-            registerForContextMenu(lv);
-
-        /**
-         * Implement {@link SwipeRefreshLayout.OnRefreshListener}. When users do the "swipe to
-         * refresh" gesture, SwipeRefreshLayout invokes
-         * {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}. In
-         * {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}, call a method that
-         * refreshes the content. Call the same method in response to the Refresh action from the
-         * action bar.
-         */
-        setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                initiateRefresh();
-            }
-        });
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView - start");
         // Create the list fragment's content view by calling the super method
         final View listFragmentView = inflater.inflate(R.layout.fragment_main, container, false);//super.onCreateView(inflater, container, savedInstanceState);
 
         getActivity().setTitle(Constants.Editors.getTitle(mEditorNumber));
 
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE)) || mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART)))
+        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE)) || mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
+            Log.v(TAG, "onCreateView - created a ListFragment - end");
             return listFragmentView;
-        else {
+        } else {
             // Now create a SwipeRefreshLayout to wrap the fragment's content view
             mSwipeRefreshLayout = new ListFragmentSwipeRefreshLayout(container.getContext());
 
@@ -183,13 +145,54 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent);
 
             // Now return the SwipeRefreshLayout as this fragment's content view
+            Log.v(TAG, "onCreateView - created a SwipeRefreshLayout - end");
             return mSwipeRefreshLayout;
         }
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated - start");
+        // Restore the previously serialized activated item position.
+        if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
+            setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
+        }
+
+        TextView emptyText = (TextView)view.findViewById(android.R.id.empty);
+
+        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE))) {
+            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
+            emptyText.setText(getString(R.string.empty_favorite_list));
+        } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
+            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_shopping, 0, 0);
+            emptyText.setText(getString(R.string.empty_cart_list));
+        } else {
+            emptyText.setText(getString(R.string.empty_editor_list));
+        }
+
+        /**
+         * Implement {@link SwipeRefreshLayout.OnRefreshListener}. When users do the "swipe to
+         * refresh" gesture, SwipeRefreshLayout invokes
+         * {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}. In
+         * {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}, call a method that
+         * refreshes the content. Call the same method in response to the Refresh action from the
+         * action bar.
+         */
+        setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                initiateRefresh();
+            }
+        });
+
+        Log.v(TAG, "onViewCreated - end");
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.v(TAG, "onAttach");
         // Activities containing this fragment must implement its callbacks.
         if (!(context instanceof Callbacks)) {
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
@@ -201,6 +204,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     @Override
     public void onDetach() {
         super.onDetach();
+        Log.v(TAG, "onDetach");
         // Reset the active callbacks interface to the callback implementation.
         mCallbacks = sComicCallbacks;
     }
@@ -208,8 +212,11 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     @Override
     public void onActivityCreated(Bundle savedState) {
         super.onActivityCreated(savedState);
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE)) || mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART)))
+        Log.v(TAG, "onActivityCreated");
+        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE)) ||
+                mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
             registerForContextMenu(getListView());
+        }
     }
 
     @Override
@@ -230,6 +237,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
                     WidgetService.updateWidget(getActivity());
+                    Log.d(TAG, "onContextItemSelected - deleting favorite comic with ID " + info.id);
                     return true;
                 } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
                     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -238,6 +246,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
                     getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
                     WidgetService.updateWidget(getActivity());
+                    Log.d(TAG, "onContextItemSelected - deleting comic in cart with ID " + info.id);
                     return true;
                 }
             case DELETE_ALL:
@@ -259,6 +268,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     );
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
                     WidgetService.updateWidget(getActivity());
+                    Log.d(TAG, "onContextItemSelected - deleting all favorite comic");
                     return true;
                 } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
                     // Update all comic on cart
@@ -278,6 +288,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     );
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
                     WidgetService.updateWidget(getActivity());
+                    Log.d(TAG, "onContextItemSelected - deleting all comic on cart");
                     return true;
                 }
         }
@@ -290,7 +301,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(id, mEditor);
+        mCallbacks.onItemSelected(id);
     }
 
     @Override
@@ -320,7 +331,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         } else {
             getListView().setItemChecked(position, true);
         }
-
+        Log.v(TAG, "setActivatedPosition - position activated is " + position);
         mActivatedPosition = position;
     }
 
@@ -331,8 +342,9 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * @see android.support.v4.widget.SwipeRefreshLayout#setOnRefreshListener(android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener)
      */
     private void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
-        if (mSwipeRefreshLayout != null)
+        if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setOnRefreshListener(listener);
+        }
     }
 
     /**
@@ -352,8 +364,9 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * @see android.support.v4.widget.SwipeRefreshLayout#setRefreshing(boolean)
      */
     public void setRefreshing(boolean refreshing) {
-        if (mSwipeRefreshLayout != null)
+        if (mSwipeRefreshLayout != null) {
             mSwipeRefreshLayout.setRefreshing(refreshing);
+        }
     }
 
     /**
@@ -409,7 +422,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
      */
     private void initiateRefresh() {
-        Log.i(TAG, "initiateRefresh for " + mEditor + " " + mEditorNumber);
+        Log.i(TAG, "initiateRefresh - start for editor " + mEditor + " " + mEditorNumber);
         // Defines selection criteria for the rows to delete
         String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
         String[] mSelectionArgs = {mEditor};
@@ -447,7 +460,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     }
 
     private void fillData() {
-        Log.d(TAG, "fillData");
+        Log.d(TAG, "fillData - start");
         // Fields from the database (projection) must include the id column for the adapter to work
         String[] from = new String[] {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
         // Fields on the UI to which we map
@@ -465,6 +478,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             }
         };
         setListAdapter(adapter);
+        Log.d(TAG, "fillData - end");
     }
 
     @Override
@@ -472,6 +486,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String order = sharedPref.getString("data_order", "ASC");
+        Log.d(TAG, "onCreateLoader - creating loader with " + order + " order");
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
         return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
                     ComicDatabase.COMICS_DATE_KEY + " " + order);

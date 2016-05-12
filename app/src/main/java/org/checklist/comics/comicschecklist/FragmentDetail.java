@@ -79,25 +79,27 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate - start");
 
         if (getArguments().containsKey(ARG_COMIC_ID)) {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             // For better performance, use a Loader to load content from a content provider.
             mComicId = getArguments().getLong(ARG_COMIC_ID);
             mActivityDetailLaunched = getArguments().getBoolean(ARG_ACTIVITY_LAUNCHED);
-            Log.d(TAG, "Loading comic with ID " + mComicId);
+            Log.i(TAG, "Loading comic with ID " + mComicId);
         }
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mUserLearnedSliding = sp.getBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, false);
 
-        Log.d(TAG, "Fragment launched by ActivityDetail " + mActivityDetailLaunched);
+        Log.i(TAG, "Fragment launched by ActivityDetail " + mActivityDetailLaunched);
         setHasOptionsMenu(mActivityDetailLaunched);
+        Log.v(TAG, "onCreate - end");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "Creating view - start");
+        Log.d(TAG, "onCreateView - start");
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         // Show the comic contents
@@ -168,7 +170,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
 
         // TODO fix landscape --> portrait when on tablet
         if (!mActivityDetailLaunched) {
-            Log.d(TAG, "Inflating second toolbar");
+            Log.d(TAG, "Inflating detail toolbar");
             // Create detail toolbar
             Toolbar toolbarDetail = (Toolbar) getActivity().findViewById(R.id.toolbarDetail);
             // Inflate a menu to be displayed in the toolbar
@@ -182,7 +184,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             });
         }
 
-        Log.v(TAG, "Creating view - end");
+        Log.v(TAG, "onCreateView - end");
         return rootView;
     }
 
@@ -286,7 +288,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                 return true;
             case R.id.buy:
                 if (mCart.equalsIgnoreCase("no")) {
-                    Log.i(TAG, "Update entry on comic database: add to chart");
+                    Log.i(TAG, "Update entry on comic database: add to cart");
                     // Update entry on comic database
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "yes");
@@ -299,7 +301,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.CART), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.i(TAG, "Update entry on comic database: remove from chart");
+                    Log.i(TAG, "Update entry on comic database: remove from cart");
                     // Update entry on comic database
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
@@ -324,6 +326,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     }
 
     private Date elaborateDate(String releaseDate) {
+        Log.d(TAG, "elaborateDate - start");
         Date date = null;
         try {
             date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(releaseDate);
@@ -335,6 +338,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                 date.setTime(System.currentTimeMillis());
             }
         }
+        Log.v(TAG, "elaborateDate - end - " + date.toString());
         return date;
     }
 

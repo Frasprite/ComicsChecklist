@@ -81,22 +81,25 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             if (bundle != null) {
                 int resultCode = bundle.getInt(Constants.NOTIFICATION_RESULT);
                 String mCurrentEditor = bundle.getString(Constants.NOTIFICATION_EDITOR);
-                if (resultCode == Constants.RESULT_START)
+                if (resultCode == Constants.RESULT_START) {
                     Toast.makeText(getApplicationContext(), mCurrentEditor + getString(R.string.search_started), Toast.LENGTH_SHORT).show();
-                else if (resultCode == Constants.RESULT_FINISHED)
+                } else if (resultCode == Constants.RESULT_FINISHED) {
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_completed), Toast.LENGTH_SHORT).show();
-                else if (resultCode == Constants.RESULT_EDITOR_FINISHED) {
-                    if (mListFragment != null)
+                } else if (resultCode == Constants.RESULT_EDITOR_FINISHED) {
+                    if (mListFragment != null) {
                         mListFragment.setRefreshing(false);
+                    }
                     Toast.makeText(getApplicationContext(), mCurrentEditor + getResources().getString(R.string.search_editor_completed), Toast.LENGTH_SHORT).show();
                 } else if (resultCode == Constants.RESULT_CANCELED) {
-                    if (mListFragment != null)
+                    if (mListFragment != null) {
                         mListFragment.setRefreshing(false);
+                    }
                     Toast.makeText(getApplicationContext(), mCurrentEditor + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
-                } else if (resultCode == Constants.RESULT_NOT_CONNECTED)
+                } else if (resultCode == Constants.RESULT_NOT_CONNECTED) {
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_no_connection), Toast.LENGTH_LONG).show();
-                else if (resultCode == Constants.RESULT_DESTROYED)
+                } else if (resultCode == Constants.RESULT_DESTROYED) {
                     Log.i(TAG, "Service destroyed");
+                }
             }
         }
     };
@@ -104,7 +107,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v(TAG, "onCreate");
+        Log.d(TAG, "onCreate - start");
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -124,15 +127,12 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             }
         });
 
-        if (findViewById(R.id.comic_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-large-land and
-            // res/values-sw600dp-land). If this view is present, then the
-            // activity should be in two-pane mode.
-            mTwoPane = true;
-        } else {
-            mTwoPane = false;
-        }
+        // The detail container view will be present only in the
+        // large-screen layouts (res/values-large-land and
+        // res/values-sw600dp-land). If this view is present, then the
+        // activity should be in two-pane mode.
+        mTwoPane = findViewById(R.id.comic_detail_container) != null;
+        Log.d(TAG, mTwoPane ? "Application is running on singlePane" : "Application is running on twoPane");
 
         mTitle = mDrawerTitle = getTitle();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -214,20 +214,23 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         if (getIntent() != null) {
             handleIntent(getIntent());
         }
+        Log.v(TAG, "onCreate - end");
     }
 
     @Override
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            Log.d(TAG, "onBackPressed - closing NavigationView");
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
+            Log.d(TAG, "onBackPressed - closing app");
             super.onBackPressed();
         }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.v(TAG, "onNewIntent " + intent);
+        Log.v(TAG, "onNewIntent - " + intent);
         handleIntent(intent);
     }
 
@@ -241,10 +244,11 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // Handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
+            Log.d(TAG, "handleIntent - handling a search query " + query);
             doMySearch(query);
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_COMIC_WIDGET)) {
             int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
-            Log.d(TAG, "Comic id is " + comicId);
+            Log.d(TAG, "handleIntent - launching detail for comic ID " + comicId);
             launchDetailView(comicId);
         }
     }
@@ -254,17 +258,17 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      * @param query the text to search on database
      */
     private void doMySearch(String query) {
-        Log.d(TAG, "Searching " + query);
+        Log.d(TAG, "doMySearch - start searching " + query);
         Cursor cursor = ComicDatabaseManager.query(this, ComicContentProvider.CONTENT_URI, null, ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
                 new String[] {"%" + query + "%"}, null);
 
         if (cursor != null && cursor.getCount() == 0) {
-            Log.d(TAG, "No data found!");
+            Log.d(TAG, "doMySearch - no data found!");
             // There are no results
             cursor.close();
             Toast.makeText(this, getResources().getText(R.string.search_no_result), Toast.LENGTH_SHORT).show();
         } else if (cursor != null && cursor.getCount() > 0) {
-            Log.d(TAG, "Found data: " + cursor.getCount());
+            Log.d(TAG, "doMySearch - found data: " + cursor.getCount());
             // There are multiple results which fit the given query, so show this on dialog
             cursor.close();
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -275,6 +279,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             DialogFragment listDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_RESULT_LIST);
             listDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
         }
+        Log.v(TAG, "doMySearch - end searching " + query);
     }
 
     /**
@@ -287,6 +292,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         if (mTwoPane) {
             // In two-pane mode, list items should be given the 'activated' state when touched
             if (mListFragment != null) {
+                Log.d(TAG, "onStart - two-pane mode, activate item on click");
                 mListFragment.setActivateOnItemClick(true);
             }
         }
@@ -343,6 +349,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     public void setTitle(CharSequence title) {
         mTitle = title;
         if (mActionBar != null) {
+            Log.v(TAG, "setTitle - setting " + mTitle + " on mActionBar");
             mActionBar.setTitle(mTitle);
         }
     }
@@ -370,8 +377,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      * indicating that the comic was selected.
      */
     @Override
-    public void onItemSelected(long id, String section) {
-        Log.d(TAG, "Launching comic with id " + id + " section " + section);
+    public void onItemSelected(long id) {
+        Log.d(TAG, "Launching detail for comic with ID " + id);
         launchDetailView(id);
     }
 
@@ -390,7 +397,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             FragmentDetail mDetailFragment = new FragmentDetail();
             mDetailFragment.setArguments(arguments);
             // Warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
-            getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commitAllowingStateLoss();
+            getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();//AllowingStateLoss();
         } else {
             Log.d(TAG, "Launching detail view in single pane mode");
             // In single-pane mode, simply start the detail activity
@@ -440,17 +447,13 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         }
     }
 
-    public boolean isTwoPane() {
-        return mTwoPane;
-    }
-
     /******************************************************************************************
      * NAVIGATION VIEW CALLBACK
      ******************************************************************************************/
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        item.getTitle();
+        Log.d(TAG, "onNavigationItemSelected - " + item.getTitle());
         int position = 0;
         switch (item.getItemId()) {
             // TODO not every case work well
