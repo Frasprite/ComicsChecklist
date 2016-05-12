@@ -168,20 +168,21 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             }
         }
 
-        // TODO fix landscape --> portrait when on tablet
         if (!mActivityDetailLaunched) {
             Log.d(TAG, "Inflating detail toolbar");
             // Create detail toolbar
             Toolbar toolbarDetail = (Toolbar) getActivity().findViewById(R.id.toolbarDetail);
             // Inflate a menu to be displayed in the toolbar
-            toolbarDetail.inflateMenu(R.menu.menu_detail);
+            if (toolbarDetail != null) {
+                toolbarDetail.inflateMenu(R.menu.menu_detail);
 
-            toolbarDetail.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    return manageItemSelected(item);
-                }
-            });
+                toolbarDetail.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return manageItemSelected(item);
+                    }
+                });
+            }
         }
 
         Log.v(TAG, "onCreateView - end");
