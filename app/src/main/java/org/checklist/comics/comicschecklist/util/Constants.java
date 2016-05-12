@@ -110,7 +110,6 @@ public class Constants {
     public static final String WIDGET_EDITOR = "WIDGET_EDITOR";
     public static final String WIDGET_TITLE = "WIDGET_TITLE";
     public static final String COMIC_ID_FROM_WIDGET = "COMIC_ID_FROM_WIDGET";
-    public static final String COMIC_EDITOR_FROM_WIDGET = "COMIC_EDITOR_FROM_WIDGET";
     public static final String ACTION_COMIC_WIDGET = "comic_widget";
 
     /* Search */

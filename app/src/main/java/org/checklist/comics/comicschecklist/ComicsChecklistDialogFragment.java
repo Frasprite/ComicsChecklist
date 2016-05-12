@@ -51,7 +51,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
         void onDialogPositiveClick(DialogFragment dialog, int dialogId);
         void onDialogNegativeClick(DialogFragment dialog, int dialogId);
         void onDialogNeutralClick(DialogFragment dialog, int dialogId);
-        void onDialogListItemClick(DialogFragment dialog, int dialogId, long id, String search);
+        void onDialogListItemClick(DialogFragment dialog, int dialogId, long id);
     }
 
     // Use this instance of the interface to deliver action events
@@ -232,7 +232,7 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                         if (comicCursor != null) {
                             comicCursor.moveToFirst();
                             mListener.onDialogListItemClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_RESULT_LIST,
-                                                            comicCursor.getLong(comicCursor.getColumnIndex(ComicDatabase.ID)), "search");
+                                                            comicCursor.getLong(comicCursor.getColumnIndex(ComicDatabase.ID)));
                             comicCursor.close();
                             cursor.close();
                         } else

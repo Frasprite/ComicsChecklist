@@ -130,6 +130,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             // res/values-sw600dp-land). If this view is present, then the
             // activity should be in two-pane mode.
             mTwoPane = true;
+        } else {
+            mTwoPane = false;
         }
 
         mTitle = mDrawerTitle = getTitle();
@@ -242,12 +244,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             doMySearch(query);
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_COMIC_WIDGET)) {
             int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
-            String editor = intent.getStringExtra(Constants.COMIC_EDITOR_FROM_WIDGET);
-            if (editor == null) {
-                editor = Constants.Editors.getName(Constants.Editors.FAVORITE);
-            }
             Log.d(TAG, "Comic id is " + comicId);
-            launchDetailView(comicId, editor);
+            launchDetailView(comicId);
         }
     }
 
@@ -374,15 +372,14 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     public void onItemSelected(long id, String section) {
         Log.d(TAG, "Launching comic with id " + id + " section " + section);
-        launchDetailView(id, section);
+        launchDetailView(id);
     }
 
     /**
      * This method launch detail view in a Fragment or on a new Activity.
      * @param id the comic id
-     * @param section is the editor of the comic
      */
-    private void launchDetailView(long id, String section) {
+    private void launchDetailView(long id) {
         if (mTwoPane) {
             Log.d(TAG, "Launching detail view in two pane mode");
             // In two-pane mode, show the detail view in this activity by
@@ -390,7 +387,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             // fragment transaction.
             Bundle arguments = new Bundle();
             arguments.putLong(FragmentDetail.ARG_COMIC_ID, id);
-            arguments.putString(FragmentDetail.ARG_SECTION, section);
             FragmentDetail mDetailFragment = new FragmentDetail();
             mDetailFragment.setArguments(arguments);
             // Warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
@@ -401,7 +397,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             // for the selected item ID.
             Intent detailIntent = new Intent(this, ActivityDetail.class);
             detailIntent.putExtra(FragmentDetail.ARG_COMIC_ID, id);
-            detailIntent.putExtra(FragmentDetail.ARG_SECTION, section);
             startActivity(detailIntent);
         }
     }
@@ -550,11 +545,11 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     }
 
     @Override
-    public void onDialogListItemClick(DialogFragment dialog, int dialogId, long id, String search) {
+    public void onDialogListItemClick(DialogFragment dialog, int dialogId, long id) {
         switch (dialogId) {
             case Constants.DIALOG_RESULT_LIST:
                 dialog.dismiss();
-                launchDetailView(id, search);
+                launchDetailView(id);
         }
     }
 }

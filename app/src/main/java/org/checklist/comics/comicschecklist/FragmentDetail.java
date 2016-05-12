@@ -17,6 +17,8 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,12 +60,13 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
      * The fragment arguments representing the item ID that this fragment represents.
      */
     public static final String ARG_COMIC_ID = "comic_id";
-    public static final String ARG_SECTION = "section";
+    public static final String ARG_ACTIVITY_LAUNCHED = "activity_launched";
 
     // The comic content this fragment is presenting.
     private String mComicName, mComicDescription, mComicCover, mComicFeature, mComicPrice, mComicRelease, mFavorite, mCart;
     private boolean mUserLearnedSliding;
     private long mComicId = -1;
+    private boolean mActivityDetailLaunched = false;
 
     private TextView titleTextView;
 
@@ -81,16 +84,20 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             // For better performance, use a Loader to load content from a content provider.
             mComicId = getArguments().getLong(ARG_COMIC_ID);
-            Log.d(TAG, "onCreate " + mComicId);
+            mActivityDetailLaunched = getArguments().getBoolean(ARG_ACTIVITY_LAUNCHED);
+            Log.d(TAG, "Loading comic with ID " + mComicId);
         }
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mUserLearnedSliding = sp.getBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, false);
+
+        Log.d(TAG, "Fragment launched by ActivityDetail " + mActivityDetailLaunched);
+        setHasOptionsMenu(mActivityDetailLaunched);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
+        Log.d(TAG, "Creating view - start");
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         // Show the comic contents
@@ -159,19 +166,35 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             }
         }
 
-        // Create detail toolbar
-        Toolbar toolbarDetail = (Toolbar) getActivity().findViewById(R.id.toolbarDetail);
-        // Inflate a menu to be displayed in the toolbar
-        toolbarDetail.inflateMenu(R.menu.menu_detail);
+        // TODO fix landscape --> portrait when on tablet
+        if (!mActivityDetailLaunched) {
+            Log.d(TAG, "Inflating second toolbar");
+            // Create detail toolbar
+            Toolbar toolbarDetail = (Toolbar) getActivity().findViewById(R.id.toolbarDetail);
+            // Inflate a menu to be displayed in the toolbar
+            toolbarDetail.inflateMenu(R.menu.menu_detail);
 
-        toolbarDetail.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                return manageItemSelected(item);
-            }
-        });
+            toolbarDetail.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    return manageItemSelected(item);
+                }
+            });
+        }
 
+        Log.v(TAG, "Creating view - end");
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_detail, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return manageItemSelected(item);
     }
 
     private void enlargeTextView(final TextView textView) {
