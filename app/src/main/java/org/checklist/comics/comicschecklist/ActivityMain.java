@@ -199,7 +199,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
-            selectItem(0);
+            selectItem(0, getString(R.string.title_section1));
         } else {
             mFromSavedInstanceState = true;
         }
@@ -408,13 +408,13 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         }
     }
 
-    private void selectItem(int position) {
+    private void selectItem(int position, String title) {
         Log.d(TAG, "selectItem " + position);
         if (mNavigationView != null) {
             if (mDrawerLayout != null) {
                 if (position < 8) {
                     // Update selected item title, then close the drawer
-                    setTitle(mNavigationView.getMenu().getItem(position).getTitle());
+                    setTitle(title);
                     mDrawerLayout.closeDrawer(mNavigationView);
                 }
             }
@@ -456,7 +456,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         Log.d(TAG, "onNavigationItemSelected - " + item.getTitle());
         int position = 0;
         switch (item.getItemId()) {
-            // TODO not every case work well
             case R.id.list_favorite:
                 position = 0;
                 break;
@@ -494,7 +493,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 position = 11;
                 break;
         }
-        selectItem(position);
+        selectItem(position, item.getTitle().toString());
         return position <= 7;
     }
 
