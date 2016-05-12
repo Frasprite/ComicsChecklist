@@ -335,6 +335,10 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         mActivatedPosition = position;
     }
 
+    /******************************************************************************************
+     * SwipeRefreshLayout methods
+     ******************************************************************************************/
+
     /**
      * Set the {@link android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener} to listen for
      * initiated refreshes.
@@ -459,6 +463,13 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         setRefreshing(true);
     }
 
+    /******************************************************************************************
+     * Data loader methods
+     ******************************************************************************************/
+
+    /**
+     * Method used to fill data on list.
+     */
     private void fillData() {
         Log.d(TAG, "fillData - start");
         // Fields from the database (projection) must include the id column for the adapter to work
