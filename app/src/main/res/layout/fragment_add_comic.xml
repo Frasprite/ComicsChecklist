@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin">
+
+    <EditText
+        android:id="@+id/name_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:hint="@string/text_preview_title"
+        android:background="@android:color/transparent"
+        android:textSize="24sp"
+        android:layout_marginBottom="10dp"/>
+
+    <EditText
+        android:id="@+id/info_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="@string/text_preview_other"
+        android:background="@android:color/transparent"
+        android:layout_below="@+id/name_edit_text"
+        android:layout_above="@+id/date_layout"
+        android:gravity="top"
+        android:textSize="18sp" />
+
+    <RelativeLayout
+        android:id="@+id/date_layout"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/date_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:textSize="24sp"
+            android:layout_toLeftOf="@+id/button_change_data"
+            android:layout_toStartOf="@+id/button_change_data"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/button_change_data"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/text_change_date"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:onClick="changeDate" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

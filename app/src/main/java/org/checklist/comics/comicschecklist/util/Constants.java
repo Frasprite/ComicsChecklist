@@ -118,7 +118,6 @@ public class Constants {
     /* Dialog */
     public static final int DIALOG_GUIDE = 0;
     public static final int DIALOG_INFO = 1;
-    public static final int DIALOG_ADD_COMIC = 2;
     public static final int DIALOG_RATE = 3;
     public static final int DIALOG_RESULT_LIST = 4;
 

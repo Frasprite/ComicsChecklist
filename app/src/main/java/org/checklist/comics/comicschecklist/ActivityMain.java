@@ -121,9 +121,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Open add dialog
-                DialogFragment addDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_ADD_COMIC);
-                addDialog.show(ActivityMain.this.getFragmentManager(), "ComicsChecklistDialogFragment");
+                // Open add comic activity
+                Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
+                startActivity(addComicIntent);
             }
         });
 
@@ -504,10 +504,10 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, int dialogId) {
         switch (dialogId) {
-            case Constants.DIALOG_ADD_COMIC:
+            /*case Constants.DIALOG_ADD_DATE:
                 dialog.dismiss();
                 Toast.makeText(this, getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
-                break;
+                break;*/
             case Constants.DIALOG_RATE:
                 dialog.dismiss();
                 this.startActivity(new Intent(Intent.ACTION_VIEW,
@@ -521,7 +521,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         switch (dialogId) {
             case Constants.DIALOG_GUIDE:
             case Constants.DIALOG_INFO:
-            case Constants.DIALOG_ADD_COMIC:
             case Constants.DIALOG_RESULT_LIST:
                 dialog.dismiss();
                 break;

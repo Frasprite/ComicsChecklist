@@ -15,8 +15,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -27,12 +25,6 @@ import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by Francesco Bevilacqua on 16/10/2014.
@@ -56,9 +48,6 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
     // Use this instance of the interface to deliver action events
     private ComicsChecklistDialogListener mListener;
-    private EditText mNameEditText;
-    private EditText mInfoEditText;
-    private DatePicker mDatePicker;
 
     public static ComicsChecklistDialogFragment newInstance(int type) {
         ComicsChecklistDialogFragment frag = new ComicsChecklistDialogFragment();
@@ -85,9 +74,9 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        // We have 4 type of dialog on CC: 0 help, 1 guide, 2 add, 3 rater, 4 search result
+        // We have 4 type of dialog on CC: 0 help, 1 guide, 2 add date, 3 rater, 4 search result
         int type = getArguments().getInt("type");
-        Log.d(TAG, "Creating " + type + "(0 help, 1 guide, 2 add, 3 rater, 4 search result)");
+        Log.d(TAG, "Creating " + type + "(0 help, 1 guide, 2 add date, 3 rater, 4 search result)");
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppCompatAlertDialogStyle);
 
@@ -119,52 +108,6 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 builder.setView(inflaterInfo.inflate(R.layout.dialog_info, null));
                 // Set title
                 builder.setTitle(R.string.dialog_info_title);
-                break;
-            case Constants.DIALOG_ADD_COMIC:
-                // Get the layout inflater
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-                View view = inflater.inflate(R.layout.dialog_add_comic, null);
-
-                mNameEditText = (EditText) view.findViewById(R.id.name_edit_text);
-                mInfoEditText = (EditText) view.findViewById(R.id.info_edit_text);
-                mDatePicker = (DatePicker) view.findViewById(R.id.date_picker);
-
-                // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
-                builder.setView(view)
-                        // Add action buttons
-                        .setPositiveButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int id) {
-                                // Save new data and the positive button event back to the host activity
-                                String name = mNameEditText.getText().toString();
-                                String info = mInfoEditText.getText().toString();
-                                String date = mDatePicker.getDayOfMonth() + "/" + mDatePicker.getMonth() + "/" + mDatePicker.getYear();
-                                if (name.length() > 0) {
-                                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                                    Date myDate;
-                                    try {
-                                        myDate = formatter.parse(date);
-                                    } catch (ParseException e) {
-                                        e.printStackTrace();
-                                        myDate = new Date();
-                                    }
-
-                                    ComicDatabaseManager.insert(getActivity(), name, Constants.Editors.getName(Constants.Editors.CART), info, date, myDate, "error", "N.D", "N.D.", "yes", "no");
-                                    mListener.onDialogPositiveClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_ADD_COMIC);
-                                } else {
-                                    Toast.makeText(getActivity(), getResources().getString(R.string.toast_fill_data_alert), Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        })
-                        .setNegativeButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // Send the negative button event back to the host activity
-                                mListener.onDialogNegativeClick(ComicsChecklistDialogFragment.this, Constants.DIALOG_ADD_COMIC);
-                            }
-                        });
-
-                // Set title
-                builder.setTitle(R.string.title_section2);
                 break;
             case Constants.DIALOG_RATE:
                 // Launch Google Play page

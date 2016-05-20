@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">Comics Checklist</string>
     <string name="activity_title_comic_detail">Dettagli</string>
+    <string name="activity_title_add_comic">Aggiungi uscita</string>
 
     <!-- Dialog text -->
     <string name="dialog_help_title">Guida</string>
@@ -28,9 +29,6 @@
     <string name="dialog_confirm_button">OK</string>
     <string name="dialog_undo_button">Annulla</string>
     <string name="dialog_no_thanks_button">No, grazie</string>
-    <string name="dialog_preview_title">Nome fumetto</string>
-    <string name="dialog_preview_release">Data d\'uscita (facoltatita)</string>
-    <string name="dialog_preview_other">Altre info, es.: editore, numeri mancanti</string>
 
     <!-- Navigation drawer text -->
     <string name="drawer_open">Apri la barra di navigazione</string>
@@ -176,5 +174,12 @@
 
     <string name="calendar_release">Disponibile da oggi in edicola/libreria.</string>
     <string name="calendar_error">Spiacente, non \è possibile inserire l\'evento nel calendario.</string>
+
+    <!-- Activity add comic -->
+    <string name="text_preview_title"><b>Nome fumetto</b></string>
+    <string name="text_preview_release">Data d\'uscita (facoltativa)</string>
+    <string name="text_preview_other">Altre info, es.: editore, numeri mancanti</string>
+    <string name="text_change_date">Cambia data</string>
+    <string name="text_default_title">Fumetto senza titolo</string>
 
 </resources>
