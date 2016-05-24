@@ -14,7 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class ActivityAddComic extends AppCompatActivity {
 
@@ -38,7 +40,7 @@ public class ActivityAddComic extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putLong(FragmentAddComic.ARG_COMIC_ID, getIntent().getLongExtra(FragmentAddComic.ARG_COMIC_ID, 0));
+            arguments.putLong(FragmentAddComic.ARG_COMIC_ID, getIntent().getLongExtra(FragmentAddComic.ARG_COMIC_ID, -1));
             FragmentAddComic fragment = new FragmentAddComic();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().add(R.id.comic_detail_container, fragment, "addComicFragment").commit();
@@ -87,12 +89,10 @@ public class ActivityAddComic extends AppCompatActivity {
             FragmentAddComic articleFrag = (FragmentAddComic)
                     getActivity().getSupportFragmentManager().findFragmentByTag("addComicFragment");
             month++;
-            String date;
-            if (month >= 10) {
-                date = day + "/" + month + "/" + year;
-            } else {
-                date = day + "/0" + month + "/" + year;
-            }
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(year, month, day);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            String date = simpleDateFormat.format(calendar.getTime());
             articleFrag.updateDate(date);
         }
     }

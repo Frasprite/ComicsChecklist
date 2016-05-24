@@ -1,5 +1,6 @@
 package org.checklist.comics.comicschecklist.database;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,7 +18,7 @@ public class ComicDatabaseManager {
 
     private static final String TAG = ComicDatabaseManager.class.getSimpleName();
 
-    public static void insert(Context context, String name, String editor, String description, String releaseDate,
+    public static long insert(Context context, String name, String editor, String description, String releaseDate,
                               Date date, String coverUrl, String feature, String price, String cartKey, String favoriteKey) {
         Log.v(TAG, "Insert comic " + name + " " + editor + " " + releaseDate);
         ContentValues values = new ContentValues();
@@ -32,7 +33,8 @@ public class ComicDatabaseManager {
         values.put(ComicDatabase.COMICS_CART_KEY, cartKey);
         values.put(ComicDatabase.COMICS_FAVORITE_KEY, favoriteKey);
 
-        context.getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
+        Uri uri = context.getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
+        return ContentUris.parseId(uri);
     }
 
     public static int delete(Context context, Uri uri, String selection, String[] selectionArgs) {

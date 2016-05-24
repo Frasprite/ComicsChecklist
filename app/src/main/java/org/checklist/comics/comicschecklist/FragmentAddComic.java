@@ -29,6 +29,7 @@ public class FragmentAddComic extends Fragment {
     private static final String TAG = FragmentAddComic.class.getSimpleName();
 
     public static final String ARG_COMIC_ID = "comic_id";
+    public static final String SAVED_COMIC_ID = "comic_id";
 
     private long mComicId = -1;
 
@@ -44,16 +45,23 @@ public class FragmentAddComic extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate - start");
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated - start");
 
         if (getArguments().containsKey(ARG_COMIC_ID)) {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             mComicId = getArguments().getLong(ARG_COMIC_ID);
+            Log.d(TAG, "onActivityCreated - mComicId (initiated from ARGUMENTS) = " + mComicId);
         }
 
-        Log.v(TAG, "onCreate - end");
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            mComicId = savedInstanceState.getLong(SAVED_COMIC_ID, -1);
+            Log.d(TAG, "onActivityCreated - mComicId (initiated from BUNDLE) = " + mComicId);
+        }
+
+        Log.v(TAG, "onActivityCreated - end");
     }
 
     @Override
@@ -109,7 +117,7 @@ public class FragmentAddComic extends Fragment {
 
             if (mComicId == -1) {
                 // Insert new entry
-                ComicDatabaseManager.insert(getActivity(), name, Constants.Editors.getName(Constants.Editors.CART), info, date, myDate, "error", "N.D", "N.D.", "yes", "no");
+                mComicId = ComicDatabaseManager.insert(getActivity(), name, Constants.Editors.getName(Constants.Editors.CART), info, date, myDate, "error", "N.D", "N.D.", "yes", "no");
             } else {
                 // Update entry
                 ContentValues mUpdateValues = new ContentValues();
@@ -118,8 +126,7 @@ public class FragmentAddComic extends Fragment {
                 mUpdateValues.put(ComicDatabase.COMICS_DATE_KEY, date);
                 // Defines selection criteria for the rows you want to update
                 String mSelectionClause = ComicDatabase.ID +  "=?";
-                // TODO update data from ID
-                int[] mSelectionArgs = new int[]{mComicId};
+                String[] mSelectionArgs = new String[]{String.valueOf(mComicId)};
                 ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
             }
         }
