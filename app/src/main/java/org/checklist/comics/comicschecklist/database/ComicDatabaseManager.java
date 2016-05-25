@@ -49,7 +49,7 @@ public class ComicDatabaseManager {
         return context.getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder);
     }
 
-    public static void update(Context context, ContentValues mUpdateValues, String mSelectionClause, String[] mSelectionArgs) {
-        context.getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
+    public static int update(Context context, ContentValues mUpdateValues, String mSelectionClause, String[] mSelectionArgs) {
+        return context.getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, mSelectionClause, mSelectionArgs);
     }
 }

@@ -387,24 +387,36 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      * @param id the comic id
      */
     private void launchDetailView(long id) {
-        if (mTwoPane) {
-            Log.d(TAG, "Launching detail view in two pane mode");
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a
-            // fragment transaction.
-            Bundle arguments = new Bundle();
-            arguments.putLong(FragmentDetail.ARG_COMIC_ID, id);
-            FragmentDetail mDetailFragment = new FragmentDetail();
-            mDetailFragment.setArguments(arguments);
-            // Warning: http://www.androiddesignpatterns.com/2013/08/fragment-transaction-commit-state-loss.html
-            getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();//AllowingStateLoss();
-        } else {
-            Log.d(TAG, "Launching detail view in single pane mode");
-            // In single-pane mode, simply start the detail activity
-            // for the selected item ID.
-            Intent detailIntent = new Intent(this, ActivityDetail.class);
-            detailIntent.putExtra(FragmentDetail.ARG_COMIC_ID, id);
-            startActivity(detailIntent);
+        // Load only a part of selected id
+        Log.d(TAG, "launchDetailView - mTitle is " + mTitle);
+        Constants.Editors editor = Constants.Editors.getEditorFromTitle(String.valueOf(mTitle));
+        switch (editor) {
+            case CART:
+                // Show note
+                Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
+                addComicIntent.putExtra(Constants.ARG_COMIC_ID, id);
+                startActivity(addComicIntent);
+                break;
+            default:
+                // Show normal comic
+                if (mTwoPane) {
+                    Log.d(TAG, "Launching detail view in two pane mode");
+                    // In two-pane mode, show the detail view in this activity by adding
+                    // or replacing the detail fragment using a fragment transaction
+                    Bundle arguments = new Bundle();
+                    arguments.putLong(FragmentDetail.ARG_COMIC_ID, id);
+                    FragmentDetail mDetailFragment = new FragmentDetail();
+                    mDetailFragment.setArguments(arguments);
+                    getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
+                } else {
+                    Log.d(TAG, "Launching detail view in single pane mode");
+                    // In single-pane mode, simply start the detail activity
+                    // for the selected item ID
+                    Intent detailIntent = new Intent(this, ActivityDetail.class);
+                    detailIntent.putExtra(FragmentDetail.ARG_COMIC_ID, id);
+                    startActivity(detailIntent);
+                }
+                break;
         }
     }
 
@@ -551,6 +563,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             case Constants.DIALOG_RESULT_LIST:
                 dialog.dismiss();
                 launchDetailView(id);
+                break;
         }
     }
 }

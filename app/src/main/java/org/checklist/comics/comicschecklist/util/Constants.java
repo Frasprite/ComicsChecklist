@@ -10,6 +10,8 @@ public class Constants {
 
     /* The fragment argument representing the section number for this fragment. */
     public static final String ARG_SECTION_NUMBER = "section_number";
+    public static final String ARG_COMIC_ID = "comic_id";
+    public static final String ARG_SAVED_COMIC_ID = "comic_id";
     /**
      * Flag used to show the drawer on launch until the user manually
      * expands it. This shared preference tracks this.
@@ -37,13 +39,16 @@ public class Constants {
         RW      (7, "rw", "RW Edizioni");
 
         private static final HashMap<Integer, Editors> map;
+        private static final HashMap<String, Editors> nameMap;
         private static final HashMap<String, Editors> titleMap;
 
         static {
             map = new HashMap<>();
+            nameMap = new HashMap<>();
             titleMap = new HashMap<>();
             for (Editors editor : Editors.values()) {
                 map.put(editor.code, editor);
+                nameMap.put(editor.name, editor);
                 titleMap.put(editor.title, editor);
             }
         }
@@ -60,6 +65,14 @@ public class Constants {
 
         public static Editors getEditor(int position) {
             return map.get(position);
+        }
+
+        public static Editors getEditorFromName(String name) {
+            return nameMap.get(name);
+        }
+
+        public static Editors getEditorFromTitle(String title) {
+            return titleMap.get(title);
         }
 
         public static String getName(int position) {

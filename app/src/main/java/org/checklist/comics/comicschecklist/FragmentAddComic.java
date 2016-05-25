@@ -28,9 +28,6 @@ public class FragmentAddComic extends Fragment {
 
     private static final String TAG = FragmentAddComic.class.getSimpleName();
 
-    public static final String ARG_COMIC_ID = "comic_id";
-    public static final String SAVED_COMIC_ID = "comic_id";
-
     private long mComicId = -1;
 
     private EditText mNameEditText;
@@ -45,26 +42,6 @@ public class FragmentAddComic extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated - start");
-
-        if (getArguments().containsKey(ARG_COMIC_ID)) {
-            // Load comic content specified by the fragment arguments from ComicContentProvider.
-            mComicId = getArguments().getLong(ARG_COMIC_ID);
-            Log.d(TAG, "onActivityCreated - mComicId (initiated from ARGUMENTS) = " + mComicId);
-        }
-
-        if (savedInstanceState != null) {
-            // Restore last state for checked position.
-            mComicId = savedInstanceState.getLong(SAVED_COMIC_ID, -1);
-            Log.d(TAG, "onActivityCreated - mComicId (initiated from BUNDLE) = " + mComicId);
-        }
-
-        Log.v(TAG, "onActivityCreated - end");
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView - start");
         View rootView = inflater.inflate(R.layout.fragment_add_comic, container, false);
@@ -75,6 +52,26 @@ public class FragmentAddComic extends Fragment {
 
         Log.v(TAG, "onCreateView - end");
         return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated - start");
+
+        if (getArguments().containsKey(Constants.ARG_COMIC_ID)) {
+            // Load comic content specified by the fragment arguments from ComicContentProvider.
+            mComicId = getArguments().getLong(Constants.ARG_COMIC_ID, -1);
+            Log.d(TAG, "onActivityCreated - mComicId (initiated from ARGUMENTS) = " + mComicId);
+        }
+
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+            mComicId = savedInstanceState.getLong(Constants.ARG_SAVED_COMIC_ID, -1);
+            Log.d(TAG, "onActivityCreated - mComicId (initiated from BUNDLE) = " + mComicId);
+        }
+
+        Log.v(TAG, "onActivityCreated - end");
     }
 
     @Override
@@ -97,10 +94,17 @@ public class FragmentAddComic extends Fragment {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState - saving mComicId " + mComicId);
+        outState.putLong(Constants.ARG_SAVED_COMIC_ID, mComicId);
+    }
+
+    @Override
     public void onPause() {
         String name = mNameEditText.getText().toString();
         String info = mInfoEditText.getText().toString();
-        String date = mDateTextView.getText().toString();//mDatePicker.getDayOfMonth() + "/" + mDatePicker.getMonth() + "/" + mDatePicker.getYear();
+        String date = mDateTextView.getText().toString();
         if (info.length() > 0) {
             // Save data if there is at least some info and put a default title
             if (name.length() == 0) {
@@ -118,16 +122,23 @@ public class FragmentAddComic extends Fragment {
             if (mComicId == -1) {
                 // Insert new entry
                 mComicId = ComicDatabaseManager.insert(getActivity(), name, Constants.Editors.getName(Constants.Editors.CART), info, date, myDate, "error", "N.D", "N.D.", "yes", "no");
+                Log.d(TAG, "INSERTED new entry on database with ID " + mComicId);
             } else {
                 // Update entry
                 ContentValues mUpdateValues = new ContentValues();
                 mUpdateValues.put(ComicDatabase.COMICS_NAME_KEY, name);
                 mUpdateValues.put(ComicDatabase.COMICS_DESCRIPTION_KEY, info);
-                mUpdateValues.put(ComicDatabase.COMICS_DATE_KEY, date);
+                mUpdateValues.put(ComicDatabase.COMICS_DATE_KEY, myDate.getTime());
+                mUpdateValues.put(ComicDatabase.COMICS_RELEASE_KEY, date);
                 // Defines selection criteria for the rows you want to update
                 String mSelectionClause = ComicDatabase.ID +  "=?";
                 String[] mSelectionArgs = new String[]{String.valueOf(mComicId)};
-                ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                if (rowUpdated > 0) {
+                    Log.d(TAG, "UPDATED entry on database with ID " + mComicId);
+                } else {
+                    Log.w(TAG, "UPDATE failed for entry with ID " + mComicId);
+                }
             }
         }
         super.onPause();
