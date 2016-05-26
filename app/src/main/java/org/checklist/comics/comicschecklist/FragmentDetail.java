@@ -67,6 +67,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     private long mComicId = -1;
     private boolean mActivityDetailLaunched = false;
 
+    private Menu mMenu;
     private TextView titleTextView;
 
     /**
@@ -174,8 +175,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             // Inflate a menu to be displayed in the toolbar
             if (toolbarDetail != null) {
                 toolbarDetail.inflateMenu(R.menu.menu_detail);
-                // TODO
-                //updateMenuItems(toolbarDetail.getMenu(), mFavorite, mCart);
+                mMenu = toolbarDetail.getMenu();
+                updateMenuItems(mFavorite, mCart);
 
                 toolbarDetail.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
@@ -192,9 +193,12 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_detail, menu);
-        // TODO
-        //updateMenuItems(menu, mFavorite, mCart);
+        if (mActivityDetailLaunched) {
+            // Fragment is launched from ActivityDetail, inflate own menu
+            inflater.inflate(R.menu.menu_detail, menu);
+            mMenu = menu;
+            updateMenuItems(mFavorite, mCart);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -203,27 +207,27 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
         return manageItemSelected(item);
     }
 
-    /*private void updateMenuItems(Menu menu, String favoriteFlag, String cartFlag) {
+    private void updateMenuItems(String favoriteFlag, String cartFlag) {
         if (favoriteFlag.equalsIgnoreCase("no")) {
             // Comic can be added to favorite
-            menu.getItem(1).setVisible(true);
-            menu.getItem(2).setVisible(false);
+            mMenu.getItem(1).setVisible(true);
+            mMenu.getItem(2).setVisible(false);
         } else {
             // Comic can be removed from favorite
-            menu.getItem(1).setVisible(false);
-            menu.getItem(2).setVisible(true);
+            mMenu.getItem(1).setVisible(false);
+            mMenu.getItem(2).setVisible(true);
         }
 
         if (cartFlag.equalsIgnoreCase("no")) {
             // Comic can be added to cart
-            menu.getItem(3).setVisible(true);
-            menu.getItem(4).setVisible(false);
+            mMenu.getItem(3).setVisible(true);
+            mMenu.getItem(4).setVisible(false);
         } else {
             // Comic can be removed from cart
-            menu.getItem(3).setVisible(false);
-            menu.getItem(4).setVisible(true);
+            mMenu.getItem(3).setVisible(false);
+            mMenu.getItem(4).setVisible(true);
         }
-    }*/
+    }
 
     private void enlargeTextView(final TextView textView) {
         final int startSize = 1;
@@ -296,6 +300,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     Log.v(TAG, "Comic already on favorite");
                 }
 
+                updateMenuItems(mFavorite, mCart);
+
                 WidgetService.updateWidget(getActivity());
                 return true;
             case R.id.remove_favorite:
@@ -319,6 +325,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     Log.v(TAG, "Comic already deleted from favorite");
                 }
 
+                updateMenuItems(mFavorite, mCart);
+
                 WidgetService.updateWidget(getActivity());
                 return true;
             case R.id.buy:
@@ -338,6 +346,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                 } else {
                     Log.v(TAG, "Comic already on cart");
                 }
+
+                updateMenuItems(mFavorite, mCart);
 
                 WidgetService.updateWidget(getActivity());
                 return true;
@@ -361,6 +371,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                 } else {
                     Log.v(TAG, "Comic already removed from cart");
                 }
+
+                updateMenuItems(mFavorite, mCart);
 
                 WidgetService.updateWidget(getActivity());
                 return true;

@@ -11,24 +11,28 @@
         android:id="@+id/favorite"
         android:icon="@drawable/ic_grade"
         android:title="@string/menu_favorites"
+        android:visible="false"
         app:showAsAction="ifRoom">
     </item>
     <item
         android:id="@+id/remove_favorite"
         android:icon="@drawable/ic_star_border"
         android:title="@string/menu_remove_favorites"
+        android:visible="false"
         app:showAsAction="ifRoom">
     </item>
     <item
         android:id="@+id/buy"
         android:icon="@drawable/ic_cart"
         android:title="@string/menu_wishlist"
+        android:visible="false"
         app:showAsAction="ifRoom">
     </item>
     <item
         android:id="@+id/remove_buy"
         android:icon="@drawable/ic_remove_shopping_cart"
         android:title="@string/menu_remove_wishlist"
+        android:visible="false"
         app:showAsAction="ifRoom">
     </item>
 </menu>
