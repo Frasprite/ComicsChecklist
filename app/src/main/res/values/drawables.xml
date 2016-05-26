@@ -3,8 +3,10 @@
     <item name="ic_arrow_upward" type="drawable">@drawable/ic_arrow_upward_white_24dp</item>
     <item name="ic_cached" type="drawable">@drawable/ic_cached_white_24dp</item>
     <item name="ic_cart" type="drawable">@drawable/ic_shopping_cart_white_24dp</item>
+    <item name="ic_remove_shopping_cart" type="drawable">@drawable/ic_remove_shopping_cart_white_24dp</item>
     <item name="ic_comic" type="drawable">@drawable/ic_import_contacts_white_24dp</item>
     <item name="ic_grade" type="drawable">@drawable/ic_grade_white_24dp</item>
+    <item name="ic_star_border" type="drawable">@drawable/ic_star_border_white_24dp</item>
     <item name="ic_help" type="drawable">@drawable/ic_help_white_24dp</item>
     <item name="ic_info" type="drawable">@drawable/ic_info_white_24dp</item>
     <item name="ic_insert_invitation" type="drawable">@drawable/ic_insert_invitation_white_24dp</item>

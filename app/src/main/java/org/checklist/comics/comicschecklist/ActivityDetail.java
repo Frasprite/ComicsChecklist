@@ -9,6 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import org.checklist.comics.comicschecklist.util.Constants;
+
 /**
  * An activity representing a single Comic detail screen. This
  * activity is only used on handset devices. On tablet-size devices,
@@ -49,7 +51,7 @@ public class ActivityDetail extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putLong(FragmentDetail.ARG_COMIC_ID, getIntent().getLongExtra(FragmentDetail.ARG_COMIC_ID, 0));
+            arguments.putLong(Constants.ARG_COMIC_ID, getIntent().getLongExtra(Constants.ARG_COMIC_ID, 0));
             arguments.putBoolean(FragmentDetail.ARG_ACTIVITY_LAUNCHED, true);
             FragmentDetail fragment = new FragmentDetail();
             fragment.setArguments(arguments);

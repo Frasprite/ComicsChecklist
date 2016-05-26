@@ -59,7 +59,6 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     /**
      * The fragment arguments representing the item ID that this fragment represents.
      */
-    public static final String ARG_COMIC_ID = "comic_id";
     public static final String ARG_ACTIVITY_LAUNCHED = "activity_launched";
 
     // The comic content this fragment is presenting.
@@ -81,10 +80,10 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate - start");
 
-        if (getArguments().containsKey(ARG_COMIC_ID)) {
+        if (getArguments().containsKey(Constants.ARG_COMIC_ID)) {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             // For better performance, use a Loader to load content from a content provider.
-            mComicId = getArguments().getLong(ARG_COMIC_ID);
+            mComicId = getArguments().getLong(Constants.ARG_COMIC_ID);
             mActivityDetailLaunched = getArguments().getBoolean(ARG_ACTIVITY_LAUNCHED);
             Log.i(TAG, "Loading comic with ID " + mComicId);
         }
@@ -175,6 +174,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             // Inflate a menu to be displayed in the toolbar
             if (toolbarDetail != null) {
                 toolbarDetail.inflateMenu(R.menu.menu_detail);
+                // TODO
+                //updateMenuItems(toolbarDetail.getMenu(), mFavorite, mCart);
 
                 toolbarDetail.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
@@ -192,6 +193,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_detail, menu);
+        // TODO
+        //updateMenuItems(menu, mFavorite, mCart);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -199,6 +202,28 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     public boolean onOptionsItemSelected(MenuItem item) {
         return manageItemSelected(item);
     }
+
+    /*private void updateMenuItems(Menu menu, String favoriteFlag, String cartFlag) {
+        if (favoriteFlag.equalsIgnoreCase("no")) {
+            // Comic can be added to favorite
+            menu.getItem(1).setVisible(true);
+            menu.getItem(2).setVisible(false);
+        } else {
+            // Comic can be removed from favorite
+            menu.getItem(1).setVisible(false);
+            menu.getItem(2).setVisible(true);
+        }
+
+        if (cartFlag.equalsIgnoreCase("no")) {
+            // Comic can be added to cart
+            menu.getItem(3).setVisible(true);
+            menu.getItem(4).setVisible(false);
+        } else {
+            // Comic can be removed from cart
+            menu.getItem(3).setVisible(false);
+            menu.getItem(4).setVisible(true);
+        }
+    }*/
 
     private void enlargeTextView(final TextView textView) {
         final int startSize = 1;
@@ -268,13 +293,20 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.FAVORITE), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
                 } else {
+                    Log.v(TAG, "Comic already on favorite");
+                }
+
+                WidgetService.updateWidget(getActivity());
+                return true;
+            case R.id.remove_favorite:
+                if (mFavorite.equalsIgnoreCase("yes")) {
                     Log.i(TAG, "Delete from favorite");
                     // Delete from favorite
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     mFavorite = "no";
                     // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
+                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY + "=?";
                     mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
                     // Delete the copy with the different editor
@@ -283,6 +315,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mSelectionArgs = new String[]{Constants.Editors.getName(Constants.Editors.FAVORITE), mComicName};
                     ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.v(TAG, "Comic already deleted from favorite");
                 }
 
                 WidgetService.updateWidget(getActivity());
@@ -302,13 +336,20 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.CART), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
+                    Log.v(TAG, "Comic already on cart");
+                }
+
+                WidgetService.updateWidget(getActivity());
+                return true;
+            case R.id.remove_buy:
+                if (mCart.equalsIgnoreCase("yes")) {
                     Log.i(TAG, "Update entry on comic database: remove from cart");
                     // Update entry on comic database
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     mCart = "no";
                     // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
+                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY + "=?";
                     mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
                     // Delete the copy with the different editor
@@ -317,6 +358,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mSelectionArgs = new String[]{Constants.Editors.getName(Constants.Editors.CART), mComicName};
                     ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.v(TAG, "Comic already removed from cart");
                 }
 
                 WidgetService.updateWidget(getActivity());

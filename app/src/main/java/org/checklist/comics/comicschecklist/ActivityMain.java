@@ -404,7 +404,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                     // In two-pane mode, show the detail view in this activity by adding
                     // or replacing the detail fragment using a fragment transaction
                     Bundle arguments = new Bundle();
-                    arguments.putLong(FragmentDetail.ARG_COMIC_ID, id);
+                    arguments.putLong(Constants.ARG_COMIC_ID, id);
                     FragmentDetail mDetailFragment = new FragmentDetail();
                     mDetailFragment.setArguments(arguments);
                     getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
@@ -413,7 +413,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                     // In single-pane mode, simply start the detail activity
                     // for the selected item ID
                     Intent detailIntent = new Intent(this, ActivityDetail.class);
-                    detailIntent.putExtra(FragmentDetail.ARG_COMIC_ID, id);
+                    detailIntent.putExtra(Constants.ARG_COMIC_ID, id);
                     startActivity(detailIntent);
                 }
                 break;
