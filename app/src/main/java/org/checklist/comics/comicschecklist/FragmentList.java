@@ -234,8 +234,11 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-                    Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
-                    getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
+                    // Defines selection criteria for the rows you want to update
+                    String mSelectionClause = ComicDatabase.ID + "=?";
+                    String[] mSelectionArgs = new String[]{String.valueOf(info.id)};
+                    // TODO use ComicDatabaseManager method on all query
+                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
                     WidgetService.updateWidget(getActivity());
                     Log.d(TAG, "onContextItemSelected - deleting favorite comic with ID " + info.id);
                     return true;
@@ -499,6 +502,8 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         String order = sharedPref.getString("data_order", "ASC");
         Log.d(TAG, "onCreateLoader - creating loader with " + order + " order");
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
+        // TODO create more efficient loader for comics on CART (query by editor + buy flag)
+        // TODO improve Editors enum usage
         return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
                     ComicDatabase.COMICS_DATE_KEY + " " + order);
     }

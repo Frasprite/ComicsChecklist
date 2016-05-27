@@ -293,7 +293,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
                     mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // In order to avoid conflict while deleting comics save a copy of comic with a new editor name
+                    // TODO delete new insertion, just update
                     ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.FAVORITE), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
                 } else {
@@ -315,6 +315,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mSelectionClause = ComicDatabase.COMICS_NAME_KEY + "=?";
                     mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO delete new insertion, just update
                     // Delete the copy with the different editor
                     // Defines selection criteria for the rows to delete
                     mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=? AND " + ComicDatabase.COMICS_NAME_KEY + "=?";
@@ -340,7 +341,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
                     mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // In order to avoid conflict while deleting comics save a copy of comic with a new editor name
+                    // TODO delete new insertion, just update
                     ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.CART), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
@@ -362,6 +363,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mSelectionClause = ComicDatabase.COMICS_NAME_KEY + "=?";
                     mSelectionArgs = new String[]{mComicName};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO delete new insertion, just update
                     // Delete the copy with the different editor
                     // Defines selection criteria for the rows to delete
                     mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=? AND " + ComicDatabase.COMICS_NAME_KEY + "=?";
@@ -382,6 +384,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     }
 
     private Date elaborateDate(String releaseDate) {
+        // TODO create new class for data creation
         Log.d(TAG, "elaborateDate - start");
         Date date = null;
         try {
