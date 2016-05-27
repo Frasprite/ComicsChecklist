@@ -245,7 +245,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                 return true;
             case DELETE_ALL:
                 mUpdateValues = new ContentValues();
-                int updateResult = 0;
+                int updateResult;
                 if (mEditor.equals(Constants.Editors.FAVORITE)) {
                     // Update all favorite
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
@@ -491,14 +491,22 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         String whereClause;
         String[] whereArgs;
         String sortOrder = ComicDatabase.COMICS_DATE_KEY + " " + order;
-        if (mEditor.equals(Constants.Editors.CART)) {
-            // Load comic with special editor name and buy flag to true
-            whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? AND " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
-            whereArgs = new String[]{Constants.Editors.getTitle(mEditor), "yes"};
-        } else {
-            // Do a simple load from editor name
-            whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-            whereArgs = new String[]{Constants.Editors.getTitle(mEditor)};
+        switch (mEditor) {
+            case CART:
+                // Load comic with special editor name and buy flag to true
+                whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? AND " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
+                whereArgs = new String[]{Constants.Editors.getTitle(mEditor), "yes"};
+                break;
+            case FAVORITE:
+                // Load only comic with positive favorite flag
+                whereClause = ComicDatabase.COMICS_FAVORITE_KEY + "=?";
+                whereArgs = new String[]{"yes"};
+                break;
+            default:
+                // Do a simple load from editor name
+                whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
+                whereArgs = new String[]{Constants.Editors.getTitle(mEditor)};
+                break;
         }
 
         return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, whereClause, whereArgs, sortOrder);
