@@ -110,7 +110,15 @@ public class Parser {
             // Create array of cover
             String docPath = doc.select("div.cover").html();
             Document divPath = Jsoup.parse(docPath);
-            for (Element element5 : divPath.select("img")) arrayCoverUrl.add(element5.attr("src"));
+            for (Element element5 : divPath.select("img")) {
+                String rawCover = element5.attr("src");
+                if (rawCover.contains(Constants.IMAGE_NOT_AVAILABLE) ||
+                        rawCover.equalsIgnoreCase(Constants.IMAGE_NOT_AVAILABLE_URL)) {
+                    arrayCoverUrl.add("");
+                } else {
+                    arrayCoverUrl.add(rawCover);
+                }
+            }
             // Create array of title and features
             String docTitle = doc.select("div.title").html();
             Document divTitle = Jsoup.parse(docTitle);
