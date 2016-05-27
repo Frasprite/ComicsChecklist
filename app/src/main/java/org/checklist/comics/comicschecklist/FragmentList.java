@@ -507,9 +507,20 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         String order = sharedPref.getString("data_order", "ASC");
         Log.d(TAG, "onCreateLoader - creating loader with " + order + " order");
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
-        // TODO create more efficient loader for comics on CART (query by editor + buy flag)
-        return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{Constants.Editors.getTitle(mEditor)},
-                    ComicDatabase.COMICS_DATE_KEY + " " + order);
+        String whereClause;
+        String[] whereArgs;
+        String sortOrder = ComicDatabase.COMICS_DATE_KEY + " " + order;
+        if (mEditor.equals(Constants.Editors.CART)) {
+            // Load comic with special editor name and buy flag to true
+            whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? AND " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
+            whereArgs = new String[]{Constants.Editors.getTitle(mEditor), "yes"};
+        } else {
+            // Do a simple load from editor name
+            whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
+            whereArgs = new String[]{Constants.Editors.getTitle(mEditor)};
+        }
+
+        return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, whereClause, whereArgs, sortOrder);
     }
 
     @Override
