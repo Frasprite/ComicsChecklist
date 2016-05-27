@@ -19,11 +19,10 @@ import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.parser.Parser;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by Francesco Bevilacqua on 25/10/2014.
@@ -365,25 +364,23 @@ public class DownloadService extends IntentService {
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
-        String dateStart = sp.getString(editorLastScan, "01/03/2004");
+        String dateStart = sp.getString(editorLastScan, "01/01/2012");
         String today = day + "/" + month + "/" + year;
 
-        // HH converts hour in 24 hours format (0-23), day calculation
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        Date d1 = DateCreator.elaborateDate(dateStart);
+        Date d2 = DateCreator.elaborateDate(today);
 
-        try {
-            Date d1 = format.parse(dateStart);
-            Date d2 = format.parse(today);
+        // Calculate day difference in milliseconds
+        long diff = d2.getTime() - d1.getTime();
 
-            //in milliseconds
-            long diff = d2.getTime() - d1.getTime();
+        result = diff / (24 * 60 * 60 * 1000);
+        sp.edit().putString(editorLastScan, today).apply();
 
-            result = diff / (24 * 60 * 60 * 1000); //diffDays
-            sp.edit().putString(editorLastScan, today).apply();
-        } catch (Exception e) {
+        // Set default value in case of error
+        if (result < 0) {
             result = 3;
         }
+
         Log.v(TAG, "calculateDayDifference " + result + " - end");
 
         return result;

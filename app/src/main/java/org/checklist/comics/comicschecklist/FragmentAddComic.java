@@ -16,13 +16,9 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-
 
 public class FragmentAddComic extends Fragment {
 
@@ -110,14 +106,9 @@ public class FragmentAddComic extends Fragment {
             if (name.length() == 0) {
                 name = getString(R.string.text_default_title);
             }
-            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date myDate;
-            try {
-                myDate = formatter.parse(date);
-            } catch (ParseException e) {
-                Log.w(TAG, "Can't elaborate date!", e);
-                myDate = new Date();
-            }
+
+            // Elaborating date
+            Date myDate = DateCreator.elaborateDate(date);
 
             if (mComicId == -1) {
                 // Insert new entry

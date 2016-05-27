@@ -5,16 +5,14 @@ import android.util.Log;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.DateFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,40 +55,36 @@ public class Parser {
         int nextYear = year + 1;
         int weekOfTheYear = calendar.get(Calendar.WEEK_OF_YEAR);
 
-        DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        Date lastDec;
-        try {
-            lastDec = formatter.parse("28/12/" + year);
-            Calendar calIt = Calendar.getInstance(Locale.ITALY);
-            calIt.setTime(lastDec);
+        // Calculating last days of year
+        Date lastDec = DateCreator.elaborateDate("28/12/" + year);
 
-            if (weekOfTheYear <= (calIt.get(Calendar.WEEK_OF_YEAR) - 3)) {
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 3), editor);
-            } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 2)) {
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-            } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 1)) {
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
-            } else if (weekOfTheYear == calIt.get(Calendar.WEEK_OF_YEAR)) {
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
-                parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 3, editor);
-            }
-        } catch (ParseException e) {
-            Log.w(TAG, "Can't compute date: search Panini interrupted " + e.toString());
+        Calendar calIt = Calendar.getInstance(Locale.ITALY);
+        calIt.setTime(lastDec);
+
+        if (weekOfTheYear <= (calIt.get(Calendar.WEEK_OF_YEAR) - 3)) {
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 3), editor);
+        } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 2)) {
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
+        } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 1)) {
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
+        } else if (weekOfTheYear == calIt.get(Calendar.WEEK_OF_YEAR)) {
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
+            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 3, editor);
         }
 
         return comicErrorPanini;
@@ -158,8 +152,7 @@ public class Parser {
             if (!title.equalsIgnoreCase("play") && !arrayName.get(i).equalsIgnoreCase("n.d.")) {
                 try {
                     // Calculating date for sql
-                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    Date myDate = formatter.parse(arrayReleaseDate.get(i));
+                    Date myDate = DateCreator.elaborateDate(arrayReleaseDate.get(i));
                     ComicDatabaseManager.insert(mContext, arrayName.get(i), editor, arrayDescription.get(i), arrayReleaseDate.get(i),
                             myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i), "no", "no");
                 } catch (Exception e) {
@@ -209,8 +202,7 @@ public class Parser {
             Elements pElements = content.select("p");
             String description = "N.D.", coverUrl, title;
             // Compute release date
-            DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date myDate = formatter.parse(releaseDate);
+            Date myDate = DateCreator.elaborateDate(releaseDate);
 
             ArrayList<String> coverList = new ArrayList<>();
             ArrayList<String> titleList = new ArrayList<>();
@@ -348,8 +340,7 @@ public class Parser {
                 Log.v(TAG, "Price " + price + " description " + description);
 
                 // Calculating date for sql
-                DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                Date myDate = formatter.parse(releaseDate);
+                Date myDate = DateCreator.elaborateDate(releaseDate);
                 // Insert comic on database
                 ComicDatabaseManager.insert(mContext, name, Constants.Editors.getName(Constants.Editors.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no");
             } catch (Exception e) {
@@ -448,8 +439,7 @@ public class Parser {
 
                     // Calculating date for sql
                     releaseDate = spanRelease.get(i).text();
-                    DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    Date myDate = formatter.parse(releaseDate);
+                    Date myDate = DateCreator.elaborateDate(releaseDate);
 
                     // Insert comic on database
                     String editor = Constants.Editors.getName(Constants.Editors.BONELLI);

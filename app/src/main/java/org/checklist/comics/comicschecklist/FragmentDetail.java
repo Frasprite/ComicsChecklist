@@ -39,12 +39,10 @@ import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Locale;
 
 /**
  * A fragment representing a single Comic detail screen.
@@ -266,7 +264,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     intent.putExtra(CalendarContract.Events.DESCRIPTION, getString(R.string.calendar_release));
 
                     // Setting dates
-                    Date date = elaborateDate(mComicRelease);
+                    Date date = DateCreator.elaborateDate(mComicRelease);
                     GregorianCalendar calDate = new GregorianCalendar();
                     calDate.setTime(date);
                     intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
@@ -368,24 +366,6 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    private Date elaborateDate(String releaseDate) {
-        // TODO create new class for data creation
-        Log.d(TAG, "elaborateDate - start");
-        Date date = null;
-        try {
-            date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(releaseDate);
-        } catch (ParseException e) {
-            Log.w(TAG, "Error while elaborating Date from " + mComicRelease + " " + e.toString());
-        } finally {
-            if (date == null) {
-                date = new Date();
-                date.setTime(System.currentTimeMillis());
-            }
-        }
-        Log.v(TAG, "elaborateDate - end - " + date.toString());
-        return date;
     }
 
     /**
