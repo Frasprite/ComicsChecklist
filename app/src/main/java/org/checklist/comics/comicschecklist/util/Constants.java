@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class Constants {
 
     /* The fragment argument representing the section number for this fragment. */
-    public static final String ARG_SECTION_NUMBER = "section_number";
+    public static final String ARG_EDITOR = "editor";
     public static final String ARG_COMIC_ID = "comic_id";
     public static final String ARG_SAVED_COMIC_ID = "comic_id";
     /**
@@ -93,6 +93,10 @@ public class Constants {
 
         public static String getName(String title) {
             return titleMap.get(title).name;
+        }
+
+        public static int getCode(Editors editor) {
+            return editor.code;
         }
     }
 

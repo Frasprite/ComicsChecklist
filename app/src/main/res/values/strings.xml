@@ -48,7 +48,6 @@
     <string name="title_section11">Guida</string>
     <string name="title_section12">Info</string>
 
-
     <!-- Widget text -->
     <string-array name="widget_editors_array">
         <item>Lista preferiti</item>

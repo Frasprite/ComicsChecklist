@@ -49,8 +49,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
 
     private SimpleCursorAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private String mEditor;
-    private int mEditorNumber;
+    private Constants.Editors mEditor;
     private static final int DELETE_ID = Menu.FIRST + 1;
     private static final int DELETE_ALL = Menu.FIRST + 2;
 
@@ -95,11 +94,11 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     /**
      * Returns a new instance of this fragment for the given section number.
      */
-    public static FragmentList newInstance(int section) {
-        Log.v(TAG, "Creating new instance " + section);
+    public static FragmentList newInstance(Constants.Editors editor) {
+        Log.v(TAG, "Creating new instance " + editor.toString());
         FragmentList fragment = new FragmentList();
         Bundle args = new Bundle();
-        args.putInt(Constants.ARG_SECTION_NUMBER, section);
+        args.putSerializable(Constants.ARG_EDITOR, editor);
         fragment.setArguments(args);
         return fragment;
     }
@@ -109,9 +108,8 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         super.onCreate(savedInstanceState);
 
         // Find editor
-        mEditorNumber = getArguments().getInt(Constants.ARG_SECTION_NUMBER);
-        mEditor = Constants.Editors.getName(mEditorNumber);
-        Log.d(TAG, "onCreate - " + mEditorNumber + " name " + mEditor);
+        mEditor = (Constants.Editors) getArguments().getSerializable(Constants.ARG_EDITOR);
+        Log.d(TAG, "onCreate - name " + mEditor);
 
         fillData();
     }
@@ -122,9 +120,9 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         // Create the list fragment's content view by calling the super method
         final View listFragmentView = inflater.inflate(R.layout.fragment_main, container, false);//super.onCreateView(inflater, container, savedInstanceState);
 
-        getActivity().setTitle(Constants.Editors.getTitle(mEditorNumber));
+        getActivity().setTitle(Constants.Editors.getTitle(mEditor));
 
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE)) || mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
+        if (mEditor.equals(Constants.Editors.FAVORITE) || mEditor.equals(Constants.Editors.CART)) {
             Log.v(TAG, "onCreateView - created a ListFragment - end");
             return listFragmentView;
         } else {
@@ -161,10 +159,10 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
 
         TextView emptyText = (TextView)view.findViewById(android.R.id.empty);
 
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE))) {
+        if (mEditor.equals(Constants.Editors.FAVORITE)) {
             emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
             emptyText.setText(getString(R.string.empty_favorite_list));
-        } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
+        } else if (mEditor.equals(Constants.Editors.CART)) {
             emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_shopping, 0, 0);
             emptyText.setText(getString(R.string.empty_cart_list));
         } else {
@@ -213,8 +211,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     public void onActivityCreated(Bundle savedState) {
         super.onActivityCreated(savedState);
         Log.v(TAG, "onActivityCreated");
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE)) ||
-                mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
+        if (mEditor.equals(Constants.Editors.FAVORITE) || mEditor.equals(Constants.Editors.CART)) {
             registerForContextMenu(getListView());
         }
     }
@@ -230,7 +227,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case DELETE_ID:
-                if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE))) {
+                if (mEditor.equals(Constants.Editors.FAVORITE)) {
                     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
@@ -242,7 +239,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     WidgetService.updateWidget(getActivity());
                     Log.d(TAG, "onContextItemSelected - deleting favorite comic with ID " + info.id);
                     return true;
-                } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
+                } else if (mEditor.equals(Constants.Editors.CART)) {
                     AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
@@ -253,7 +250,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     return true;
                 }
             case DELETE_ALL:
-                if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.FAVORITE))) {
+                if (mEditor.equals(Constants.Editors.FAVORITE)) {
                     // Update all favorite
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
@@ -273,7 +270,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     WidgetService.updateWidget(getActivity());
                     Log.d(TAG, "onContextItemSelected - deleting all favorite comic");
                     return true;
-                } else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.CART))) {
+                } else if (mEditor.equals(Constants.Editors.CART)) {
                     // Update all comic on cart
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
@@ -429,10 +426,10 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
      */
     private void initiateRefresh() {
-        Log.i(TAG, "initiateRefresh - start for editor " + mEditor + " " + mEditorNumber);
+        Log.i(TAG, "initiateRefresh - start for editor " + mEditor);
         // Defines selection criteria for the rows to delete
         String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-        String[] mSelectionArgs = {mEditor};
+        String[] mSelectionArgs = {Constants.Editors.getTitle(mEditor)};
 
         // Deletes the entries that match the selection criteria
         ComicDatabaseManager.delete(getActivity(),
@@ -443,24 +440,32 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
 
         // Update shared preference of editor as well
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.MARVEL)))
-            sp.edit().remove(Constants.PREF_MARVEL_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.PANINI)))
-            sp.edit().remove(Constants.PREF_PANINI_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.PLANET)))
-            sp.edit().remove(Constants.PREF_PLANET_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.BONELLI)))
-            sp.edit().remove(Constants.PREF_BONELLI_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.STAR)))
-            sp.edit().remove(Constants.PREF_STAR_LAST_SCAN).apply();
-        else if (mEditor.equalsIgnoreCase(Constants.Editors.getName(Constants.Editors.RW)))
-            sp.edit().remove(Constants.PREF_RW_LAST_SCAN).apply();
+        switch (mEditor) {
+            case MARVEL:
+                sp.edit().remove(Constants.PREF_MARVEL_LAST_SCAN).apply();
+                break;
+            case PANINI:
+                sp.edit().remove(Constants.PREF_PANINI_LAST_SCAN).apply();
+                break;
+            case PLANET:
+                sp.edit().remove(Constants.PREF_PLANET_LAST_SCAN).apply();
+                break;
+            case BONELLI:
+                sp.edit().remove(Constants.PREF_BONELLI_LAST_SCAN).apply();
+                break;
+            case STAR:
+                sp.edit().remove(Constants.PREF_STAR_LAST_SCAN).apply();
+                break;
+            case RW:
+                sp.edit().remove(Constants.PREF_RW_LAST_SCAN).apply();
+                break;
+        }
 
         /**
          * Execute the background task, which uses {@link org.checklist.comics.comicschecklist.service.DownloadService} to load the data.
          */
         Intent intent = new Intent(getActivity(), DownloadService.class);
-        intent.putExtra(Constants.ARG_SECTION_NUMBER, mEditorNumber);
+        intent.putExtra(Constants.ARG_EDITOR, mEditor);
         intent.putExtra(Constants.MANUAL_SEARCH, true);
         getActivity().startService(intent);
         setRefreshing(true);
@@ -503,8 +508,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         Log.d(TAG, "onCreateLoader - creating loader with " + order + " order");
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
         // TODO create more efficient loader for comics on CART (query by editor + buy flag)
-        // TODO improve Editors enum usage
-        return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
+        return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{Constants.Editors.getTitle(mEditor)},
                     ComicDatabase.COMICS_DATE_KEY + " " + order);
     }
 

@@ -199,7 +199,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
-            selectItem(0, getString(R.string.title_section1));
+            selectItem(Constants.Editors.getCode(Constants.Editors.FAVORITE),
+                       Constants.Editors.getTitle(Constants.Editors.FAVORITE));
         } else {
             mFromSavedInstanceState = true;
         }
@@ -433,7 +434,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         }
         if (position <= 7) {
             // Update the main content by replacing fragments
-            mListFragment = FragmentList.newInstance(position);
+            mListFragment = FragmentList.newInstance(Constants.Editors.getEditor(position));
             getSupportFragmentManager().beginTransaction().replace(R.id.container, mListFragment).commit();
         } else {
             switch (position) {

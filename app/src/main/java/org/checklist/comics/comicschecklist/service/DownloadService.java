@@ -161,9 +161,8 @@ public class DownloadService extends IntentService {
                         createNotification(getResources().getString(R.string.search_completed), false);
                 }
             } else {
-                Log.i(TAG, "Manual search for section n. " + intent.getIntExtra(Constants.ARG_SECTION_NUMBER, 0));
-                int section = intent.getIntExtra(Constants.ARG_SECTION_NUMBER, -1);
-                Constants.Editors editor = Constants.Editors.getEditor(section);
+                Constants.Editors editor = (Constants.Editors) intent.getSerializableExtra(Constants.ARG_EDITOR);
+                Log.i(TAG, "Manual search for editor " + editor.toString());
                 boolean notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true);
 
                 searchNecessary = true;
