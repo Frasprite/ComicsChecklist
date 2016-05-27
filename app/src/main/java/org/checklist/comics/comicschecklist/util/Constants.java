@@ -100,6 +100,11 @@ public class Constants {
         }
     }
 
+    /* Data sync preferences */
+    public static final String PREF_SYNC_FREQUENCY = "sync_frequency";
+    public static final String PREF_DELETE_FREQUENCY = "delete_frequency";
+    public static final String PREF_LIST_ORDER = "data_order";
+
     /* Preference last scan */
     public static final String PREF_MARVEL_LAST_SCAN = "marvel_lastscan";
     public static final String PREF_PANINI_LAST_SCAN = "panini_lastscan";

@@ -45,7 +45,7 @@ public class DownloadService extends IntentService {
         boolean searchNecessary = false;
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String syncPref = sharedPref.getString("sync_frequency", "3");
+        String syncPref = sharedPref.getString(Constants.PREF_SYNC_FREQUENCY, "3");
         int frequency = Integer.parseInt(syncPref);
         boolean manualSearch = intent.getBooleanExtra(Constants.MANUAL_SEARCH, false);
 
@@ -322,7 +322,7 @@ public class DownloadService extends IntentService {
 
     private void deleteOldRows() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String deletePref = sharedPref.getString("delete_frequency", "-1");
+        String deletePref = sharedPref.getString(Constants.PREF_DELETE_FREQUENCY, "-1");
         int frequency = Integer.parseInt(deletePref);
         int rowsDeleted = 0;
         if (frequency > -1) {

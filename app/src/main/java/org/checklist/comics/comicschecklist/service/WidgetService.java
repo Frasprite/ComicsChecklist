@@ -76,7 +76,9 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         mWidgetItems.clear();
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String sortOrder = sharedPref.getString("data_order", "ASC");
+        String whereClause;
+        String[] whereArgs;
+        String sortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, "ASC");
 
         Log.d(TAG, "Editor founded, query database " + mEditor);
         Uri uri = ComicContentProvider.CONTENT_URI;
@@ -84,8 +86,26 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
                 ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
 
-        mCursor = ComicDatabaseManager.query(mContext, uri, projection, ComicDatabase.COMICS_EDITOR_KEY + "=?", new String[]{mEditor},
-                ComicDatabase.COMICS_DATE_KEY + " " + sortOrder);
+        // Load data based on selected editor
+        Constants.Editors editor = Constants.Editors.getEditorFromName(mEditor);
+        switch (editor) {
+            case CART:
+                // Load comic with special editor name and buy flag to true
+                whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? AND " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
+                whereArgs = new String[]{mEditor, "yes"};
+                break;
+            case FAVORITE:
+                // Load only comic with positive favorite flag
+                whereClause = ComicDatabase.COMICS_FAVORITE_KEY + "=?";
+                whereArgs = new String[]{"yes"};
+                break;
+            default:
+                // Do a simple load from editor name
+                whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
+                whereArgs = new String[]{mEditor};
+                break;
+        }
+        mCursor = ComicDatabaseManager.query(mContext, uri, projection, whereClause, whereArgs, sortOrder);
 
         int mID;
         String mName;

@@ -236,9 +236,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-            bindPreferenceSummaryToValue(findPreference("delete_frequency"));
-            bindPreferenceSummaryToValue(findPreference("data_order"));
+            bindPreferenceSummaryToValue(findPreference(Constants.PREF_SYNC_FREQUENCY));
+            bindPreferenceSummaryToValue(findPreference(Constants.PREF_DELETE_FREQUENCY));
+            bindPreferenceSummaryToValue(findPreference(Constants.PREF_LIST_ORDER));
         }
 
         @Override
