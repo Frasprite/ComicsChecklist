@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
@@ -225,72 +224,54 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        ContentValues mUpdateValues;
         switch (item.getItemId()) {
             case DELETE_ID:
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                mUpdateValues = new ContentValues();
                 if (mEditor.equals(Constants.Editors.FAVORITE)) {
-                    AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                    ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-                    // Defines selection criteria for the rows you want to update
-                    String mSelectionClause = ComicDatabase.ID + "=?";
-                    String[] mSelectionArgs = new String[]{String.valueOf(info.id)};
-                    // TODO use ComicDatabaseManager method on all query
-                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    WidgetService.updateWidget(getActivity());
-                    Log.d(TAG, "onContextItemSelected - deleting favorite comic with ID " + info.id);
-                    return true;
+                    Log.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + info.id);
                 } else if (mEditor.equals(Constants.Editors.CART)) {
-                    AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                    ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
-                    Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + info.id);
-                    getActivity().getContentResolver().update(uri, mUpdateValues, null, null);
-                    WidgetService.updateWidget(getActivity());
-                    Log.d(TAG, "onContextItemSelected - deleting comic in cart with ID " + info.id);
-                    return true;
+                    Log.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + info.id);
                 }
+                // Defines selection criteria for the rows you want to update
+                String whereClause = ComicDatabase.ID + "=?";
+                String[] whereArgs = new String[]{String.valueOf(info.id)};
+                int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
+                Log.v(TAG, "onContextItemSelected - row updated " + rowUpdated);
+                WidgetService.updateWidget(getActivity());
+                return true;
             case DELETE_ALL:
+                mUpdateValues = new ContentValues();
+                int updateResult = 0;
                 if (mEditor.equals(Constants.Editors.FAVORITE)) {
                     // Update all favorite
-                    ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, null, null);
-                    // Delete all copies with the different editor
-                    // Defines selection criteria for the rows to delete
-                    String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-                    String[] mSelectionArgs = {Constants.Editors.getName(Constants.Editors.FAVORITE)};
-
-                    // Deletes the entries that match the selection criteria
-                    ComicDatabaseManager.delete(getActivity(),
-                            ComicContentProvider.CONTENT_URI,   // the comic content URI
-                            mSelectionClause,                   // the column to select on
-                            mSelectionArgs                      // the value to compare to
-                    );
-                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
-                    WidgetService.updateWidget(getActivity());
-                    Log.d(TAG, "onContextItemSelected - deleting all favorite comic");
-                    return true;
+                    updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
+                    if (updateResult > 0) {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onContextItemSelected - deleting all favorite comic");
+                    } else {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
+                        Log.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
+                    }
                 } else if (mEditor.equals(Constants.Editors.CART)) {
                     // Update all comic on cart
-                    ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
-                    getActivity().getContentResolver().update(ComicContentProvider.CONTENT_URI, mUpdateValues, null, null);
-                    // Delete all copies with the different editor
-                    // Defines selection criteria for the rows to delete
-                    String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-                    String[] mSelectionArgs = {Constants.Editors.getName(Constants.Editors.CART)};
-
-                    // Deletes the entries that match the selection criteria
-                    ComicDatabaseManager.delete(getActivity(),
-                            ComicContentProvider.CONTENT_URI,   // the comic content URI
-                            mSelectionClause,                   // the column to select on
-                            mSelectionArgs                      // the value to compare to
-                    );
-                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
-                    WidgetService.updateWidget(getActivity());
-                    Log.d(TAG, "onContextItemSelected - deleting all comic on cart");
-                    return true;
+                    updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
+                    if (updateResult > 0) {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onContextItemSelected - deleting all comic on cart");
+                    } else {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
+                        Log.w(TAG, "onContextItemSelected - error while removing all comic from cart");
+                    }
                 }
+
+                WidgetService.updateWidget(getActivity());
+                return true;
         }
         return super.onContextItemSelected(item);
     }

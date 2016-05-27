@@ -155,6 +155,7 @@
     <string name="comic_deleted_cart">Fumetto tolto dalla lista da comprare.</string>
     <string name="comic_added_favorite">Fumetto agggiunto alla lista dei preferiti!</string>
     <string name="comic_deleted_favorite">Fumetto tolto dalla lista dei preferiti.</string>
+    <string name="comic_delete_all_fail">Spiacente, impossibile rimuovere i dati.</string>
 
     <string name="toast_no_connection">Problema alla connessione di rete: verifica la tua connettività.</string>
     <string name="toast_fill_data_alert">Devi inserire il nome del fumetto!</string>
