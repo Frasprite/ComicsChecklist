@@ -62,7 +62,10 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     public static final String ARG_ACTIVITY_LAUNCHED = "activity_launched";
 
     // The comic content this fragment is presenting.
-    private String mComicName, mComicDescription, mComicCover, mComicFeature, mComicPrice, mComicRelease, mFavorite, mCart;
+    private String mComicName;
+    private String mComicRelease;
+    private String mFavorite;
+    private String mCart;
     private boolean mUserLearnedSliding;
     private long mComicId = -1;
     private boolean mActivityDetailLaunched = false;
@@ -113,16 +116,16 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             mCursor.moveToFirst();
             mComicName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
             mComicRelease = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY));
-            mComicDescription = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY));
+            String mComicDescription = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY));
             if (mComicDescription.length() == 0)
                 mComicDescription = "N.D";
-            mComicPrice = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY));
+            String mComicPrice = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY));
             if (mComicPrice.length() == 0)
                 mComicPrice = "N.D.";
-            mComicFeature = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY));
+            String mComicFeature = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY));
             if (mComicFeature.length() == 0)
                 mComicFeature = "N.D.";
-            mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
+            String mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
             mFavorite = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FAVORITE_KEY));
             mCart = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY));
             mCursor.close();
@@ -290,11 +293,9 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "yes");
                     mFavorite = "yes";
                     // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
-                    mSelectionArgs = new String[]{mComicName};
+                    mSelectionClause = ComicDatabase.ID +  "=?";
+                    mSelectionArgs = new String[]{String.valueOf(mComicId)};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // TODO delete new insertion, just update
-                    ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.FAVORITE), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.v(TAG, "Comic already on favorite");
@@ -312,15 +313,9 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     mFavorite = "no";
                     // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY + "=?";
-                    mSelectionArgs = new String[]{mComicName};
+                    mSelectionClause = ComicDatabase.ID +  "=?";
+                    mSelectionArgs = new String[]{String.valueOf(mComicId)};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // TODO delete new insertion, just update
-                    // Delete the copy with the different editor
-                    // Defines selection criteria for the rows to delete
-                    mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=? AND " + ComicDatabase.COMICS_NAME_KEY + "=?";
-                    mSelectionArgs = new String[]{Constants.Editors.getName(Constants.Editors.FAVORITE), mComicName};
-                    ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.v(TAG, "Comic already deleted from favorite");
@@ -338,11 +333,9 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "yes");
                     mCart = "yes";
                     // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY +  "=?";
-                    mSelectionArgs = new String[]{mComicName};
+                    mSelectionClause = ComicDatabase.ID +  "=?";
+                    mSelectionArgs = new String[]{String.valueOf(mComicId)};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // TODO delete new insertion, just update
-                    ComicDatabaseManager.insert(getActivity(), mComicName, Constants.Editors.getName(Constants.Editors.CART), mComicDescription, mComicRelease, elaborateDate(mComicRelease), mComicCover, mComicFeature, mComicPrice, mCart, mFavorite);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.v(TAG, "Comic already on cart");
@@ -360,15 +353,9 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     mCart = "no";
                     // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.COMICS_NAME_KEY + "=?";
-                    mSelectionArgs = new String[]{mComicName};
+                    mSelectionClause = ComicDatabase.ID +  "=?";
+                    mSelectionArgs = new String[]{String.valueOf(mComicId)};
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                    // TODO delete new insertion, just update
-                    // Delete the copy with the different editor
-                    // Defines selection criteria for the rows to delete
-                    mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=? AND " + ComicDatabase.COMICS_NAME_KEY + "=?";
-                    mSelectionArgs = new String[]{Constants.Editors.getName(Constants.Editors.CART), mComicName};
-                    ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.v(TAG, "Comic already removed from cart");
