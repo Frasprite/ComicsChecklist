@@ -49,10 +49,10 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     private static final String TAG = ComicsRemoteViewsFactory.class.getSimpleName();
 
     private int mCount = 0;
-    private List<WidgetItem> mWidgetItems = new ArrayList<>();
-    private Context mContext;
-    private int mAppWidgetId;
-    private String mEditor, mTitle;
+    private final List<WidgetItem> mWidgetItems = new ArrayList<>();
+    private final Context mContext;
+    private final int mAppWidgetId;
+    private final String mEditor, mTitle;
     private Cursor mCursor;
 
     public ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {

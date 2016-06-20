@@ -3,8 +3,3 @@
 /.idea/workspace.xml
 /.idea/libraries
 /build
-.DS_Store
-src/.DS_Store
-src/main/.DS_Store
-src/main/res/.DS_Store
-src/main/res/drawable-nodpi/.DS_Store
