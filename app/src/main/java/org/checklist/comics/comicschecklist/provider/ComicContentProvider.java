@@ -168,7 +168,7 @@ public class ComicContentProvider extends ContentProvider {
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
                 ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
                 ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY,
-                ComicDatabase.COMICS_CART_KEY};
+                ComicDatabase.COMICS_CART_KEY, ComicDatabase.COMICS_URL_KEY};
         if (projection != null) {
             HashSet<String> requestedColumns = new HashSet<>(Arrays.asList(projection));
             HashSet<String> availableColumns = new HashSet<>(Arrays.asList(available));

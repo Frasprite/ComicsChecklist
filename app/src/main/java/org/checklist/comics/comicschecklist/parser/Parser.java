@@ -162,7 +162,7 @@ public class Parser {
                     // Calculating date for sql
                     Date myDate = DateCreator.elaborateDate(arrayReleaseDate.get(i));
                     ComicDatabaseManager.insert(mContext, arrayName.get(i), editor, arrayDescription.get(i), arrayReleaseDate.get(i),
-                            myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i), "no", "no");
+                            myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i), "no", "no", url);
                 } catch (Exception e) {
                     // Error while comic fetching
                     Log.w(TAG, title + " " + e.toString());
@@ -260,7 +260,7 @@ public class Parser {
 
                 if (coverList.size() == titleList.size() && featureList.size() == priceList.size()) {
                     for (int i = 0; i < coverList.size(); i++) {
-                        ComicDatabaseManager.insert(mContext, titleList.get(i), Constants.Editors.getName(Constants.Editors.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i), "no", "no");
+                        ComicDatabaseManager.insert(mContext, titleList.get(i), Constants.Editors.getName(Constants.Editors.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i), "no", "no", siteUrl);
                     }
                 }
             } catch (Exception e) {
@@ -316,7 +316,8 @@ public class Parser {
             // Try to open computed URL
             try {
                 // Create doc (ISO-8859-1 CP1252 UTF-8)
-                doc = Jsoup.parse(new URL(Constants.COMIC_ROOT + i).openStream(), "UTF-8", Constants.COMIC_ROOT + i);
+                String URL = Constants.COMIC_ROOT + i;
+                doc = Jsoup.parse(new URL(URL).openStream(), "UTF-8", Constants.COMIC_ROOT + i);
                 Element content = doc.getElementsByTag("article").first();
                 // Take various info (name, release date and number)
                 Elements li = content.select("li"); // select all li
@@ -350,7 +351,7 @@ public class Parser {
                 // Calculating date for sql
                 Date myDate = DateCreator.elaborateDate(releaseDate);
                 // Insert comic on database
-                ComicDatabaseManager.insert(mContext, name, Constants.Editors.getName(Constants.Editors.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no");
+                ComicDatabaseManager.insert(mContext, name, Constants.Editors.getName(Constants.Editors.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", URL);
             } catch (Exception e) {
                 Log.w(TAG, "Error while searching data for comic id " + i + " " + e.toString());
                 comicErrorStar = true;
@@ -451,7 +452,7 @@ public class Parser {
 
                     // Insert comic on database
                     String editor = Constants.Editors.getName(Constants.Editors.BONELLI);
-                    ComicDatabaseManager.insert(mContext, name.toUpperCase(), editor, description, releaseDate, myDate, coverUrl, feature, price, "no", "no");
+                    ComicDatabaseManager.insert(mContext, name.toUpperCase(), editor, description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
                 } catch (Exception e) {
                     Log.w(TAG, "Can't take more info from " + moreInfoUrl + " " + e.toString() + " comic not fetched");
                 }

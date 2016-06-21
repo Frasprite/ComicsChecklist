@@ -19,7 +19,7 @@ public class ComicDatabaseManager {
     private static final String TAG = ComicDatabaseManager.class.getSimpleName();
 
     public static long insert(Context context, String name, String editor, String description, String releaseDate,
-                              Date date, String coverUrl, String feature, String price, String cartKey, String favoriteKey) {
+                              Date date, String coverUrl, String feature, String price, String cartKey, String favoriteKey, String URL) {
         Log.v(TAG, "Insert comic " + name + " " + editor + " " + releaseDate);
         ContentValues values = new ContentValues();
         values.put(ComicDatabase.COMICS_NAME_KEY, name);
@@ -32,6 +32,7 @@ public class ComicDatabaseManager {
         values.put(ComicDatabase.COMICS_PRICE_KEY, price);
         values.put(ComicDatabase.COMICS_CART_KEY, cartKey);
         values.put(ComicDatabase.COMICS_FAVORITE_KEY, favoriteKey);
+        values.put(ComicDatabase.COMICS_URL_KEY, URL);
 
         Uri uri = context.getContentResolver().insert(ComicContentProvider.CONTENT_URI, values);
         return ContentUris.parseId(uri);

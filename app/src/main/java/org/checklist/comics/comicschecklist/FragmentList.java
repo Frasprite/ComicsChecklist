@@ -493,19 +493,22 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         String sortOrder = ComicDatabase.COMICS_DATE_KEY + " " + order;
         switch (mEditor) {
             case CART:
+                Log.d(TAG, "Loading CART content");
                 // Load comic with special editor name and buy flag to true
                 whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? AND " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
-                whereArgs = new String[]{Constants.Editors.getTitle(mEditor), "yes"};
+                whereArgs = new String[]{Constants.Editors.getName(mEditor), "yes"};
                 break;
             case FAVORITE:
+                Log.d(TAG, "Loading FAVORITE content");
                 // Load only comic with positive favorite flag
                 whereClause = ComicDatabase.COMICS_FAVORITE_KEY + "=?";
                 whereArgs = new String[]{"yes"};
                 break;
             default:
+                Log.d(TAG, "Loading " + mEditor + " content");
                 // Do a simple load from editor name
                 whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-                whereArgs = new String[]{Constants.Editors.getTitle(mEditor)};
+                whereArgs = new String[]{Constants.Editors.getName(mEditor)};
                 break;
         }
 

@@ -16,7 +16,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class ComicDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "comictable.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     public ComicDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

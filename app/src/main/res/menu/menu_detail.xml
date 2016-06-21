@@ -8,6 +8,12 @@
         app:showAsAction="ifRoom">
     </item>
     <item
+        android:id="@+id/comicSite"
+        android:icon="@drawable/ic_public"
+        android:title="@string/menu_comic_site"
+        app:showAsAction="ifRoom">
+    </item>
+    <item
         android:id="@+id/favorite"
         android:icon="@drawable/ic_grade"
         android:title="@string/menu_favorites"

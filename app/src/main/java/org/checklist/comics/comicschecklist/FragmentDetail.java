@@ -64,6 +64,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     private String mComicRelease;
     private String mFavorite;
     private String mCart;
+    private String mComicEditor;
+    private String mComicURL;
     private boolean mUserLearnedSliding;
     private long mComicId = -1;
     private boolean mActivityDetailLaunched = false;
@@ -109,7 +111,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY,
                     ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
                     ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY, ComicDatabase.COMICS_EDITOR_KEY,
-                    ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
+                    ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY, ComicDatabase.COMICS_URL_KEY};
             Cursor mCursor = ComicDatabaseManager.query(getActivity(), uri, projection, null, null, null);
             mCursor.moveToFirst();
             mComicName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
@@ -126,6 +128,8 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             String mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
             mFavorite = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FAVORITE_KEY));
             mCart = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY));
+            mComicEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
+            mComicURL = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_URL_KEY));
             mCursor.close();
             // Populating view
             titleTextView = ((TextView) rootView.findViewById(R.id.title_text_view));
@@ -211,22 +215,28 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     private void updateMenuItems(String favoriteFlag, String cartFlag) {
         if (favoriteFlag.equalsIgnoreCase("no")) {
             // Comic can be added to favorite
-            mMenu.getItem(1).setVisible(true);
-            mMenu.getItem(2).setVisible(false);
+            mMenu.getItem(2).setVisible(true);
+            mMenu.getItem(3).setVisible(false);
         } else {
             // Comic can be removed from favorite
-            mMenu.getItem(1).setVisible(false);
-            mMenu.getItem(2).setVisible(true);
+            mMenu.getItem(2).setVisible(false);
+            mMenu.getItem(3).setVisible(true);
         }
 
         if (cartFlag.equalsIgnoreCase("no")) {
             // Comic can be added to cart
-            mMenu.getItem(3).setVisible(true);
-            mMenu.getItem(4).setVisible(false);
+            mMenu.getItem(4).setVisible(true);
+            mMenu.getItem(5).setVisible(false);
         } else {
             // Comic can be removed from cart
-            mMenu.getItem(3).setVisible(false);
-            mMenu.getItem(4).setVisible(true);
+            mMenu.getItem(4).setVisible(false);
+            mMenu.getItem(5).setVisible(true);
+        }
+
+        if (Constants.Editors.getEditorFromName(mComicEditor) == Constants.Editors.CART) {
+            mMenu.getItem(1).setVisible(false);
+        } else {
+            mMenu.getItem(1).setVisible(true);
         }
     }
 
@@ -282,6 +292,10 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                 } catch (Exception e) {
                     Toast.makeText(getActivity(), R.string.calendar_error, Toast.LENGTH_SHORT).show();
                 }
+                return true;
+            case R.id.comicSite:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mComicURL));
+                startActivity(browserIntent);
                 return true;
             case R.id.favorite:
                 if (mFavorite.equalsIgnoreCase("no")) {

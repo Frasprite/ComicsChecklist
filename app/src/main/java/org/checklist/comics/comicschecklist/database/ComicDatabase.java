@@ -1,9 +1,14 @@
 package org.checklist.comics.comicschecklist.database;
 
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import org.checklist.comics.comicschecklist.util.Constants;
+
 public class ComicDatabase {
+
+    private static final String TAG = ComicDatabase.class.getSimpleName();
 
     // Metadati della tabella
     public static final String COMICS_TABLE = "comic";
@@ -18,6 +23,7 @@ public class ComicDatabase {
     public static final String COMICS_EDITOR_KEY = "editor";
     public static final String COMICS_FAVORITE_KEY = "favorite";
     public static final String COMICS_CART_KEY = "wishlist";
+    public static final String COMICS_URL_KEY = "url";
 
     /**
      * Codice SQL di creazione della tabella.
@@ -35,6 +41,7 @@ public class ComicDatabase {
             + COMICS_EDITOR_KEY + " text not null, "
             + COMICS_FAVORITE_KEY + " text not null, "
             + COMICS_CART_KEY + " text not null, "
+            + COMICS_URL_KEY + " text not null, "
             + "UNIQUE (" + COMICS_NAME_KEY + ", " + COMICS_EDITOR_KEY + ", " + COMICS_RELEASE_KEY +") ON CONFLICT REPLACE);";
 
     public static void onCreate(SQLiteDatabase database) {
@@ -43,10 +50,29 @@ public class ComicDatabase {
 
     public static void onUpgrade(SQLiteDatabase database, int oldVersion,
                                  int newVersion) {
-        Log.w(ComicDatabase.class.getName(), "Upgrading database from version "
-                + oldVersion + " to " + newVersion
-                + ", which will destroy all old data");
-        database.execSQL("DROP TABLE IF EXISTS " + COMICS_TABLE);
-        onCreate(database);
+        if (oldVersion == 1 && newVersion == 2) {
+            Log.w(TAG, "Upgrading database from version "
+                    + oldVersion + " to " + newVersion);
+            // Update database by adding new column
+            database.execSQL("ALTER TABLE " + COMICS_TABLE + " ADD COLUMN " + COMICS_URL_KEY + " TEXT");
+            // Populate new column
+            updateRows(database, Constants.URLPANINI, Constants.Editors.getName(Constants.Editors.MARVEL));
+            updateRows(database, Constants.URLPANINI, Constants.Editors.getName(Constants.Editors.PANINI));
+            updateRows(database, Constants.URLPANINI, Constants.Editors.getName(Constants.Editors.PLANET));
+            updateRows(database, Constants.IMG_URL, Constants.Editors.getName(Constants.Editors.STAR));
+            updateRows(database, Constants.MAIN_URL, Constants.Editors.getName(Constants.Editors.BONELLI));
+            updateRows(database, Constants.RW_URL, Constants.Editors.getName(Constants.Editors.RW));
+        }
+    }
+
+    private static void updateRows(SQLiteDatabase database, String URL, String editorName) {
+        // Add default value to new column
+        ContentValues mUpdateValues = new ContentValues();
+        mUpdateValues.put(ComicDatabase.COMICS_URL_KEY, URL);
+        // Defines selection criteria for the rows you want to update
+        String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY +  "=?";
+        String[] mSelectionArgs = new String[]{String.valueOf(editorName)};
+        int rows = database.update(COMICS_TABLE, mUpdateValues, mSelectionClause, mSelectionArgs);
+        Log.v(TAG, "Total rows updated: " + rows);
     }
 }

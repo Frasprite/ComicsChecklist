@@ -63,6 +63,7 @@
 
     <!-- Menu & context menu text -->
 	<string name="menu_calendar">Aggiungi uscita al calendario</string>
+    <string name="menu_comic_site">Sito web</string>
 	<string name="menu_favorites">Aggiungi ai preferiti</string>
     <string name="menu_wishlist">Da comprare</string>
     <string name="menu_remove_favorites">Togli dai preferiti</string>
