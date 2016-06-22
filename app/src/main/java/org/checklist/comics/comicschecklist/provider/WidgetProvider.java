@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import org.checklist.comics.comicschecklist.ActivityAddComic;
 import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.SettingsWidget;

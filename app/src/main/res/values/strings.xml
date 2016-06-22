@@ -159,7 +159,6 @@
     <string name="comic_delete_all_fail">Spiacente, impossibile rimuovere i dati.</string>
 
     <string name="toast_no_connection">Problema alla connessione di rete: verifica la tua connettività.</string>
-    <string name="toast_fill_data_alert">Devi inserire il nome del fumetto!</string>
 
     <string name="empty_list">La lista è vuota!</string>
     <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nPer ulteriori informazioni consulta la "Guida" dal menu laterale.</string>
@@ -181,7 +180,6 @@
 
     <!-- Activity add comic -->
     <string name="text_preview_title"><b>Nome fumetto</b></string>
-    <string name="text_preview_release">Data d\'uscita (facoltativa)</string>
     <string name="text_preview_other">Altre info, es.: editore, numeri mancanti</string>
     <string name="text_change_date">Cambia data</string>
     <string name="text_default_title">Fumetto senza titolo</string>

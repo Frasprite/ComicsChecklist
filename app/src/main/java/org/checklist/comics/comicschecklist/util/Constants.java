@@ -75,16 +75,8 @@ public class Constants {
             return titleMap.get(title);
         }
 
-        public static String getName(int position) {
-            return map.get(position).name;
-        }
-
         public static String getName(Editors editor) {
             return editor.name;
-        }
-
-        public static String getTitle(int position) {
-            return map.get(position).title;
         }
 
         public static String getTitle(Editors editor) {
