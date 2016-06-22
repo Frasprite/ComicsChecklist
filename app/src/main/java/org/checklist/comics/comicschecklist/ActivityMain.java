@@ -251,6 +251,10 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
             Log.d(TAG, "handleIntent - launching detail for comic ID " + comicId);
             launchDetailView(comicId);
+        } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_WIDGET_ADD)) {
+            // Open add comic activity
+            Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
+            startActivity(addComicIntent);
         }
     }
 

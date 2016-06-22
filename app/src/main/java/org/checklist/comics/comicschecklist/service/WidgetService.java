@@ -78,16 +78,17 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
         String whereClause;
         String[] whereArgs;
-        String sortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, "ASC");
+        String sortOrder = ComicDatabase.COMICS_DATE_KEY + " " + sharedPref.getString(Constants.PREF_LIST_ORDER, "ASC");
 
         Log.d(TAG, "Editor founded, query database " + mEditor);
         Uri uri = ComicContentProvider.CONTENT_URI;
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
-                ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
+                ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY, ComicDatabase.COMICS_URL_KEY};
 
         // Load data based on selected editor
         Constants.Editors editor = Constants.Editors.getEditorFromName(mEditor);
+        Log.v(TAG, "Preparing entry for widget, mEditor is " + mEditor + " found editor is " + editor);
         switch (editor) {
             case CART:
                 // Load comic with special editor name and buy flag to true
