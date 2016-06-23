@@ -147,7 +147,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                     .into(coverView);
 
             SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
-            layout.setPanelSlideListener(this);
+            layout.addPanelSlideListener(this);
 
             ImageView arrowSx = (ImageView) rootView.findViewById(R.id.go_up_sx);
             ImageView arrowDx = (ImageView) rootView.findViewById(R.id.go_up_dx);
@@ -436,26 +436,18 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     }
 
     @Override
-    public void onPanelCollapsed(View panel) {
-        // Anything you put here is going to happen if the view is closed
-        titleTextView.setMaxLines(1);
-    }
-
-    @Override
-    public void onPanelExpanded(View panel) {
-        enlargeTextView(titleTextView);
-        // Anything you put here is going to happen if the view is open
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        sp.edit().putBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, true).apply();
-    }
-
-    @Override
-    public void onPanelAnchored(View panel) {
-        // Anything you put here is going to happen if the view is anchored
-    }
-
-    @Override
-    public void onPanelHidden(View panel) {
-        // Anything you put here is going to happen if the view is hidden
+    public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+        switch (newState) {
+            case COLLAPSED:
+                // Anything you put here is going to happen if the view is closed
+                titleTextView.setMaxLines(1);
+                break;
+            case EXPANDED:
+                enlargeTextView(titleTextView);
+                // Anything you put here is going to happen if the view is open
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                sp.edit().putBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, true).apply();
+                break;
+        }
     }
 }
