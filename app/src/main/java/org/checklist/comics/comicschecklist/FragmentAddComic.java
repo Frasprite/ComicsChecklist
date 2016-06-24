@@ -18,7 +18,10 @@ import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class FragmentAddComic extends Fragment {
 
@@ -86,6 +89,12 @@ public class FragmentAddComic extends Fragment {
             mInfoEditText.setText(mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY)));
             mDateTextView.setText(mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY)));
             mCursor.close();
+        } else {
+            // Leave all form in blank and set default date
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            String date = simpleDateFormat.format(calendar.getTime());
+            updateDate(date);
         }
     }
 
