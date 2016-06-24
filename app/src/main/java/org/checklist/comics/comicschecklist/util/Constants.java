@@ -126,6 +126,7 @@ public class Constants {
     public static final String COMIC_ID_FROM_WIDGET = "COMIC_ID_FROM_WIDGET";
     public static final String ACTION_COMIC_WIDGET = "comic_widget";
     public static final String ACTION_WIDGET_ADD = "action_add_comic";
+    public static final String ACTION_WIDGET_OPEN_APP = "action_open_app";
 
     /* Search */
     public static final String PREF_SEARCH_QUERY = "search_query";

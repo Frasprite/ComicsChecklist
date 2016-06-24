@@ -49,21 +49,6 @@ public class WidgetProvider extends AppWidgetProvider {
         // Enter relevant functionality for when the last widget is disabled
     }
 
-    /*@Override
-    public void onReceive(Context context, Intent intent) {
-        if (intent.getAction().equals(Constants.ACTION_WIDGET_ADD)) {
-            Log.i(TAG, "Widget button clicked " + Constants.ACTION_WIDGET_ADD);
-            // Open add comic activity
-            Intent addComicIntent = new Intent(context, ActivityMain.class);
-            addComicIntent.setAction(Constants.ACTION_WIDGET_ADD);
-            addComicIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(addComicIntent);
-        } else {
-            Log.i(TAG, "Other action from widget received " + intent.toString());
-            super.onReceive(context, intent);
-        }
-    }*/
-
     public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
@@ -103,6 +88,13 @@ public class WidgetProvider extends AppWidgetProvider {
         addComicIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent actionAddPendingIntent = PendingIntent.getActivity(context, 0, addComicIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.widgetAddButton, actionAddPendingIntent);
+
+        // Redirect on widget button click event to open app
+        Intent openAppIntent = new Intent(context, ActivityMain.class);
+        openAppIntent.setAction(Constants.ACTION_WIDGET_OPEN_APP);
+        openAppIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent actionOpenAppPendingIntent = PendingIntent.getActivity(context, 0, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.widgetTextView, actionOpenAppPendingIntent);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
