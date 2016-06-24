@@ -113,8 +113,6 @@ public class ComicsChecklistDialogFragment extends DialogFragment {
                 LayoutInflater inflaterInfo = getActivity().getLayoutInflater();
                 // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
                 builder.setView(inflaterInfo.inflate(R.layout.dialog_info, null));
-                // Set title
-                builder.setTitle(R.string.dialog_info_title);
                 break;
             case Constants.DIALOG_RATE:
                 // Launch Google Play page
