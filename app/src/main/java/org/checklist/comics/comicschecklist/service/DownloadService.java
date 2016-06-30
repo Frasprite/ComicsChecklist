@@ -161,111 +161,113 @@ public class DownloadService extends IntentService {
                 }
             } else {
                 Constants.Editors editor = (Constants.Editors) intent.getSerializableExtra(Constants.ARG_EDITOR);
-                Log.i(TAG, "Manual search for editor " + editor.toString());
                 boolean notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true);
+                if (editor != null) {
+                    Log.i(TAG, "Manual search for editor " + editor.toString());
 
-                searchNecessary = true;
+                    searchNecessary = true;
 
-                switch (editor) {
-                    case MARVEL:
-                        // Marvel
-                        publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.MARVEL));
-                        if (error) {
-                            publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section3));
+                    switch (editor) {
+                        case MARVEL:
+                            // Marvel
+                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
                             if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_failed), false);
-                        } else {
-                            publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section3));
+                                createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_started), true);
+                            error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.MARVEL));
+                            if (error) {
+                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section3));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_failed), false);
+                            } else {
+                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section3));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_editor_completed), true);
+                            }
+                            break;
+                        case PANINI:
+                            // Panini
+                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
                             if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_editor_completed), true);
-                        }
-                        break;
-                    case PANINI:
-                        // Panini
-                        publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PANINI));
-                        if (error) {
-                            publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section4));
+                                createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_started), true);
+                            error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PANINI));
+                            if (error) {
+                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section4));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_failed), false);
+                            } else {
+                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section4));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_editor_completed), true);
+                            }
+                            break;
+                        case PLANET:
+                            // Planet
+                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
                             if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_failed), false);
-                        } else {
-                            publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section4));
+                                createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_started), true);
+                            error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PLANET));
+                            if (error) {
+                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section5));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_failed), false);
+                            } else {
+                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section5));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_editor_completed), true);
+                            }
+                            break;
+                        case STAR:
+                            // Star
+                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
                             if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_editor_completed), true);
-                        }
-                        break;
-                    case PLANET:
-                        // Planet
-                        publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PLANET));
-                        if (error) {
-                            publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section5));
+                                createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_started), true);
+                            error = myParser.startParseStarC();
+                            if (error) {
+                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section6));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_failed), false);
+                            } else {
+                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section6));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_editor_completed), true);
+                            }
+                            break;
+                        case BONELLI:
+                            // Bonelli
+                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
                             if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_failed), false);
-                        } else {
-                            publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section5));
+                                createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_started), true);
+                            error = myParser.startParseBonelli();
+                            if (error) {
+                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section7));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_failed), false);
+                            } else {
+                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section7));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_editor_completed), true);
+                            }
+                            break;
+                        case RW:
+                            // RW
+                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
                             if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_editor_completed), true);
-                        }
-                        break;
-                    case STAR:
-                        // Star
-                        publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParseStarC();
-                        if (error) {
-                            publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section6));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_failed), false);
-                        } else {
-                            publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section6));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_editor_completed), true);
-                        }
-                        break;
-                    case BONELLI:
-                        // Bonelli
-                        publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParseBonelli();
-                        if (error) {
-                            publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section7));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_failed), false);
-                        } else {
-                            publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section7));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_editor_completed), true);
-                        }
-                        break;
-                    case RW:
-                        // RW
-                        publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_started), true);
-                        error = myParser.startParseRW();
-                        if (error) {
-                            publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section8));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_failed), false);
-                        } else {
-                            publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section8));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_editor_completed), true);
-                        }
-                        break;
-                    default:
-                        searchNecessary = false;
-                        break;
+                                createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_started), true);
+                            error = myParser.startParseRW();
+                            if (error) {
+                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section8));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_failed), false);
+                            } else {
+                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section8));
+                                if (notificationPref)
+                                    createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_editor_completed), true);
+                            }
+                            break;
+                        default:
+                            searchNecessary = false;
+                            break;
+                    }
                 }
 
                 if (searchNecessary) {
