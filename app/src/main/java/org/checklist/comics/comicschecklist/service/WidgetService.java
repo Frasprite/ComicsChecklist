@@ -92,7 +92,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         switch (editor) {
             case CART:
                 // Load comic with special editor name and buy flag to true
-                whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? AND " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
+                whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? OR " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
                 whereArgs = new String[]{mEditor, "yes"};
                 break;
             case FAVORITE:

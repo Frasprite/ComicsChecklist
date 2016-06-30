@@ -495,7 +495,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             case CART:
                 Log.d(TAG, "Loading CART content");
                 // Load comic with special editor name and buy flag to true
-                whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? AND " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
+                whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? OR " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
                 whereArgs = new String[]{Constants.Editors.getName(mEditor), "yes"};
                 break;
             case FAVORITE:
