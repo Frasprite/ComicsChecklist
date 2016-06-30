@@ -47,7 +47,7 @@ public class ParserTest {
     public void startParseBonelliTest() {
         Parser parser = new Parser(mMockContext);
         boolean result = parser.startParseBonelli();
-        assertThat(result, is(true));
+        assertThat(result, is(false));
     }
 
     @Test

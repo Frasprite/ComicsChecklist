@@ -105,7 +105,10 @@ public class Parser {
         ArrayList<String> arrayDescription = new ArrayList<>();
         try {
             // Take data and save it on document
-            Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                    .maxBodySize(0)
+                    .get();
 
             // Create array of cover
             String docPath = doc.select("div.cover").html();
@@ -203,7 +206,10 @@ public class Parser {
         Log.d(TAG, "Parsing " + siteUrl);
         try {
             // Take data and save it on document
-            Document doc = Jsoup.parse(new URL(siteUrl).openStream(), "UTF-8", siteUrl);
+            Document doc = Jsoup.connect(siteUrl)
+                    .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                    .maxBodySize(0)
+                    .get();
             Element content = doc.getElementById("content");
 
             // Take every potential comic
@@ -385,7 +391,10 @@ public class Parser {
         Log.d(TAG, "Parsing Bonelli URL " + url);
         try {
             // Creating doc file from URL
-            Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
+            Document doc = Jsoup.connect(url)
+                    .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                    .maxBodySize(0)
+                    .get();
 
             // Finding release date
             String releaseTag = doc.select("p.tag_2").html();
@@ -408,7 +417,10 @@ public class Parser {
                 Log.v(TAG, name + " " + moreInfoUrl);
                 try {
                     // Creating doc file from URL
-                    Document docMoreInfo = Jsoup.parse(new URL(moreInfoUrl).openStream(), "UTF-8", moreInfoUrl);
+                    Document docMoreInfo = Jsoup.connect(moreInfoUrl)
+                            .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                            .maxBodySize(0)
+                            .get();
 
                     // Finding periodicity
                     periodicityTag = docMoreInfo.select("p.tag_3").html();
