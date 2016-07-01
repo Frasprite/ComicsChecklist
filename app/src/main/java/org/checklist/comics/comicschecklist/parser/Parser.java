@@ -13,6 +13,7 @@ import org.jsoup.select.Elements;
 
 import java.net.URL;
 import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -191,7 +192,9 @@ public class Parser {
         String url;
         for (int i = 1; i < day + 3; i++) {
             url = Constants.FIRSTRW + Constants.MIDDLERW + i + Constants.MIDDLERW + month + Constants.MIDDLERW + year + Constants.ENDRW;
-            parseUrlRW(url, i + "/" + (monthInt) + "/" + year);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            String date = simpleDateFormat.format(calendar.getTime());
+            parseUrlRW(url, date);
         }
 
         return comicErrorRw;
