@@ -362,12 +362,13 @@ public class DownloadService extends IntentService {
         long result; // If result is 3, we need a refresh
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;
+        int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String dateStart = sp.getString(editorLastScan, "01/01/2012");
         String today = day + "/" + month + "/" + year;
+        Log.d(TAG, "calculateDayDifference - date is " + today);
 
         Date d1 = DateCreator.elaborateDate(dateStart);
         Date d2 = DateCreator.elaborateDate(today);

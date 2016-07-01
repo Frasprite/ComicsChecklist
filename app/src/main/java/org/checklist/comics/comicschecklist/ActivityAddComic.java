@@ -80,6 +80,7 @@ public class ActivityAddComic extends AppCompatActivity {
             int day = c.get(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
+            Log.d(TAG, "onCreateDialog - date is " + day + "/" + month + "/" + year);
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
@@ -88,11 +89,11 @@ public class ActivityAddComic extends AppCompatActivity {
             // Set chosen date to text view
             FragmentAddComic articleFrag = (FragmentAddComic)
                     getActivity().getSupportFragmentManager().findFragmentByTag("addComicFragment");
-            month++;
             Calendar calendar = Calendar.getInstance();
             calendar.set(year, month, day);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             String date = simpleDateFormat.format(calendar.getTime());
+            Log.i(TAG, "onDateSet - returning " + date);
             articleFrag.updateDate(date);
         }
     }

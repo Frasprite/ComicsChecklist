@@ -16,7 +16,6 @@ import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
@@ -50,7 +49,7 @@ public class Parser {
         Log.i(TAG, "Start searching for Panini comics");
         comicErrorPanini = false;
 
-        Calendar calendar = new GregorianCalendar();
+        Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int nextYear = year + 1;
         int weekOfTheYear = calendar.get(Calendar.WEEK_OF_YEAR);
@@ -58,28 +57,28 @@ public class Parser {
         // Calculating last days of year
         Date lastDec = DateCreator.elaborateDate("28/12/" + year);
 
-        Calendar calIt = Calendar.getInstance(Locale.ITALY);
-        calIt.setTime(lastDec);
+        Calendar futureCalendar = Calendar.getInstance();
+        futureCalendar.setTime(lastDec);
 
-        if (weekOfTheYear <= (calIt.get(Calendar.WEEK_OF_YEAR) - 3)) {
+        if (weekOfTheYear <= (futureCalendar.get(Calendar.WEEK_OF_YEAR) - 3)) {
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 3), editor);
-        } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 2)) {
+        } else if (weekOfTheYear == (futureCalendar.get(Calendar.WEEK_OF_YEAR) - 2)) {
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-        } else if (weekOfTheYear == (calIt.get(Calendar.WEEK_OF_YEAR) - 1)) {
+        } else if (weekOfTheYear == (futureCalendar.get(Calendar.WEEK_OF_YEAR) - 1)) {
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
-        } else if (weekOfTheYear == calIt.get(Calendar.WEEK_OF_YEAR)) {
+        } else if (weekOfTheYear == futureCalendar.get(Calendar.WEEK_OF_YEAR)) {
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
             parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
@@ -183,15 +182,16 @@ public class Parser {
         Log.i(TAG, "Start searching for RW comics");
         comicErrorRw = false;
 
-        Calendar calendar = new GregorianCalendar();
+        Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int monthInt = calendar.get(Calendar.MONTH);
         int year = calendar.get(Calendar.YEAR);
+        Log.d(TAG, "startParseRW - date is " + day + "/" + monthInt + "/" + year);
         String month = DateFormatSymbols.getInstance(Locale.ITALIAN).getMonths()[monthInt];
         String url;
         for (int i = 1; i < day + 3; i++) {
             url = Constants.FIRSTRW + Constants.MIDDLERW + i + Constants.MIDDLERW + month + Constants.MIDDLERW + year + Constants.ENDRW;
-            parseUrlRW(url, i + "/" + (monthInt + 1) + "/" + year);
+            parseUrlRW(url, i + "/" + (monthInt) + "/" + year);
         }
 
         return comicErrorRw;

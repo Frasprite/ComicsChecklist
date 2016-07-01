@@ -41,8 +41,8 @@ import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
+import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * A fragment representing a single Comic detail screen.
@@ -275,7 +275,7 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
 
                     // Setting dates
                     Date date = DateCreator.elaborateDate(mComicRelease);
-                    GregorianCalendar calDate = new GregorianCalendar();
+                    Calendar calDate = Calendar.getInstance();
                     calDate.setTime(date);
                     intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
                             calDate.getTimeInMillis());
