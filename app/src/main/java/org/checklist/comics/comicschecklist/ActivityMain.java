@@ -436,6 +436,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 }
             }
         }
+
         if (position <= 7) {
             // Update the main content by replacing fragments
             mListFragment = FragmentList.newInstance(Constants.Editors.getEditor(position));
@@ -521,10 +522,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     public void onDialogPositiveClick(DialogFragment dialog, int dialogId) {
         switch (dialogId) {
-            /*case Constants.DIALOG_ADD_DATE:
-                dialog.dismiss();
-                Toast.makeText(this, getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
-                break;*/
             case Constants.DIALOG_RATE:
                 dialog.dismiss();
                 this.startActivity(new Intent(Intent.ACTION_VIEW,
