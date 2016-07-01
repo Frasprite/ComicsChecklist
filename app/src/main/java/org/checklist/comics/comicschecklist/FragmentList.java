@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ListFragment;
@@ -232,15 +233,15 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                 if (mEditor.equals(Constants.Editors.FAVORITE)) {
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
                     Log.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + info.id);
+                    // Defines selection criteria for the rows you want to update
+                    String whereClause = ComicDatabase.ID + "=?";
+                    String[] whereArgs = new String[]{String.valueOf(info.id)};
+                    int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
+                    Log.v(TAG, "onContextItemSelected - favorite comic UPDATED " + rowUpdated);
                 } else if (mEditor.equals(Constants.Editors.CART)) {
-                    mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                     Log.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + info.id);
+                    removeComicFromCart(info.id);
                 }
-                // Defines selection criteria for the rows you want to update
-                String whereClause = ComicDatabase.ID + "=?";
-                String[] whereArgs = new String[]{String.valueOf(info.id)};
-                int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
-                Log.v(TAG, "onContextItemSelected - row updated " + rowUpdated);
                 WidgetService.updateWidget(getActivity());
                 return true;
             case DELETE_ALL:
@@ -258,12 +259,11 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                         Log.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
                     }
                 } else if (mEditor.equals(Constants.Editors.CART)) {
-                    // Update all comic on cart
-                    mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
-                    updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
+                    // Remove comic from cart
+                    updateResult = removeAllComicFromCart();
                     if (updateResult > 0) {
                         Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "onContextItemSelected - deleting all comic on cart");
+                        Log.d(TAG, "onContextItemSelected - deleting " + updateResult + " from cart");
                     } else {
                         Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
                         Log.w(TAG, "onContextItemSelected - error while removing all comic from cart");
@@ -274,6 +274,46 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                 return true;
         }
         return super.onContextItemSelected(item);
+    }
+
+    private void removeComicFromCart(long comicId) {
+        // Evaluate if comic was created by user or it is coming from network
+        Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + comicId);
+        String[] projection = {ComicDatabase.COMICS_EDITOR_KEY};
+        Cursor cursor = ComicDatabaseManager.query(getActivity(), uri, projection, null, null, null);
+        cursor.moveToFirst();
+        String rawEditor = cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
+        Constants.Editors editor = Constants.Editors.getEditorFromName(rawEditor);
+        Log.d(TAG, "rawEditor " + rawEditor + " editor " + editor + " for comicId " + comicId);
+        cursor.close();
+        // Defines selection criteria for the rows you want to update / remove
+        String whereClause = ComicDatabase.ID + "=?";
+        String[] whereArgs = new String[]{String.valueOf(comicId)};
+        switch (editor) {
+            case CART:
+                int rowRemoved = ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, whereClause, whereArgs);
+                Log.v(TAG, "removeComicFromCart - row REMOVED " + rowRemoved);
+                break;
+            default:
+                ContentValues mUpdateValues = new ContentValues();
+                mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
+                int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
+                Log.v(TAG, "removeComicFromCart - row UPDATED " + rowUpdated);
+                break;
+        }
+    }
+
+    private int removeAllComicFromCart() {
+        // Update all comic on cart and delete those manually created
+        int total = 0;
+        ContentValues mUpdateValues = new ContentValues();
+        mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
+        total = total + ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
+        // Defines selection criteria for the rows you want to update / remove
+        String whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
+        String[] whereArgs = new String[]{String.valueOf(Constants.Editors.getName(Constants.Editors.CART))};
+        total = total + ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, whereClause, whereArgs);
+        return total;
     }
 
     @Override
