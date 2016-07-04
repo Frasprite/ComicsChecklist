@@ -399,8 +399,14 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      */
     private void launchDetailView(long id) {
         // Load only a part of selected id
-        Log.d(TAG, "launchDetailView - mTitle is " + mTitle);
-        Constants.Editors editor = Constants.Editors.getEditorFromTitle(String.valueOf(mTitle));
+        Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + id);
+        String[] projection = {ComicDatabase.COMICS_EDITOR_KEY};
+        Cursor mCursor = ComicDatabaseManager.query(this, uri, projection, null, null, null);
+        mCursor.moveToFirst();
+        String rawEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
+        mCursor.close();
+        Log.d(TAG, "launchDetailView - comic ID is " + id + " editor is " + rawEditor);
+        Constants.Editors editor = Constants.Editors.getEditorFromName(rawEditor);
         switch (editor) {
             case CART:
                 // Show note
