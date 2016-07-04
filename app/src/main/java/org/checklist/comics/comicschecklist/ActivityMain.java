@@ -323,10 +323,13 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         if (!mDrawerLayout.isDrawerOpen(mNavigationView)) {
             // Get the SearchView and set the searchable configuration
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-            SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-            // Assumes current activity is the searchable activity
-            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-            searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+            MenuItem searchItem = menu.findItem(R.id.search);
+            if (searchItem != null) {
+                SearchView searchView = (SearchView) searchItem.getActionView();
+                // Assumes current activity is the searchable activity
+                searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+                searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+            }
 
             return true;
         }
@@ -465,13 +468,13 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         }
     }
 
-    /******************************************************************************************
+    /* ****************************************************************************************
      * NAVIGATION VIEW CALLBACK
      ******************************************************************************************/
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Log.d(TAG, "onNavigationItemSelected - " + item.getTitle());
+        Log.d(TAG, "onNavigationItemSelected - start " + item.getTitle());
         int position = 0;
         switch (item.getItemId()) {
             case R.id.list_favorite:
@@ -512,10 +515,12 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 break;
         }
         selectItem(position, item.getTitle().toString());
-        return position <= 7;
+        boolean result = position <= 7;
+        Log.v(TAG, "onNavigationItemSelected - end - result " + result);
+        return result;
     }
 
-    /******************************************************************************************
+    /* ****************************************************************************************
      * DIALOG CALLBACK
      ******************************************************************************************/
 
