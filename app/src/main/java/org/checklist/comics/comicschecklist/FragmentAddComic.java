@@ -15,6 +15,7 @@ import android.widget.TextView;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -140,6 +141,9 @@ public class FragmentAddComic extends Fragment {
                     Log.w(TAG, "UPDATE failed for entry with ID " + mComicId);
                 }
             }
+
+            // Update widget
+            WidgetService.updateWidget(getActivity());
         }
         super.onPause();
     }
