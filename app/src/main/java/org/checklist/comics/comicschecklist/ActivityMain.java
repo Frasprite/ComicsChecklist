@@ -97,6 +97,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                     Toast.makeText(getApplicationContext(), mCurrentEditor + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
                 } else if (resultCode == Constants.RESULT_NOT_CONNECTED) {
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_no_connection), Toast.LENGTH_LONG).show();
+                    if (mListFragment != null) {
+                        mListFragment.setRefreshing(false);
+                    }
                 } else if (resultCode == Constants.RESULT_DESTROYED) {
                     Log.i(TAG, "Service destroyed");
                 }
