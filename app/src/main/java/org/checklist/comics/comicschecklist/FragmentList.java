@@ -35,6 +35,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
 /**
  * A list fragment representing a list of Comics. This fragment
@@ -448,43 +449,33 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      */
     private void initiateRefresh() {
         Log.i(TAG, "initiateRefresh - start for editor " + mEditor);
-        // Defines selection criteria for the rows to delete
-        String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-        String[] mSelectionArgs = {Constants.Editors.getTitle(mEditor)};
 
-        // Deletes the entries that match the selection criteria
-        ComicDatabaseManager.delete(getActivity(),
-                ComicContentProvider.CONTENT_URI,   // the comic content URI
-                mSelectionClause,                   // the column to select on
-                mSelectionArgs                      // the value to compare to
-        );
+        String today = DateCreator.getTodayString();
 
-        // Update shared preference of editor as well
+        // Update shared preference of editor that must be refreshed
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         switch (mEditor) {
             case MARVEL:
-                sp.edit().remove(Constants.PREF_MARVEL_LAST_SCAN).apply();
+                sp.edit().putString(Constants.PREF_MARVEL_LAST_SCAN, today).apply();
                 break;
             case PANINI:
-                sp.edit().remove(Constants.PREF_PANINI_LAST_SCAN).apply();
+                sp.edit().putString(Constants.PREF_PANINI_LAST_SCAN, today).apply();
                 break;
             case PLANET:
-                sp.edit().remove(Constants.PREF_PLANET_LAST_SCAN).apply();
+                sp.edit().putString(Constants.PREF_PLANET_LAST_SCAN, today).apply();
                 break;
             case BONELLI:
-                sp.edit().remove(Constants.PREF_BONELLI_LAST_SCAN).apply();
+                sp.edit().putString(Constants.PREF_BONELLI_LAST_SCAN, today).apply();
                 break;
             case STAR:
-                sp.edit().remove(Constants.PREF_STAR_LAST_SCAN).apply();
+                sp.edit().putString(Constants.PREF_STAR_LAST_SCAN, today).apply();
                 break;
             case RW:
-                sp.edit().remove(Constants.PREF_RW_LAST_SCAN).apply();
+                sp.edit().putString(Constants.PREF_RW_LAST_SCAN, today).apply();
                 break;
         }
 
-        /**
-         * Execute the background task, which uses {@link org.checklist.comics.comicschecklist.service.DownloadService} to load the data.
-         */
+        // Execute the background task, used on DownloadService to load the data
         Intent intent = new Intent(getActivity(), DownloadService.class);
         intent.putExtra(Constants.ARG_EDITOR, mEditor);
         intent.putExtra(Constants.MANUAL_SEARCH, true);

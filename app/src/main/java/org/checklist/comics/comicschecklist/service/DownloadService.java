@@ -26,7 +26,7 @@ import java.util.Date;
 
 /**
  * Created by Francesco Bevilacqua on 25/10/2014.
- * This code is part of ParserTest project.
+ * This code is part of ComicsChecklist project.
  */
 public class DownloadService extends IntentService {
 
@@ -34,7 +34,7 @@ public class DownloadService extends IntentService {
     private boolean error = false;
 
     public DownloadService() {
-        super("DownloadService");
+        super(TAG);
     }
 
     // Will be called asynchronously by Android
@@ -57,107 +57,54 @@ public class DownloadService extends IntentService {
             if (frequency > -1 && !manualSearch) {
                 Log.i(TAG, "Automatic search launched");
                 boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);
+
+                // RW scan
                 if (calculateDayDifference(Constants.PREF_RW_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
-                    if (notificationPref)
-                        createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParseRW();
-                    if (error) {
-                        publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section8));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_failed), false);
-                    } else {
-                        publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section8));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_editor_completed), true);
-                    }
+                    searchComics(myParser, notificationPref, R.string.title_section8, Constants.Editors.RW);
                 }
+
+                // Marvel scan
                 if (calculateDayDifference(Constants.PREF_MARVEL_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
-                    if (notificationPref)
-                        createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.MARVEL));
-                    if (error) {
-                        publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section3));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_failed), false);
-                    } else {
-                        publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section3));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_editor_completed), true);
-                    }
+                    searchComics(myParser, notificationPref, R.string.title_section3, Constants.Editors.MARVEL);
                 }
+
+                // Panini Comics scan
                 if (calculateDayDifference(Constants.PREF_PANINI_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
-                    if (notificationPref)
-                        createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PANINI));
-                    if (error) {
-                        publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section4));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_failed), false);
-                    } else {
-                        publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section4));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_editor_completed), true);
-                    }
+                    searchComics(myParser, notificationPref, R.string.title_section4, Constants.Editors.PANINI);
                 }
+
+                // Planet Manga scan
                 if (calculateDayDifference(Constants.PREF_PLANET_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
-                    if (notificationPref)
-                        createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PLANET));
-                    if (error) {
-                        publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section5));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_failed), false);
-                    } else {
-                        publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section5));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_editor_completed), true);
-                    }
+                    searchComics(myParser, notificationPref, R.string.title_section5, Constants.Editors.PLANET);
                 }
+
+                // Bonelli scan
                 if (calculateDayDifference(Constants.PREF_BONELLI_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
-                    if (notificationPref)
-                        createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParseBonelli();
-                    if (error) {
-                        publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section7));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_failed), false);
-                    } else {
-                        publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section7));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_editor_completed), true);
-                    }
+                    searchComics(myParser, notificationPref, R.string.title_section7, Constants.Editors.BONELLI);
                 }
+
+                // Star comics scan
                 if (calculateDayDifference(Constants.PREF_STAR_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
-                    if (notificationPref)
-                        createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_started), true);
-                    error = myParser.startParseStarC();
-                    if (error) {
-                        publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section6));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_failed), false);
-                    } else {
-                        publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section6));
-                        if (notificationPref)
-                            createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_editor_completed), true);
-                    }
+                    searchComics(myParser, notificationPref, R.string.title_section6, Constants.Editors.STAR);
                 }
 
                 if (searchNecessary) {
                     publishResults(Constants.RESULT_FINISHED, "noEditor");
-                    if (notificationPref)
+                    if (notificationPref) {
                         createNotification(getResources().getString(R.string.search_completed), false);
+                    }
                 }
             } else {
                 Constants.Editors editor = (Constants.Editors) intent.getSerializableExtra(Constants.ARG_EDITOR);
@@ -169,100 +116,28 @@ public class DownloadService extends IntentService {
 
                     switch (editor) {
                         case MARVEL:
-                            // Marvel
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_started), true);
-                            error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.MARVEL));
-                            if (error) {
-                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section3));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_failed), false);
-                            } else {
-                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section3));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section3) + getResources().getString(R.string.search_editor_completed), true);
-                            }
+                            searchComics(myParser, notificationPref, R.string.title_section3, Constants.Editors.MARVEL);
                             break;
                         case PANINI:
-                            // Panini
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_started), true);
-                            error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PANINI));
-                            if (error) {
-                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section4));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_failed), false);
-                            } else {
-                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section4));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section4) + getResources().getString(R.string.search_editor_completed), true);
-                            }
+                            searchComics(myParser, notificationPref, R.string.title_section4, Constants.Editors.PANINI);
                             break;
                         case PLANET:
-                            // Planet
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_started), true);
-                            error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PLANET));
-                            if (error) {
-                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section5));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_failed), false);
-                            } else {
-                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section5));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section5) + getResources().getString(R.string.search_editor_completed), true);
-                            }
+                            searchComics(myParser, notificationPref, R.string.title_section5, Constants.Editors.PLANET);
                             break;
                         case STAR:
-                            // Star
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_started), true);
-                            error = myParser.startParseStarC();
-                            if (error) {
-                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section6));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_failed), false);
-                            } else {
-                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section6));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section6) + getResources().getString(R.string.search_editor_completed), true);
-                            }
+                            searchComics(myParser, notificationPref, R.string.title_section6, Constants.Editors.STAR);
                             break;
                         case BONELLI:
-                            // Bonelli
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_started), true);
-                            error = myParser.startParseBonelli();
-                            if (error) {
-                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section7));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_failed), false);
-                            } else {
-                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section7));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section7) + getResources().getString(R.string.search_editor_completed), true);
-                            }
+                            searchComics(myParser, notificationPref, R.string.title_section7, Constants.Editors.BONELLI);
                             break;
                         case RW:
-                            // RW
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
-                            if (notificationPref)
-                                createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_started), true);
-                            error = myParser.startParseRW();
-                            if (error) {
-                                publishResults(Constants.RESULT_CANCELED, getResources().getString(R.string.title_section8));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_failed), false);
-                            } else {
-                                publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(R.string.title_section8));
-                                if (notificationPref)
-                                    createNotification(getResources().getString(R.string.title_section8) + getResources().getString(R.string.search_editor_completed), true);
-                            }
+                            searchComics(myParser, notificationPref, R.string.title_section8, Constants.Editors.RW);
                             break;
                         default:
                             searchNecessary = false;
@@ -299,6 +174,59 @@ public class DownloadService extends IntentService {
         }
     }
 
+    /**
+     * Start searching for specified comics editor.
+     * @param myParser the parser class which will search on the web
+     * @param notificationPref boolean indicating if notification are desired
+     * @param stringID editor personal text
+     * @param editor editor to search
+     */
+    private void searchComics(Parser myParser, boolean notificationPref, int stringID, Constants.Editors editor) {
+        if (notificationPref) {
+            createNotification(getResources().getString(stringID) + getResources().getString(R.string.search_started), true);
+        }
+
+        // Select editor
+        switch (editor) {
+            case MARVEL:
+                error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.MARVEL));
+                break;
+            case PANINI:
+                error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PANINI));
+                break;
+            case PLANET:
+                error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PLANET));
+                break;
+            case STAR:
+                error = myParser.startParseStarC();
+                break;
+            case BONELLI:
+                error = myParser.startParseBonelli();
+                break;
+            case RW:
+                error = myParser.startParseRW();
+                break;
+        }
+
+        // See result
+        if (error) {
+            publishResults(Constants.RESULT_CANCELED, getResources().getString(stringID));
+            if (notificationPref) {
+                createNotification(getResources().getString(stringID) + getResources().getString(R.string.search_failed), false);
+            }
+        } else {
+            publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(stringID));
+            if (notificationPref) {
+                createNotification(getResources().getString(stringID) + getResources().getString(R.string.search_editor_completed), true);
+            }
+        }
+    }
+
+    /**
+     * Method which create the notification.
+     * @param message the message to show
+     * @param bool whether or not to show an indeterminate process
+     */
     private void createNotification(String message, boolean bool) {
         Log.v(TAG, "Creating notification");
         // Prepare intent which is triggered if the notification is selected
@@ -311,8 +239,9 @@ public class DownloadService extends IntentService {
                 .setContentText(message).setSmallIcon(R.drawable.ic_stat_notification)
                 .setContentIntent(pIntent);
 
-        if (bool)
+        if (bool) {
             mBuilder.setProgress(0, 0, true);
+        }
 
         mBuilder.setContentIntent(pIntent);
         // Sets an ID for the notification and gets an instance of the NotificationManager service
@@ -321,6 +250,9 @@ public class DownloadService extends IntentService {
         mNotifyMgr.notify(Constants.NOTIFICATION_ID, mBuilder.build());
     }
 
+    /**
+     * This method will delete old rows on database.
+     */
     private void deleteOldRows() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String deletePref = sharedPref.getString(Constants.PREF_DELETE_FREQUENCY, "-1");
@@ -349,6 +281,11 @@ public class DownloadService extends IntentService {
         }
     }
 
+    /**
+     * Method which send to {@link ActivityMain} the status of search.
+     * @param result the result of search
+     * @param editor the editor searched
+     */
     private void publishResults(int result, String editor) {
         Log.v(TAG, "Result of search " + result + " " + editor);
         Intent intent = new Intent(Constants.NOTIFICATION);
@@ -357,19 +294,20 @@ public class DownloadService extends IntentService {
         sendBroadcast(intent);
     }
 
+    /**
+     * This method calculate the difference since last scan for given editor.
+     * @param editorLastScan the editor target
+     * @return the difference in long data
+     */
     private long calculateDayDifference(String editorLastScan) {
         Log.v(TAG, "calculateDayDifference " + editorLastScan + " - start");
         long result; // If result is 3, we need a refresh
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        String today = DateCreator.getTodayString();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String dateStart = sp.getString(editorLastScan, "01/01/2012");
-        String today = day + "/" + month + "/" + year;
-        Log.d(TAG, "calculateDayDifference - date is " + today);
 
+        Log.d(TAG, "calculateDayDifference - date is " + today);
         Date d1 = DateCreator.elaborateDate(dateStart);
         Date d2 = DateCreator.elaborateDate(today);
 
