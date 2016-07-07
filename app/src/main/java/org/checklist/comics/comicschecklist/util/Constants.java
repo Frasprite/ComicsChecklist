@@ -128,15 +128,6 @@ public class Constants {
     public static final String ACTION_WIDGET_ADD = "action_add_comic";
     public static final String ACTION_WIDGET_OPEN_APP = "action_open_app";
 
-    /* Search */
-    public static final String PREF_SEARCH_QUERY = "search_query";
-
-    /* Dialog */
-    public static final int DIALOG_GUIDE = 0;
-    public static final int DIALOG_INFO = 1;
-    public static final int DIALOG_RATE = 3;
-    public static final int DIALOG_RESULT_LIST = 4;
-
     /**
      * Constants for parser class.
      */

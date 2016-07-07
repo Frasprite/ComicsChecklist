@@ -1,9 +1,9 @@
 package org.checklist.comics.comicschecklist;
 
-import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -20,13 +20,18 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,6 +41,8 @@ import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.Constants;
+
+import java.util.HashMap;
 
 /**
  * An activity representing a list of Comics. This activity
@@ -52,8 +59,7 @@ import org.checklist.comics.comicschecklist.util.Constants;
  * to listen for item selections.
  */
 public class ActivityMain extends AppCompatActivity implements FragmentList.Callbacks,
-                                                                    ComicsChecklistDialogFragment.ComicsChecklistDialogListener,
-                                                                    NavigationView.OnNavigationItemSelectedListener {
+                                                                NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = ActivityMain.class.getSimpleName();
 
@@ -267,8 +273,19 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      */
     private void doMySearch(String query) {
         Log.d(TAG, "doMySearch - start searching " + query);
-        Cursor cursor = ComicDatabaseManager.query(this, ComicContentProvider.CONTENT_URI, null, ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
-                new String[] {"%" + query + "%"}, null);
+
+        // Load order for list
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String order = sharedPref.getString(Constants.PREF_LIST_ORDER, "ASC");
+        String sortOrder = ComicDatabase.COMICS_DATE_KEY + " " + order;
+
+        // Query database
+        final Cursor cursor = ComicDatabaseManager.query(this,
+                                                   ComicContentProvider.CONTENT_URI,
+                                                   new String[] {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY},
+                                                   ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
+                                                   new String[] {"%" + query + "%"},
+                                                   sortOrder);
 
         if (cursor != null && cursor.getCount() == 0) {
             Log.d(TAG, "doMySearch - no data found!");
@@ -278,14 +295,63 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         } else if (cursor != null && cursor.getCount() > 0) {
             Log.d(TAG, "doMySearch - found data: " + cursor.getCount());
             // There are multiple results which fit the given query, so show this on dialog
-            cursor.close();
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = sp.edit();
-            editor.putString(Constants.PREF_SEARCH_QUERY, query);
-            editor.apply();
+
             // Open a dialog with a list of results
-            DialogFragment listDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_RESULT_LIST);
-            listDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+
+            // Set negative button
+            builder.setNegativeButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    // Simply dismiss dialog
+                    dialog.dismiss();
+                }
+            });
+
+            // Preparing list
+            LayoutInflater listInflater = this.getLayoutInflater();
+            View view = listInflater.inflate(R.layout.dialog_search_list, null);
+            final ListView mList = (ListView) view.findViewById(R.id.searchListView);
+
+            // Fields from the database (projection) must include the id column for the adapter to work
+            String[] from = new String[] {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
+            // Fields on the UI to which we map
+            int[] to = new int[] {android.R.id.text1, android.R.id.text2};
+
+            // Preparing map of ID for support
+            final HashMap<String, Long> mIDMap = new HashMap<>();
+            for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                // The Cursor is now set to the right position
+                mIDMap.put(cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY)), cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID)));
+            }
+
+            // Populate list with data
+            SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_activated_2, cursor, from, to, 0);
+            mList.setAdapter(adapter);
+
+            // Set item click button
+            mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    TextView tv = (TextView) view.findViewById(android.R.id.text1);
+                    // Get comic name and find ID from mIDMap
+                    String name = tv.getText().toString();
+                    long ID = mIDMap.get(name);
+                    Log.d(TAG, "onItemClick (dialog) - ID from mIDMap " + ID);
+
+                    if (ID != 0) {
+                        launchDetailView(ID);
+                        cursor.close();
+                    } else {
+                        Toast.makeText(ActivityMain.this, getResources().getText(R.string.search_error), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            // Return dialog
+            builder.setTitle(R.string.search_result)
+                    .setView(view)
+                    .create()
+                    .show();
         }
         Log.v(TAG, "doMySearch - end searching " + query);
     }
@@ -465,13 +531,35 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                     break;
                 case 10:
                     // Open help dialog
-                    DialogFragment helpDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_GUIDE);
-                    helpDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+                    AlertDialog.Builder helpBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                    helpBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // Send the negative button event back to the host activity
+                            dialog.dismiss();
+                        }
+                    });
+                    // Get the layout inflater
+                    LayoutInflater inflaterHelp = this.getLayoutInflater();
+                    // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
+                    helpBuilder.setView(inflaterHelp.inflate(R.layout.dialog_help, null));
+                    // Set title
+                    helpBuilder.setTitle(R.string.dialog_help_title);
+                    helpBuilder.show();
                     break;
                 case 11:
                     // Open info dialog
-                    DialogFragment infoDialog = ComicsChecklistDialogFragment.newInstance(Constants.DIALOG_INFO);
-                    infoDialog.show(getFragmentManager(), "ComicsChecklistDialogFragment");
+                    AlertDialog.Builder infoBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                    infoBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // Send the negative button event back to the host activity
+                            dialog.dismiss();
+                        }
+                    });
+                    // Get the layout inflater
+                    LayoutInflater inflaterInfo = this.getLayoutInflater();
+                    // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
+                    infoBuilder.setView(inflaterInfo.inflate(R.layout.dialog_info, null));
+                    infoBuilder.show();
                     break;
             }
         }
@@ -527,59 +615,5 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         boolean result = position <= 7;
         Log.v(TAG, "onNavigationItemSelected - end - result " + result);
         return result;
-    }
-
-    /* ****************************************************************************************
-     * DIALOG CALLBACK
-     ******************************************************************************************/
-
-    @Override
-    public void onDialogPositiveClick(DialogFragment dialog, int dialogId) {
-        switch (dialogId) {
-            case Constants.DIALOG_RATE:
-                dialog.dismiss();
-                this.startActivity(new Intent(Intent.ACTION_VIEW,
-                        Uri.parse("market://details?id=" + this.getPackageName())));
-                break;
-        }
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog, int dialogId) {
-        switch (dialogId) {
-            case Constants.DIALOG_GUIDE:
-            case Constants.DIALOG_INFO:
-            case Constants.DIALOG_RESULT_LIST:
-                dialog.dismiss();
-                break;
-            case Constants.DIALOG_RATE:
-                dialog.dismiss();
-                SharedPreferences prefs = this.getSharedPreferences (Constants.PREF_APP_RATER, 0);
-                final SharedPreferences.Editor editorPref = prefs.edit();
-                if (editorPref != null) {
-                    editorPref.putBoolean(Constants.PREF_USER_DONT_RATE, true);
-                    editorPref.apply();
-                }
-                break;
-        }
-    }
-
-    @Override
-    public void onDialogNeutralClick(DialogFragment dialog, int dialogId) {
-        switch (dialogId) {
-            case Constants.DIALOG_RATE:
-                dialog.dismiss();
-                break;
-        }
-    }
-
-    @Override
-    public void onDialogListItemClick(DialogFragment dialog, int dialogId, long id) {
-        switch (dialogId) {
-            case Constants.DIALOG_RESULT_LIST:
-                dialog.dismiss();
-                launchDetailView(id);
-                break;
-        }
     }
 }

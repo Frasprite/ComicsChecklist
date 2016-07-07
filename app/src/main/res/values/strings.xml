@@ -6,7 +6,6 @@
 
     <!-- Dialog text -->
     <string name="dialog_help_title">Guida</string>
-    <string name="dialog_info_title">Info</string>
     <string name="dialog_og_text">Applicazione sviluppata da un idea di Francesco Bevilacqua, fondatore e admin di www.opengeek.it .\nPotete seguirne l\'evoluzione sulla pagina ufficiale di Google+!</string>
     <string name="dialog_bp_text">Realizzazione grafica, ottimizzazione, pubblicazione e promozione di Purple Soc. Coop. www.bitpurple.com .</string>
     <string name="dialog_other_text">Launcher icon design by Alexis Boudal www.behance.net/boudalalexis .</string>

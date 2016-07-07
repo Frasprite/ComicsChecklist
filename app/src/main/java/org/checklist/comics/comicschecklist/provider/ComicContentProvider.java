@@ -162,7 +162,7 @@ public class ComicContentProvider extends ContentProvider {
     }
 
     private void checkColumns(String[] projection) {
-        Log.v(TAG, "checkColumns - start\n" + java.util.Arrays.toString(projection));
+        Log.v(TAG, "checkColumns - start\nProjection is " + java.util.Arrays.toString(projection));
         String[] available = {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.ID,
                 ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
