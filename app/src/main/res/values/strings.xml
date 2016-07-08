@@ -192,6 +192,7 @@
     <string name="description_opengeek_image">OpenGeek logo</string>
     <string name="description_bitpurple_image">BitPurple logo</string>
     <string name="description_widget_button">Add new comic as note</string>
+    <string name="description_nav_view_image">Navigation drawer image</string>
 
     <string name="calendar_release">Disponibile da oggi in edicola/libreria.</string>
     <string name="calendar_error">Spiacente, non \è possibile inserire l\'evento nel calendario.</string>

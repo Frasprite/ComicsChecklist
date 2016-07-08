@@ -11,6 +11,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_speech_bubble"
+        android:contentDescription="@string/description_nav_view_image"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
