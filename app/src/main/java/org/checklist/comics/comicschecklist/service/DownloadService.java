@@ -54,6 +54,10 @@ public class DownloadService extends IntentService {
 
         if (isConnected) {
             Log.d(TAG, "Checking if search is manual or automatic " + frequency);
+
+            // Use this code for screenshot
+            //myParser.startParseFreeComics();
+
             if (frequency > -1 && !manualSearch) {
                 Log.i(TAG, "Automatic search launched");
                 boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);
