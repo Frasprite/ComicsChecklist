@@ -17,7 +17,6 @@ public class Constants {
      * expands it. This shared preference tracks this.
      */
     public static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
-    public static final String PREF_USER_LEARNED_SLIDING_UP = "sliding_up_learned";
 
     /* AppRater */
     public static final String PREF_USER_DONT_RATE = "dont_show_again";

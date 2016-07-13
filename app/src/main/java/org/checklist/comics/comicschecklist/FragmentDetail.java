@@ -1,19 +1,12 @@
 package org.checklist.comics.comicschecklist;
 
-import android.animation.ValueAnimator;
 import android.content.ContentValues;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.CalendarContract;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,16 +15,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
@@ -50,7 +37,7 @@ import java.util.Date;
  * in two-pane mode (on tablets) or a {@link ActivityDetail}
  * on handsets.
  */
-public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.PanelSlideListener {
+public class FragmentDetail extends Fragment {
 
     private static final String TAG = FragmentDetail.class.getSimpleName();
 
@@ -66,12 +53,10 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
     private String mCart;
     private String mComicEditor;
     private String mComicURL;
-    private boolean mUserLearnedSliding;
     private long mComicId = -1;
     private boolean mActivityDetailLaunched = false;
 
     private Menu mMenu;
-    private TextView titleTextView;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -91,9 +76,6 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             mActivityDetailLaunched = getArguments().getBoolean(ARG_ACTIVITY_LAUNCHED);
             Log.i(TAG, "Loading comic with ID " + mComicId);
         }
-
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mUserLearnedSliding = sp.getBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, false);
 
         Log.i(TAG, "Fragment launched by ActivityDetail " + mActivityDetailLaunched);
         setHasOptionsMenu(mActivityDetailLaunched);
@@ -125,14 +107,13 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             String mComicFeature = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY));
             if (mComicFeature.length() == 0)
                 mComicFeature = "N.D.";
-            String mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
             mFavorite = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FAVORITE_KEY));
             mCart = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY));
             mComicEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
             mComicURL = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_URL_KEY));
             mCursor.close();
             // Populating view
-            titleTextView = ((TextView) rootView.findViewById(R.id.title_text_view));
+            TextView titleTextView = ((TextView) rootView.findViewById(R.id.title_text_view));
             titleTextView.setText(mComicName);
             ((TextView) rootView.findViewById(R.id.release_text_view)).setText(mComicRelease);
             ((TextView) rootView.findViewById(R.id.description_text_view)).setText(mComicDescription);
@@ -140,37 +121,11 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
             ((TextView) rootView.findViewById(R.id.price_text_view)).setText(mComicPrice);
             ImageView coverView = (ImageView) rootView.findViewById(R.id.cover_image_view);
             Picasso.with(getActivity())
-                    .load(mComicCover)
+                    .load(R.drawable.comic_placeholder)
                     .placeholder(R.drawable.comic_placeholder)
                     .error(R.drawable.comic_placeholder)
                     .resize(250, 383)
                     .into(coverView);
-
-            SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView.findViewById(R.id.sliding_layout);
-            layout.addPanelSlideListener(this);
-
-            ImageView arrowSx = (ImageView) rootView.findViewById(R.id.go_up_sx);
-            ImageView arrowDx = (ImageView) rootView.findViewById(R.id.go_up_dx);
-
-            if (!mUserLearnedSliding) {
-                Drawable image1 = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_upward, null);
-                Drawable image2 = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_arrow_upward, null);
-                if (image1 != null && image2 != null) {
-                    image1.setColorFilter(ContextCompat.getColor(getContext(), R.color.divider), PorterDuff.Mode.MULTIPLY);
-                    image2.setColorFilter(ContextCompat.getColor(getContext(), R.color.primary), PorterDuff.Mode.MULTIPLY);
-
-                    Drawable imagesToShow[] = {image1, image2};
-
-                    animate(arrowSx, imagesToShow, 0, true);
-                    animate(arrowDx, imagesToShow, 0, true);
-                } else {
-                    arrowDx.setVisibility(View.GONE);
-                    arrowSx.setVisibility(View.GONE);
-                }
-            } else {
-                arrowDx.setVisibility(View.GONE);
-                arrowSx.setVisibility(View.GONE);
-            }
         }
 
         if (!mActivityDetailLaunched) {
@@ -238,25 +193,6 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
         } else {
             mMenu.getItem(1).setVisible(true);
         }
-    }
-
-    private void enlargeTextView(final TextView textView) {
-        final int startSize = 1;
-        final int endSize = 5;
-        final int animationDuration = 300; // Animation duration in ms
-
-        ValueAnimator animator = ValueAnimator.ofInt(startSize, endSize);
-        animator.setDuration(animationDuration);
-
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int animatedValue = (int) valueAnimator.getAnimatedValue();
-                textView.setMaxLines(animatedValue);
-            }
-        });
-
-        animator.start();
     }
 
     private boolean manageItemSelected(MenuItem item) {
@@ -379,75 +315,6 @@ public class FragmentDetail extends Fragment implements SlidingUpPanelLayout.Pan
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    /**
-     * This method will fade out the arrow on info panel.
-     * @param imageView The View which displays the images
-     * @param images Holds R references to the images to display
-     * @param imageIndex index of the first image to show in images[]
-     * @param forever If true then after the last image it starts all over again with the first image resulting in an infinite loop
-     */
-    private void animate(final ImageView imageView, final Drawable images[], final int imageIndex, final boolean forever) {
-
-        int fadeInDuration = 500; // Configure time values
-        int timeBetween = 3000;
-        int fadeOutDuration = 1000;
-
-        imageView.setVisibility(View.INVISIBLE);    // Visible or invisible by default - this will apply when the animation ends
-        imageView.setImageDrawable(images[imageIndex]);
-
-        Animation fadeIn = new AlphaAnimation(0, 1);
-        fadeIn.setInterpolator(new DecelerateInterpolator());
-        fadeIn.setDuration(fadeInDuration);
-
-        Animation fadeOut = new AlphaAnimation(1, 0);
-        fadeOut.setInterpolator(new AccelerateInterpolator());
-        fadeOut.setStartOffset(fadeInDuration + timeBetween);
-        fadeOut.setDuration(fadeOutDuration);
-
-        AnimationSet animation = new AnimationSet(false);
-        animation.addAnimation(fadeIn);
-        animation.addAnimation(fadeOut);
-        animation.setRepeatCount(1);
-        imageView.setAnimation(animation);
-
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            public void onAnimationEnd(Animation animation) {
-                if (images.length - 1 > imageIndex) {
-                    animate(imageView, images, imageIndex + 1, forever); // Calls itself until it gets to the end of the array
-                } else {
-                    if (forever) {
-                        animate(imageView, images, 0, true);  // Calls itself to start the animation all over again in a loop if forever = true
-                    }
-                }
-            }
-
-            public void onAnimationRepeat(Animation animation) {}
-
-            public void onAnimationStart(Animation animation) {}
-        });
-    }
-
-    @Override
-    public void onPanelSlide(View panel, float slideOffset) {
-        // Anything you put here is going to happen if user do a slide
-    }
-
-    @Override
-    public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
-        switch (newState) {
-            case COLLAPSED:
-                // Anything you put here is going to happen if the view is closed
-                titleTextView.setMaxLines(1);
-                break;
-            case EXPANDED:
-                enlargeTextView(titleTextView);
-                // Anything you put here is going to happen if the view is open
-                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                sp.edit().putBoolean(Constants.PREF_USER_LEARNED_SLIDING_UP, true).apply();
-                break;
         }
     }
 }

@@ -1,6 +1,5 @@
 <resources>
     <item name="ic_add" type="drawable">@drawable/ic_add_white_24dp</item>
-    <item name="ic_arrow_upward" type="drawable">@drawable/ic_arrow_upward_white_24dp</item>
     <item name="ic_cached" type="drawable">@drawable/ic_cached_white_24dp</item>
     <item name="ic_cart" type="drawable">@drawable/ic_shopping_cart_white_24dp</item>
     <item name="ic_remove_shopping_cart" type="drawable">@drawable/ic_remove_shopping_cart_white_24dp</item>

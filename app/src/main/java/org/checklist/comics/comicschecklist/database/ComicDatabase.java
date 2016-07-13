@@ -63,6 +63,10 @@ public class ComicDatabase {
             updateRows(database, Constants.MAIN_URL, Constants.Editors.getName(Constants.Editors.BONELLI));
             updateRows(database, Constants.RW_URL, Constants.Editors.getName(Constants.Editors.RW));
         }
+
+        // N.B.:
+        // http://www.sqlite.org/lang_altertable.html
+        // It is not possible to remove a column on SQLite.
     }
 
     private static void updateRows(SQLiteDatabase database, String URL, String editorName) {

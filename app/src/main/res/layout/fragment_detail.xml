@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:sothree="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/sliding_layout"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="bottom"
-    sothree:umanoDragView="@+id/comic_detail_visible_layout"
-    sothree:umanoOverlay="true">
-    <!-- sothree:shadowHeight="4dp" -->
+    android:layout_height="match_parent" >
 
     <ImageView
         android:id="@+id/cover_image_view"
@@ -33,33 +27,17 @@
             android:orientation="horizontal"
             android:paddingTop="10dp">
 
-            <ImageView
-                android:id="@+id/go_up_sx"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:contentDescription="@null" />
-
             <TextView
                 android:id="@+id/title_text_view"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:layout_weight="5"
                 android:gravity="center_horizontal"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textStyle="bold"
-                android:maxLines="1"
                 android:ellipsize="end"
                 android:paddingLeft="6dp"
                 android:paddingRight="6dp" />
-
-            <ImageView
-                android:id="@+id/go_up_dx"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:contentDescription="@null" />
 
         </LinearLayout>
 
@@ -103,7 +81,7 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:fadeScrollbars="false"
             android:padding="10dp">
 
@@ -116,4 +94,4 @@
         </ScrollView>
     </LinearLayout>
 
-</com.sothree.slidinguppanel.SlidingUpPanelLayout>
+</FrameLayout>

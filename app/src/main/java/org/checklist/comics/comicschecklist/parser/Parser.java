@@ -155,13 +155,16 @@ public class Parser {
             String docPath = doc.select("div.cover").html();
             Document divPath = Jsoup.parse(docPath);
             for (Element element5 : divPath.select("img")) {
+                // N.B.: changed due to violation of copyright
                 String rawCover = element5.attr("src");
-                if (rawCover.contains(Constants.IMAGE_NOT_AVAILABLE) ||
+                rawCover = "";
+                arrayCoverUrl.add(rawCover);
+                /*if (rawCover.contains(Constants.IMAGE_NOT_AVAILABLE) ||
                         rawCover.equalsIgnoreCase(Constants.IMAGE_NOT_AVAILABLE_URL)) {
                     arrayCoverUrl.add("");
                 } else {
                     arrayCoverUrl.add(rawCover);
-                }
+                }*/
             }
             // Create array of title and features
             String docTitle = doc.select("div.title").html();
@@ -275,9 +278,12 @@ public class Parser {
                         Element src = checkForImg.get(0);
                         coverUrl = src.attr("src");
                         if (coverUrl.startsWith(Constants.MEDIARW)) {
-                            // Saving cover
+                            // N.B.: changed due to violation of copyright
+                            String rawCover = "";
+                            coverList.add(rawCover);
+                            /* Saving cover
                             Log.v(TAG, "Cover " + coverUrl);
-                            coverList.add(coverUrl);
+                            coverList.add(coverUrl);*/
                             title = coverUrl.replace(Constants.MEDIARW, "").replace("_", " ").replace(".jpg", "").toUpperCase();
                             // Title elaborated
                             Log.v(TAG, "Title " + title);
@@ -385,9 +391,11 @@ public class Parser {
                 name = testata + " " + number;
                 Log.v(TAG, "Data found " + testata + " " + releaseDate + " " + name + " ");
                 // Take cover URL
-                Element linkPathImg = content.select("img").first();
-                coverUrl = Constants.IMG_URL + linkPathImg.attr("src");
-                Log.v(TAG, "Cover " + coverUrl);
+                //Element linkPathImg = content.select("img").first();
+                //coverUrl = Constants.IMG_URL + linkPathImg.attr("src");
+                //Log.v(TAG, "Cover " + coverUrl);
+                // N.B.: changed due to violation of copyright
+                coverUrl = "";
                 // Take description and price
                 Elements pList = content.select("p");
                 description = pList.get(1).text();
@@ -490,9 +498,11 @@ public class Parser {
                     }
 
                     // Finding cover image
-                    Elements linkPathImg = docMoreInfo.select("div.bk-cover img[src]");
-                    coverUrl = Constants.MAIN_URL + linkPathImg.attr("src");
-                    Log.v(TAG, "Comic cover: " + coverUrl);
+                    //Elements linkPathImg = docMoreInfo.select("div.bk-cover img[src]");
+                    //coverUrl = Constants.MAIN_URL + linkPathImg.attr("src");
+                    //Log.v(TAG, "Comic cover: " + coverUrl);
+                    // N.B.: changed due to violation of copyright
+                    coverUrl = "";
 
                     // Defining comic name
                     if (name.startsWith("N°.")) {
