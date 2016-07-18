@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="database" path="comictable.db"/>
+    <include domain="sharedpref" path="app_rater.xml"/>
+    <!-- getDefaultSharedPreferences(this) return: context.getPackageName() + "_preferences" -->
+    <include domain="sharedpref" path="org.checklist.comics.comicschecklist_preferences.xml"/>
+</full-backup-content>

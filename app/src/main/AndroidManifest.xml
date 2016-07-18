@@ -8,11 +8,12 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:supportsRtl="false" >
+        android:supportsRtl="false"
+        android:fullBackupContent="@xml/cc_backup_scheme" >
         <activity
             android:name=".ActivityMain"
             android:label="@string/app_name"
