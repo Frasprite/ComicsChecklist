@@ -1,6 +1,5 @@
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
 
 import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
@@ -16,9 +15,7 @@ import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.anything;
 
-
 @RunWith(AndroidJUnit4.class)
-@LargeTest
 public class ActivityMainTest {
 
     @Rule

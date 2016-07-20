@@ -135,8 +135,6 @@ public class Constants {
     public static final String SECONDPANINI = "/checklist?year=";
     public static final String THIRDPANINI = "&weekOfYear=";
     public static final String URLPANINI = "http://www.paninicomics.it";
-    public static final String IMAGE_NOT_AVAILABLE_URL = "http://www.paninicomics.it/nsnegozio/html/images/nonDisponibile.jpg";
-    public static final String IMAGE_NOT_AVAILABLE = "nonDisponibile.jpg";
     // RWEdizioni ex.: http://www.rwedizioni.it/news/uscite-9-gennaio-2016/
     public static final String RW_URL = "http://www.rwedizioni.it";
     public static final String FIRSTRW = "http://www.rwedizioni.it/news/uscite";
