@@ -516,12 +516,12 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String order = sharedPref.getString(Constants.PREF_LIST_ORDER, "ASC");
-        Log.d(TAG, "onCreateLoader - creating loader with " + order + " order");
+        String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
+        String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
+        Log.d(TAG, "onCreateLoader - creating loader ordered with " + sortOrder);
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
         String whereClause;
         String[] whereArgs;
-        String sortOrder = ComicDatabase.COMICS_DATE_KEY + " " + order;
         switch (mEditor) {
             case CART:
                 Log.d(TAG, "Loading CART content");

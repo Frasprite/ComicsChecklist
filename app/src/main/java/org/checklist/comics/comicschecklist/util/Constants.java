@@ -1,5 +1,7 @@
 package org.checklist.comics.comicschecklist.util;
 
+import org.checklist.comics.comicschecklist.database.ComicDatabase;
+
 import java.util.HashMap;
 
 /**
@@ -25,6 +27,39 @@ public class Constants {
     public static final String PREF_DATE_FIRST_LAUNCH = "date_first_launch";
     public final static int DAYS_UNTIL_PROMPT = 7;
     public final static int LAUNCHES_UNTIL_PROMPT = 7;
+
+    /* Enum of filters for list */
+    public enum Filters {
+        DATE_ASC (1, ComicDatabase.COMICS_DATE_KEY + " ASC"),
+        DATE_DESC(2, ComicDatabase.COMICS_DATE_KEY + " DESC"),
+        NAME_ASC (3, ComicDatabase.COMICS_NAME_KEY + " ASC"),
+        NAME_DESC(4, ComicDatabase.COMICS_NAME_KEY + " DESC");
+
+        private static final HashMap<Integer, Filters> map;
+
+        static {
+            map = new HashMap<>();
+            for (Filters filter : Filters.values()) {
+                map.put(filter.code, filter);
+            }
+        }
+
+        private final int code;
+        private final String sortOrder;
+
+        Filters(int code, String sortOrder) {
+            this.code = code;
+            this.sortOrder = sortOrder;
+        }
+
+        public static int getCode(Filters filter) {
+            return filter.code;
+        }
+
+        public static String getSortOrder(int rawSortOrder) {
+            return map.get(rawSortOrder).sortOrder;
+        }
+    }
 
     /* Enum of editors and list created by user */
     public enum Editors {
@@ -68,10 +103,6 @@ public class Constants {
 
         public static Editors getEditorFromName(String name) {
             return nameMap.get(name);
-        }
-
-        public static Editors getEditorFromTitle(String title) {
-            return titleMap.get(title);
         }
 
         public static String getName(Editors editor) {

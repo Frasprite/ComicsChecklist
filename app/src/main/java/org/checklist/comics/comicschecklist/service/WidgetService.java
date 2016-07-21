@@ -78,9 +78,11 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
         String whereClause;
         String[] whereArgs;
-        String sortOrder = ComicDatabase.COMICS_DATE_KEY + " " + sharedPref.getString(Constants.PREF_LIST_ORDER, "ASC");
+        String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
+        String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
+        Log.d(TAG, "populateWidget - ordering by " + sortOrder);
 
-        Log.d(TAG, "Editor founded, query database " + mEditor);
+        Log.d(TAG, "populateWidget - editor founded, query database " + mEditor);
         Uri uri = ComicContentProvider.CONTENT_URI;
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
@@ -88,7 +90,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
         // Load data based on selected editor
         Constants.Editors editor = Constants.Editors.getEditorFromName(mEditor);
-        Log.v(TAG, "Preparing entry for widget, mEditor is " + mEditor + " found editor is " + editor);
+        Log.v(TAG, "populateWidget - preparing entry for widget, mEditor is " + mEditor + " found editor is " + editor);
         switch (editor) {
             case CART:
                 // Load comic with special editor name and buy flag to true
@@ -112,7 +114,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         String mName;
         String mRelease;
         if (mCursor != null) {
-            Log.d(TAG, "Cursor has data");
+            Log.d(TAG, "populateWidget - cursor has data: " + mCursor.getCount());
             for (int i = 0; i < mCursor.getCount(); i++) {
                 mCursor.moveToNext();
                 mID = mCursor.getInt(mCursor.getColumnIndex(ComicDatabase.ID));

@@ -99,7 +99,7 @@
 
     <!-- Strings related to Settings -->
     <!-- String set for Data & Sync -->
-    <string name="pref_header_data_sync">Dati &amp; sincronizzazione</string>
+    <string name="pref_header_data_sync">Sincronizzazione dati</string>
 
     <string name="pref_title_sync_frequency">Frequenza sincronizzazione</string>
     <string-array name="pref_sync_frequency_titles">
@@ -149,10 +149,14 @@
     <string-array name="pref_data_order_titles">
         <item>per data crescente</item>
         <item>per data decrescente</item>
+        <item>per testata A-Z</item>
+        <item>per testata Z-A</item>
     </string-array>
     <string-array name="pref_data_order_values">
-        <item>ASC</item>
-        <item>DESC</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
     </string-array>
 
     <!-- String set for Notifications -->
@@ -202,5 +206,7 @@
     <string name="text_preview_other">Altre info, es.: editore, numeri mancanti</string>
     <string name="text_change_date">Cambia data</string>
     <string name="text_default_title">Fumetto senza titolo</string>
+
+    <string name="pref_header_data_filter">Filtri della lista</string>
 
 </resources>

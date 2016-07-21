@@ -276,8 +276,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
 
         // Load order for list
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String order = sharedPref.getString(Constants.PREF_LIST_ORDER, "ASC");
-        String sortOrder = ComicDatabase.COMICS_DATE_KEY + " " + order;
+        String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
+        String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
+        Log.d(TAG, "doMySearch - ordering by " + sortOrder);
 
         // Query database
         final Cursor cursor = ComicDatabaseManager.query(this,

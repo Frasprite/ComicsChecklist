@@ -14,4 +14,10 @@
         android:icon="@drawable/ic_cached"
         android:title="@string/pref_header_data_sync" />
 
+    <header
+        android:id="@+id/data_filter"
+        android:fragment="org.checklist.comics.comicschecklist.SettingsActivity$DataFilterPreferenceFragment"
+        android:icon="@drawable/ic_filter"
+        android:title="@string/pref_header_data_filter" />
+
 </preference-headers>
