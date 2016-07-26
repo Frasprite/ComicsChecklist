@@ -64,7 +64,7 @@ public class WidgetProvider extends AppWidgetProvider {
         // Add the app widget unique ID to the intent extras.
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.putExtra(Constants.WIDGET_TITLE, widgetText);
-        intent.putExtra(Constants.WIDGET_EDITOR, Constants.Editors.getName((String) widgetText));
+        intent.putExtra(Constants.WIDGET_EDITOR, Constants.Sections.getName((String) widgetText));
         Log.d(TAG, "updateAppWidget widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         // Set up the RemoteViews object to use a RemoteViews adapter.

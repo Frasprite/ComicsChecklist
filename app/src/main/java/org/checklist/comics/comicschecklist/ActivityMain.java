@@ -208,8 +208,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         if (savedInstanceState == null) {
-            selectItem(Constants.Editors.getCode(Constants.Editors.FAVORITE),
-                       Constants.Editors.getTitle(Constants.Editors.FAVORITE));
+            selectItem(Constants.Sections.FAVORITE);
         } else {
             mFromSavedInstanceState = true;
         }
@@ -473,7 +472,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         String rawEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
         mCursor.close();
         Log.d(TAG, "launchDetailView - comic ID is " + id + " editor is " + rawEditor);
-        Constants.Editors editor = Constants.Editors.getEditorFromName(rawEditor);
+        Constants.Sections editor = Constants.Sections.getEditorFromName(rawEditor);
         switch (editor) {
             case CART:
                 // Show note
@@ -504,65 +503,74 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         }
     }
 
-    private void selectItem(int position, String title) {
-        Log.d(TAG, "selectItem " + position);
+    private void selectItem(Constants.Sections section) {
+        Log.d(TAG, "selectItem - " + section);
         if (mNavigationView != null) {
             if (mDrawerLayout != null) {
-                if (position < 8) {
+                if (section == Constants.Sections.FAVORITE || section == Constants.Sections.CART ||
+                        section == Constants.Sections.MARVEL || section == Constants.Sections.PLANET ||
+                        section == Constants.Sections.PANINI || section == Constants.Sections.BONELLI ||
+                        section == Constants.Sections.RW || section == Constants.Sections.STAR) {
                     // Update selected item title, then close the drawer
-                    setTitle(title);
+                    setTitle(Constants.Sections.getTitle(section));
                     mDrawerLayout.closeDrawer(mNavigationView);
                 }
             }
         }
 
-        if (position <= 7) {
-            // Update the main content by replacing fragments
-            mListFragment = FragmentList.newInstance(Constants.Editors.getEditor(position));
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, mListFragment).commit();
-        } else {
-            switch (position) {
-                case 8:
-                    // Open settings
-                    Intent launchPreferencesIntent = new Intent().setClass(this, SettingsActivity.class);
-                    startActivity(launchPreferencesIntent);
-                    break;
-                case 9:
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
-                    break;
-                case 10:
-                    // Open help dialog
-                    AlertDialog.Builder helpBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-                    helpBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // Send the negative button event back to the host activity
-                            dialog.dismiss();
-                        }
-                    });
-                    // Get the layout inflater
-                    LayoutInflater inflaterHelp = this.getLayoutInflater();
-                    // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
-                    helpBuilder.setView(inflaterHelp.inflate(R.layout.dialog_help, null));
-                    // Set title
-                    helpBuilder.setTitle(R.string.dialog_help_title);
-                    helpBuilder.show();
-                    break;
-                case 11:
-                    // Open info dialog
-                    AlertDialog.Builder infoBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-                    infoBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // Send the negative button event back to the host activity
-                            dialog.dismiss();
-                        }
-                    });
-                    // Get the layout inflater
-                    LayoutInflater inflaterInfo = this.getLayoutInflater();
-                    // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
-                    infoBuilder.setView(inflaterInfo.inflate(R.layout.dialog_info, null));
-                    infoBuilder.show();
-                    break;
-            }
+        switch (section) {
+            case FAVORITE:
+            case CART:
+            case MARVEL:
+            case PLANET:
+            case PANINI:
+            case BONELLI:
+            case RW:
+            case STAR:
+                // Update the main content by replacing fragments
+                mListFragment = FragmentList.newInstance(section);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, mListFragment).commit();
+                break;
+            case SETTINGS:
+                // Open settings
+                Intent launchPreferencesIntent = new Intent().setClass(this, SettingsActivity.class);
+                startActivity(launchPreferencesIntent);
+                break;
+            case GOOGLE:
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
+                break;
+            case GUIDA:
+                // Open help dialog
+                AlertDialog.Builder helpBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                helpBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Send the negative button event back to the host activity
+                        dialog.dismiss();
+                    }
+                });
+                // Get the layout inflater
+                LayoutInflater inflaterHelp = this.getLayoutInflater();
+                // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
+                helpBuilder.setView(inflaterHelp.inflate(R.layout.dialog_help, null));
+                // Set title
+                helpBuilder.setTitle(R.string.dialog_help_title);
+                helpBuilder.show();
+                break;
+            case INFO:
+                // Open info dialog
+                AlertDialog.Builder infoBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                infoBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Send the negative button event back to the host activity
+                        dialog.dismiss();
+                    }
+                });
+                // Get the layout inflater
+                LayoutInflater inflaterInfo = this.getLayoutInflater();
+                // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
+                infoBuilder.setView(inflaterInfo.inflate(R.layout.dialog_info, null));
+                infoBuilder.show();
+                break;
         }
     }
 
@@ -573,48 +581,64 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         Log.d(TAG, "onNavigationItemSelected - start " + item.getTitle());
-        int position = 0;
+        Constants.Sections section;
+        boolean result;
         switch (item.getItemId()) {
             case R.id.list_favorite:
-                position = 0;
+                section = Constants.Sections.FAVORITE;
+                result = true;
                 break;
             case R.id.list_cart:
-                position = 1;
+                section = Constants.Sections.CART;
+                result = true;
                 break;
             case R.id.list_marvel:
-                position = 2;
+                section = Constants.Sections.MARVEL;
+                result = true;
                 break;
             case R.id.list_panini:
-                position = 3;
+                section = Constants.Sections.PANINI;
+                result = true;
                 break;
             case R.id.list_planet:
-                position = 4;
+                section = Constants.Sections.PLANET;
+                result = true;
                 break;
             case R.id.list_star:
-                position = 5;
+                section = Constants.Sections.STAR;
+                result = true;
                 break;
             case R.id.list_bonelli:
-                position = 6;
+                section = Constants.Sections.BONELLI;
+                result = true;
                 break;
             case R.id.list_rw:
-                position = 7;
+                section = Constants.Sections.RW;
+                result = true;
                 break;
             case R.id.action_settings:
-                position = 8;
+                section = Constants.Sections.SETTINGS;
+                result = false;
                 break;
             case R.id.action_social:
-                position = 9;
+                section = Constants.Sections.GOOGLE;
+                result = false;
                 break;
             case R.id.action_help:
-                position = 10;
+                section = Constants.Sections.GUIDA;
+                result = false;
                 break;
             case R.id.action_info:
-                position = 11;
+                section = Constants.Sections.INFO;
+                result = false;
+                break;
+            default:
+                section = Constants.Sections.FAVORITE;
+                result = true;
                 break;
         }
-        selectItem(position, item.getTitle().toString());
-        boolean result = position <= 7;
-        Log.v(TAG, "onNavigationItemSelected - end - result " + result);
+        selectItem(section);
+        Log.v(TAG, "onNavigationItemSelected - end - section " + section + " result " + result);
         return result;
     }
 }

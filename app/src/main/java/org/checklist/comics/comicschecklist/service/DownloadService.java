@@ -66,42 +66,42 @@ public class DownloadService extends IntentService {
                 if (calculateDayDifference(Constants.PREF_RW_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
-                    searchComics(myParser, notificationPref, R.string.title_section8, Constants.Editors.RW);
+                    searchComics(myParser, notificationPref, R.string.title_section8, Constants.Sections.RW);
                 }
 
                 // Marvel scan
                 if (calculateDayDifference(Constants.PREF_MARVEL_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
-                    searchComics(myParser, notificationPref, R.string.title_section3, Constants.Editors.MARVEL);
+                    searchComics(myParser, notificationPref, R.string.title_section3, Constants.Sections.MARVEL);
                 }
 
                 // Panini Comics scan
                 if (calculateDayDifference(Constants.PREF_PANINI_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
-                    searchComics(myParser, notificationPref, R.string.title_section4, Constants.Editors.PANINI);
+                    searchComics(myParser, notificationPref, R.string.title_section4, Constants.Sections.PANINI);
                 }
 
                 // Planet Manga scan
                 if (calculateDayDifference(Constants.PREF_PLANET_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
-                    searchComics(myParser, notificationPref, R.string.title_section5, Constants.Editors.PLANET);
+                    searchComics(myParser, notificationPref, R.string.title_section5, Constants.Sections.PLANET);
                 }
 
                 // Bonelli scan
                 if (calculateDayDifference(Constants.PREF_BONELLI_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
-                    searchComics(myParser, notificationPref, R.string.title_section7, Constants.Editors.BONELLI);
+                    searchComics(myParser, notificationPref, R.string.title_section7, Constants.Sections.BONELLI);
                 }
 
                 // Star comics scan
                 if (calculateDayDifference(Constants.PREF_STAR_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
                     publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
-                    searchComics(myParser, notificationPref, R.string.title_section6, Constants.Editors.STAR);
+                    searchComics(myParser, notificationPref, R.string.title_section6, Constants.Sections.STAR);
                 }
 
                 if (searchNecessary) {
@@ -111,7 +111,7 @@ public class DownloadService extends IntentService {
                     }
                 }
             } else {
-                Constants.Editors editor = (Constants.Editors) intent.getSerializableExtra(Constants.ARG_EDITOR);
+                Constants.Sections editor = (Constants.Sections) intent.getSerializableExtra(Constants.ARG_EDITOR);
                 boolean notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true);
                 if (editor != null) {
                     Log.i(TAG, "Manual search for editor " + editor.toString());
@@ -121,27 +121,27 @@ public class DownloadService extends IntentService {
                     switch (editor) {
                         case MARVEL:
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
-                            searchComics(myParser, notificationPref, R.string.title_section3, Constants.Editors.MARVEL);
+                            searchComics(myParser, notificationPref, R.string.title_section3, Constants.Sections.MARVEL);
                             break;
                         case PANINI:
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
-                            searchComics(myParser, notificationPref, R.string.title_section4, Constants.Editors.PANINI);
+                            searchComics(myParser, notificationPref, R.string.title_section4, Constants.Sections.PANINI);
                             break;
                         case PLANET:
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
-                            searchComics(myParser, notificationPref, R.string.title_section5, Constants.Editors.PLANET);
+                            searchComics(myParser, notificationPref, R.string.title_section5, Constants.Sections.PLANET);
                             break;
                         case STAR:
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
-                            searchComics(myParser, notificationPref, R.string.title_section6, Constants.Editors.STAR);
+                            searchComics(myParser, notificationPref, R.string.title_section6, Constants.Sections.STAR);
                             break;
                         case BONELLI:
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
-                            searchComics(myParser, notificationPref, R.string.title_section7, Constants.Editors.BONELLI);
+                            searchComics(myParser, notificationPref, R.string.title_section7, Constants.Sections.BONELLI);
                             break;
                         case RW:
                             publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
-                            searchComics(myParser, notificationPref, R.string.title_section8, Constants.Editors.RW);
+                            searchComics(myParser, notificationPref, R.string.title_section8, Constants.Sections.RW);
                             break;
                         default:
                             searchNecessary = false;
@@ -185,7 +185,7 @@ public class DownloadService extends IntentService {
      * @param stringID editor personal text
      * @param editor editor to search
      */
-    private void searchComics(Parser myParser, boolean notificationPref, int stringID, Constants.Editors editor) {
+    private void searchComics(Parser myParser, boolean notificationPref, int stringID, Constants.Sections editor) {
         if (notificationPref) {
             createNotification(getResources().getString(stringID) + getResources().getString(R.string.search_started), true);
         }
@@ -193,13 +193,13 @@ public class DownloadService extends IntentService {
         // Select editor
         switch (editor) {
             case MARVEL:
-                error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.MARVEL));
+                error = myParser.startParsePanini(Constants.Sections.getName(Constants.Sections.MARVEL));
                 break;
             case PANINI:
-                error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PANINI));
+                error = myParser.startParsePanini(Constants.Sections.getName(Constants.Sections.PANINI));
                 break;
             case PLANET:
-                error = myParser.startParsePanini(Constants.Editors.getName(Constants.Editors.PLANET));
+                error = myParser.startParsePanini(Constants.Sections.getName(Constants.Sections.PLANET));
                 break;
             case STAR:
                 error = myParser.startParseStarC();

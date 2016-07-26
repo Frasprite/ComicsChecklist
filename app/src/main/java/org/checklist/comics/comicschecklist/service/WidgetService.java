@@ -89,7 +89,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
                 ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY, ComicDatabase.COMICS_URL_KEY};
 
         // Load data based on selected editor
-        Constants.Editors editor = Constants.Editors.getEditorFromName(mEditor);
+        Constants.Sections editor = Constants.Sections.getEditorFromName(mEditor);
         Log.v(TAG, "populateWidget - preparing entry for widget, mEditor is " + mEditor + " found editor is " + editor);
         switch (editor) {
             case CART:

@@ -316,7 +316,7 @@ public class Parser {
 
                 if (coverList.size() == titleList.size() && featureList.size() == priceList.size()) {
                     for (int i = 0; i < coverList.size(); i++) {
-                        ComicDatabaseManager.insert(mContext, titleList.get(i), Constants.Editors.getName(Constants.Editors.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i), "no", "no", siteUrl);
+                        ComicDatabaseManager.insert(mContext, titleList.get(i), Constants.Sections.getName(Constants.Sections.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i), "no", "no", siteUrl);
                     }
                 }
             } catch (Exception e) {
@@ -409,7 +409,7 @@ public class Parser {
                 // Calculating date for sql
                 Date myDate = DateCreator.elaborateDate(releaseDate);
                 // Insert comic on database
-                ComicDatabaseManager.insert(mContext, name, Constants.Editors.getName(Constants.Editors.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", URL);
+                ComicDatabaseManager.insert(mContext, name, Constants.Sections.getName(Constants.Sections.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", URL);
             } catch (Exception e) {
                 Log.w(TAG, "Error while searching data for comic id " + i + " " + e.toString());
                 comicErrorStar = true;
@@ -517,7 +517,7 @@ public class Parser {
                     Date myDate = DateCreator.elaborateDate(releaseDate);
 
                     // Insert comic on database
-                    String editor = Constants.Editors.getName(Constants.Editors.BONELLI);
+                    String editor = Constants.Sections.getName(Constants.Sections.BONELLI);
                     ComicDatabaseManager.insert(mContext, name.toUpperCase(), editor, description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
                 } catch (Exception e) {
                     Log.w(TAG, "Can't take more info from " + moreInfoUrl + " " + e.toString() + " comic not fetched");

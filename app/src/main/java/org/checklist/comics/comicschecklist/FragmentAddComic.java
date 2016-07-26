@@ -122,7 +122,7 @@ public class FragmentAddComic extends Fragment {
 
             if (mComicId == -1) {
                 // Insert new entry
-                mComicId = ComicDatabaseManager.insert(getActivity(), name, Constants.Editors.getName(Constants.Editors.CART), info, date, myDate, "error", "N.D", "N.D.", "yes", "no", "");
+                mComicId = ComicDatabaseManager.insert(getActivity(), name, Constants.Sections.getName(Constants.Sections.CART), info, date, myDate, "error", "N.D", "N.D.", "yes", "no", "");
                 Log.d(TAG, "INSERTED new entry on database with ID " + mComicId);
             } else {
                 // Update entry

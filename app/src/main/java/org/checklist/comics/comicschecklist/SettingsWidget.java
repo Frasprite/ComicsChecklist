@@ -67,10 +67,10 @@ public class SettingsWidget extends ListActivity {
     protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
         Log.d(TAG, "onListItemClick - start - position " + position);
         Context context = SettingsWidget.this;
-        Constants.Editors editor = Constants.Editors.getEditor(position);
+        Constants.Sections editor = Constants.Sections.getEditor(position);
         // Take name and title reference of editor chosen
-        String title = Constants.Editors.getTitle(editor);
-        String name = Constants.Editors.getName(editor);
+        String title = Constants.Sections.getTitle(editor);
+        String name = Constants.Sections.getName(editor);
         // Create widget
         Log.v(TAG, "onListItemClick - end - title " + title + " name " + name);
         createWidget(context, title, name);
@@ -111,7 +111,7 @@ public class SettingsWidget extends ListActivity {
         if (titleValue != null) {
             return titleValue;
         } else {
-            return Constants.Editors.getTitle(Constants.Editors.FAVORITE);
+            return Constants.Sections.getTitle(Constants.Sections.FAVORITE);
         }
     }
 

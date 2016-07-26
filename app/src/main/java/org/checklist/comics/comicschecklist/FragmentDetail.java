@@ -188,7 +188,7 @@ public class FragmentDetail extends Fragment {
             mMenu.getItem(5).setVisible(true);
         }
 
-        if (Constants.Editors.getEditorFromName(mComicEditor) == Constants.Editors.CART) {
+        if (Constants.Sections.getEditorFromName(mComicEditor) == Constants.Sections.CART) {
             mMenu.getItem(1).setVisible(false);
         } else {
             mMenu.getItem(1).setVisible(true);

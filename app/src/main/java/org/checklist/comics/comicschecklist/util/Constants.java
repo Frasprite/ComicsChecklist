@@ -61,8 +61,8 @@ public class Constants {
         }
     }
 
-    /* Enum of editors and list created by user */
-    public enum Editors {
+    /* Enum of sections available on menu */
+    public enum Sections {
         FAVORITE(0, "preferiti", "Lista preferiti"),
         CART    (1, "da comprare", "Da comprare"),
         MARVEL  (2, "marvelitalia", "Marvel"),
@@ -70,17 +70,21 @@ public class Constants {
         PLANET  (4, "planetmanga", "Planet Manga"),
         STAR    (5, "star", "Star Comics"),
         BONELLI (6, "bonelli", "Sergio Bonelli"),
-        RW      (7, "rw", "RW Edizioni");
+        RW      (7, "rw", "RW Edizioni"),
+        SETTINGS(8, "settings", "Impostazioni"),
+        GOOGLE  (9, "google plus", "Segui su Google+"),
+        GUIDA   (10,"guida", "Guida"),
+        INFO    (11,"info", "Info");
 
-        private static final HashMap<Integer, Editors> map;
-        private static final HashMap<String, Editors> nameMap;
-        private static final HashMap<String, Editors> titleMap;
+        private static final HashMap<Integer, Sections> map;
+        private static final HashMap<String, Sections> nameMap;
+        private static final HashMap<String, Sections> titleMap;
 
         static {
             map = new HashMap<>();
             nameMap = new HashMap<>();
             titleMap = new HashMap<>();
-            for (Editors editor : Editors.values()) {
+            for (Sections editor : Sections.values()) {
                 map.put(editor.code, editor);
                 nameMap.put(editor.name, editor);
                 titleMap.put(editor.title, editor);
@@ -91,25 +95,25 @@ public class Constants {
         private final String name;
         private final String title;
 
-        Editors(int code, String name, String title) {
+        Sections(int code, String name, String title) {
             this.code = code;
             this.name = name;
             this.title = title;
         }
 
-        public static Editors getEditor(int position) {
+        public static Sections getEditor(int position) {
             return map.get(position);
         }
 
-        public static Editors getEditorFromName(String name) {
+        public static Sections getEditorFromName(String name) {
             return nameMap.get(name);
         }
 
-        public static String getName(Editors editor) {
+        public static String getName(Sections editor) {
             return editor.name;
         }
 
-        public static String getTitle(Editors editor) {
+        public static String getTitle(Sections editor) {
             return editor.title;
         }
 
@@ -117,7 +121,7 @@ public class Constants {
             return titleMap.get(title).name;
         }
 
-        public static int getCode(Editors editor) {
+        public static int getCode(Sections editor) {
             return editor.code;
         }
     }
