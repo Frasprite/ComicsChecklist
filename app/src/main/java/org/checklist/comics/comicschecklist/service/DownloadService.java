@@ -65,43 +65,49 @@ public class DownloadService extends IntentService {
                 // RW scan
                 if (calculateDayDifference(Constants.PREF_RW_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
-                    publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
-                    searchComics(myParser, notificationPref, R.string.title_section8, Constants.Sections.RW);
+                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.RW);
+                    publishResults(Constants.RESULT_START, editorTitle);
+                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.RW);
                 }
 
                 // Marvel scan
                 if (calculateDayDifference(Constants.PREF_MARVEL_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
-                    publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
-                    searchComics(myParser, notificationPref, R.string.title_section3, Constants.Sections.MARVEL);
+                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.MARVEL);
+                    publishResults(Constants.RESULT_START, editorTitle);
+                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.MARVEL);
                 }
 
                 // Panini Comics scan
                 if (calculateDayDifference(Constants.PREF_PANINI_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
-                    publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
-                    searchComics(myParser, notificationPref, R.string.title_section4, Constants.Sections.PANINI);
+                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.PANINI);
+                    publishResults(Constants.RESULT_START, editorTitle);
+                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.PANINI);
                 }
 
                 // Planet Manga scan
                 if (calculateDayDifference(Constants.PREF_PLANET_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
-                    publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
-                    searchComics(myParser, notificationPref, R.string.title_section5, Constants.Sections.PLANET);
+                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.PLANET);
+                    publishResults(Constants.RESULT_START, editorTitle);
+                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.PLANET);
                 }
 
                 // Bonelli scan
                 if (calculateDayDifference(Constants.PREF_BONELLI_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
-                    publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
-                    searchComics(myParser, notificationPref, R.string.title_section7, Constants.Sections.BONELLI);
+                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.BONELLI);
+                    publishResults(Constants.RESULT_START, editorTitle);
+                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.BONELLI);
                 }
 
                 // Star comics scan
                 if (calculateDayDifference(Constants.PREF_STAR_LAST_SCAN) >= frequency) {
                     searchNecessary = true;
-                    publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
-                    searchComics(myParser, notificationPref, R.string.title_section6, Constants.Sections.STAR);
+                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.STAR);
+                    publishResults(Constants.RESULT_START, editorTitle);
+                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.STAR);
                 }
 
                 if (searchNecessary) {
@@ -115,38 +121,12 @@ public class DownloadService extends IntentService {
                 boolean notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true);
                 if (editor != null) {
                     Log.i(TAG, "Manual search for editor " + editor.toString());
-
                     searchNecessary = true;
-
-                    switch (editor) {
-                        case MARVEL:
-                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section3));
-                            searchComics(myParser, notificationPref, R.string.title_section3, Constants.Sections.MARVEL);
-                            break;
-                        case PANINI:
-                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section4));
-                            searchComics(myParser, notificationPref, R.string.title_section4, Constants.Sections.PANINI);
-                            break;
-                        case PLANET:
-                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section5));
-                            searchComics(myParser, notificationPref, R.string.title_section5, Constants.Sections.PLANET);
-                            break;
-                        case STAR:
-                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section6));
-                            searchComics(myParser, notificationPref, R.string.title_section6, Constants.Sections.STAR);
-                            break;
-                        case BONELLI:
-                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section7));
-                            searchComics(myParser, notificationPref, R.string.title_section7, Constants.Sections.BONELLI);
-                            break;
-                        case RW:
-                            publishResults(Constants.RESULT_START, getResources().getString(R.string.title_section8));
-                            searchComics(myParser, notificationPref, R.string.title_section8, Constants.Sections.RW);
-                            break;
-                        default:
-                            searchNecessary = false;
-                            break;
-                    }
+                    String editorTitle = Constants.Sections.getTitle(editor);
+                    publishResults(Constants.RESULT_START, editorTitle);
+                    searchComics(myParser, notificationPref, editorTitle, editor);
+                } else {
+                    searchNecessary = false;
                 }
 
                 if (searchNecessary) {
@@ -182,12 +162,12 @@ public class DownloadService extends IntentService {
      * Start searching for specified comics editor.
      * @param myParser the parser class which will search on the web
      * @param notificationPref boolean indicating if notification are desired
-     * @param stringID editor personal text
+     * @param editorTitle editor personal text
      * @param editor editor to search
      */
-    private void searchComics(Parser myParser, boolean notificationPref, int stringID, Constants.Sections editor) {
+    private void searchComics(Parser myParser, boolean notificationPref, String editorTitle, Constants.Sections editor) {
         if (notificationPref) {
-            createNotification(getResources().getString(stringID) + getResources().getString(R.string.search_started), true);
+            createNotification(editorTitle + getResources().getString(R.string.search_started), true);
         }
 
         // Select editor
@@ -214,14 +194,14 @@ public class DownloadService extends IntentService {
 
         // See result
         if (error) {
-            publishResults(Constants.RESULT_CANCELED, getResources().getString(stringID));
+            publishResults(Constants.RESULT_CANCELED, editorTitle);
             if (notificationPref) {
-                createNotification(getResources().getString(stringID) + getResources().getString(R.string.search_failed), false);
+                createNotification(editorTitle + getResources().getString(R.string.search_failed), false);
             }
         } else {
-            publishResults(Constants.RESULT_EDITOR_FINISHED, getResources().getString(stringID));
+            publishResults(Constants.RESULT_EDITOR_FINISHED, editorTitle);
             if (notificationPref) {
-                createNotification(getResources().getString(stringID) + getResources().getString(R.string.search_editor_completed), true);
+                createNotification(editorTitle + getResources().getString(R.string.search_editor_completed), true);
             }
         }
     }
