@@ -130,6 +130,7 @@ public class Constants {
     public static final String PREF_SYNC_FREQUENCY = "sync_frequency";
     public static final String PREF_DELETE_FREQUENCY = "delete_frequency";
     public static final String PREF_LIST_ORDER = "data_order";
+    public static final String PREF_AVAILABLE_EDITORS = "available_editors";
 
     /* Preference last scan */
     public static final String PREF_MARVEL_LAST_SCAN = "marvel_lastscan";

@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.ListPreference;
+import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -36,6 +37,8 @@ import java.util.List;
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
+    private static final String TAG = SettingsActivity.class.getSimpleName();
+
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -44,6 +47,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
+            Log.d(TAG, "onPreferenceChange - preference " + preference.getKey() + " value " + stringValue);
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
@@ -270,6 +274,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(Constants.PREF_LIST_ORDER));
+            MultiSelectListPreference multiSelectListPreference = (MultiSelectListPreference) findPreference((Constants.PREF_AVAILABLE_EDITORS));
+            multiSelectListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object value) {
+                    Log.d(TAG, "onPreferenceChange - preference " + preference.getKey() + " value " + value.toString());
+                    return true;
+                }
+            });
         }
 
         @Override

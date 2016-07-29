@@ -166,6 +166,34 @@
     <string name="pref_title_notification_favorite">Preferiti</string>
     <string name="pref_summary_notification_favorite">Verrai avvertito tramite notifiche push se uno dei tuoi fumetti preferiti è disponibile</string>
 
+    <!-- String set fot editors on Navigation View -->
+    <string name="pref_title_available_editor">Editori disponibili</string>
+    <string name="pref_summary_available_editor">Salva memoria e tempo: seleziona solo gli editori che vuoi seguire</string>
+    <string-array name="pref_available_editors">
+        <item>Marvel</item>
+        <item>Panini Comics</item>
+        <item>Planet Manga</item>
+        <item>Star Comics</item>
+        <item>Sergio Bonelli</item>
+        <item>RW Edizioni</item>
+    </string-array>
+    <string-array name="pref_available_editors_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+    <string-array name="pref_basic_editors">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+
     <!-- Notification text -->
     <string name="notification_comic_out">Oggi esce un solo fumetto, apri la lista dei preferiti!</string>
     <string name="notification_comics_out_1">Oggi escono</string>

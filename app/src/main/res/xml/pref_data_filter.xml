@@ -3,6 +3,18 @@
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <MultiSelectListPreference
+        android:key="available_editors"
+        android:title="@string/pref_title_available_editor"
+        android:summary="@string/pref_summary_available_editor"
+        android:entries="@array/pref_available_editors"
+        android:entryValues="@array/pref_available_editors_values"
+        android:defaultValue="@array/pref_basic_editors"
+        />
+
+    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+         dismiss it. -->
+    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <ListPreference
         android:key="data_order"
         android:title="@string/pref_title_data_order"
