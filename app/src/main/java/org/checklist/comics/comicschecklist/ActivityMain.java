@@ -42,7 +42,10 @@ import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.Constants;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * An activity representing a list of Comics. This activity
@@ -377,6 +380,46 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         super.onResume();
         Log.v(TAG, "onResume");
         registerReceiver(receiver, new IntentFilter(Constants.NOTIFICATION));
+        // Populate navigation view menu
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String[] rawArray = getResources().getStringArray(R.array.pref_basic_editors);
+        Set<String> editorSet = sp.getStringSet(Constants.PREF_AVAILABLE_EDITORS, null);
+
+        if (editorSet == null) {
+            editorSet = new HashSet<>(Arrays.asList(rawArray));
+        }
+
+        // Populate menu
+        if (editorSet.contains("2")) {
+            mNavigationView.getMenu().findItem(R.id.list_marvel).setVisible(true);
+        } else {
+            mNavigationView.getMenu().findItem(R.id.list_marvel).setVisible(false);
+        }
+        if (editorSet.contains("3")) {
+            mNavigationView.getMenu().findItem(R.id.list_panini).setVisible(true);
+        } else {
+            mNavigationView.getMenu().findItem(R.id.list_panini).setVisible(false);
+        }
+        if (editorSet.contains("4")) {
+            mNavigationView.getMenu().findItem(R.id.list_planet).setVisible(true);
+        } else {
+            mNavigationView.getMenu().findItem(R.id.list_planet).setVisible(false);
+        }
+        if (editorSet.contains("5")) {
+            mNavigationView.getMenu().findItem(R.id.list_star).setVisible(true);
+        } else {
+            mNavigationView.getMenu().findItem(R.id.list_star).setVisible(false);
+        }
+        if (editorSet.contains("6")) {
+            mNavigationView.getMenu().findItem(R.id.list_bonelli).setVisible(true);
+        } else {
+            mNavigationView.getMenu().findItem(R.id.list_bonelli).setVisible(false);
+        }
+        if (editorSet.contains("7")) {
+            mNavigationView.getMenu().findItem(R.id.list_rw).setVisible(true);
+        } else {
+            mNavigationView.getMenu().findItem(R.id.list_rw).setVisible(false);
+        }
     }
 
     @Override
