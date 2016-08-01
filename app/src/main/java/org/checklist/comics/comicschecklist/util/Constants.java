@@ -121,8 +121,12 @@ public class Constants {
             return titleMap.get(title).name;
         }
 
-        public static int getCode(Sections editor) {
-            return editor.code;
+        public int getCode() {
+            return code;
+        }
+
+        public String getTitle() {
+            return title;
         }
     }
 

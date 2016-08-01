@@ -67,15 +67,9 @@
     <string name="title_section12">Info</string>
 
     <!-- Widget text -->
-    <string-array name="widget_editors_array">
+    <string-array name="widget_sections_array">
         <item>Lista preferiti</item>
         <item>Da comprare</item>
-        <item>Marvel</item>
-        <item>Panini Comics</item>
-        <item>Planet Manga</item>
-        <item>Star Comics</item>
-        <item>Sergio Bonelli</item>
-        <item>RW Edizioni</item>
     </string-array>
     <string name="widget_label">CC Widget</string>
 

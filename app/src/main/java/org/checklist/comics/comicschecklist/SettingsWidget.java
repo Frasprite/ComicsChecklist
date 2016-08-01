@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,12 @@ import android.widget.ListView;
 
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Francesco Bevilacqua on 05/01/2015.
@@ -32,6 +39,8 @@ public class SettingsWidget extends ListActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // TODO with Lollipop, pick an editor dialog is completely white!!!
+
         Log.d(TAG, "onCreate - start");
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
@@ -41,10 +50,30 @@ public class SettingsWidget extends ListActivity {
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         // Defined array values to show in ListView
-        String[] values = getResources().getStringArray(R.array.widget_editors_array);
+        String[] values = getResources().getStringArray(R.array.widget_sections_array);
+
+        // Loading user editor preference
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String[] rawArray = getResources().getStringArray(R.array.pref_basic_editors);
+        Set<String> editorSet = sp.getStringSet(Constants.PREF_AVAILABLE_EDITORS, null);
+
+        if (editorSet == null) {
+            editorSet = new HashSet<>(Arrays.asList(rawArray));
+        }
+
+        // Create fixed array list then a new "open" one
+        List<String> sectionList = Arrays.asList(values);
+        ArrayList<String> updatableSectionList = new ArrayList<>();
+        updatableSectionList.addAll(sectionList);
+
+        for (String editor : editorSet) {
+            // Get section and add it to list
+            Constants.Sections section = Constants.Sections.getEditor(Integer.parseInt(editor));
+            updatableSectionList.add(section.getTitle());
+        }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);
+                android.R.layout.simple_list_item_1, android.R.id.text1, updatableSectionList);
 
         getListView().setAdapter(adapter);
 

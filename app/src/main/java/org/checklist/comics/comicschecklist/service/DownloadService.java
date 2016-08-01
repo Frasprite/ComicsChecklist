@@ -21,8 +21,11 @@ import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by Francesco Bevilacqua on 25/10/2014.
@@ -52,6 +55,15 @@ public class DownloadService extends IntentService {
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
+        // Loading user editor preference
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String[] rawArray = getResources().getStringArray(R.array.pref_basic_editors);
+        Set<String> editorSet = sp.getStringSet(Constants.PREF_AVAILABLE_EDITORS, null);
+
+        if (editorSet == null) {
+            editorSet = new HashSet<>(Arrays.asList(rawArray));
+        }
+
         if (isConnected) {
             Log.d(TAG, "Checking if search is manual or automatic " + frequency);
 
@@ -63,7 +75,8 @@ public class DownloadService extends IntentService {
                 boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);
 
                 // RW scan
-                if (calculateDayDifference(Constants.PREF_RW_LAST_SCAN) >= frequency) {
+                if (calculateDayDifference(Constants.PREF_RW_LAST_SCAN) >= frequency &&
+                        editorSet.contains(String.valueOf(Constants.Sections.RW.getCode()))) {
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(Constants.Sections.RW);
                     publishResults(Constants.RESULT_START, editorTitle);
@@ -71,7 +84,8 @@ public class DownloadService extends IntentService {
                 }
 
                 // Marvel scan
-                if (calculateDayDifference(Constants.PREF_MARVEL_LAST_SCAN) >= frequency) {
+                if (calculateDayDifference(Constants.PREF_MARVEL_LAST_SCAN) >= frequency &&
+                        editorSet.contains(String.valueOf(Constants.Sections.MARVEL.getCode()))) {
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(Constants.Sections.MARVEL);
                     publishResults(Constants.RESULT_START, editorTitle);
@@ -79,7 +93,8 @@ public class DownloadService extends IntentService {
                 }
 
                 // Panini Comics scan
-                if (calculateDayDifference(Constants.PREF_PANINI_LAST_SCAN) >= frequency) {
+                if (calculateDayDifference(Constants.PREF_PANINI_LAST_SCAN) >= frequency &&
+                        editorSet.contains(String.valueOf(Constants.Sections.PANINI.getCode()))) {
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(Constants.Sections.PANINI);
                     publishResults(Constants.RESULT_START, editorTitle);
@@ -87,7 +102,8 @@ public class DownloadService extends IntentService {
                 }
 
                 // Planet Manga scan
-                if (calculateDayDifference(Constants.PREF_PLANET_LAST_SCAN) >= frequency) {
+                if (calculateDayDifference(Constants.PREF_PLANET_LAST_SCAN) >= frequency &&
+                        editorSet.contains(String.valueOf(Constants.Sections.PLANET.getCode()))) {
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(Constants.Sections.PLANET);
                     publishResults(Constants.RESULT_START, editorTitle);
@@ -95,7 +111,8 @@ public class DownloadService extends IntentService {
                 }
 
                 // Bonelli scan
-                if (calculateDayDifference(Constants.PREF_BONELLI_LAST_SCAN) >= frequency) {
+                if (calculateDayDifference(Constants.PREF_BONELLI_LAST_SCAN) >= frequency &&
+                        editorSet.contains(String.valueOf(Constants.Sections.BONELLI.getCode()))) {
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(Constants.Sections.BONELLI);
                     publishResults(Constants.RESULT_START, editorTitle);
@@ -103,7 +120,8 @@ public class DownloadService extends IntentService {
                 }
 
                 // Star comics scan
-                if (calculateDayDifference(Constants.PREF_STAR_LAST_SCAN) >= frequency) {
+                if (calculateDayDifference(Constants.PREF_STAR_LAST_SCAN) >= frequency &&
+                        editorSet.contains(String.valueOf(Constants.Sections.STAR.getCode()))) {
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(Constants.Sections.STAR);
                     publishResults(Constants.RESULT_START, editorTitle);
