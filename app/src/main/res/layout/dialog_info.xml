@@ -167,29 +167,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/dialog_picasso_license" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/dialog_panel_title_text"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:autoLink="web"
-                android:text="@string/dialog_panel_link" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/dialog_panel_copyright" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/dialog_panel_license" />
-
         </LinearLayout>
 
     </LinearLayout>
