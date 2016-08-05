@@ -1,16 +1,18 @@
 package org.checklist.comics.comicschecklist;
 
-import android.app.ListActivity;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -26,7 +28,7 @@ import java.util.Set;
  * Created by Francesco Bevilacqua on 05/01/2015.
  * This code is part of Comics Checklist project.
  */
-public class SettingsWidget extends ListActivity {
+public class SettingsWidget extends AppCompatActivity {
 
     private static final String TAG = SettingsWidget.class.getSimpleName();
 
@@ -35,19 +37,22 @@ public class SettingsWidget extends ListActivity {
     private static final String PREFS_NAME = "AppWidget";
     private static final String PREF_PREFIX_KEY = "appwidget";
 
+    private ArrayList<String> mUpdatableSectionList;
+
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // TODO with Lollipop, pick an editor dialog is completely white!!!
 
         Log.d(TAG, "onCreate - start");
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
 
-        // Set layout size of activity
-        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        setContentView(R.layout.activity_widget_settings);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(getString(R.string.activity_title_chose_content));
+        }
 
         // Defined array values to show in ListView
         String[] values = getResources().getStringArray(R.array.widget_sections_array);
@@ -63,19 +68,43 @@ public class SettingsWidget extends ListActivity {
 
         // Create fixed array list then a new "open" one
         List<String> sectionList = Arrays.asList(values);
-        ArrayList<String> updatableSectionList = new ArrayList<>();
-        updatableSectionList.addAll(sectionList);
+        mUpdatableSectionList = new ArrayList<>();
+        mUpdatableSectionList.addAll(sectionList);
 
         for (String editor : editorSet) {
             // Get section and add it to list
             Constants.Sections section = Constants.Sections.getEditor(Integer.parseInt(editor));
-            updatableSectionList.add(section.getTitle());
+            mUpdatableSectionList.add(section.getTitle());
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, updatableSectionList);
+                android.R.layout.simple_list_item_1, android.R.id.text1, mUpdatableSectionList);
 
-        getListView().setAdapter(adapter);
+        ListView listView = (ListView) findViewById(R.id.widget_list) ;
+        listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Log.d(TAG, "onListItemClick - start - position " + position);
+                Context context = SettingsWidget.this;
+                String editorTitle = mUpdatableSectionList.get(position);
+                Constants.Sections editor = Constants.Sections.getEditorFromTitle(editorTitle);
+                // Take name and title reference of editor chosen
+                String title = Constants.Sections.getTitle(editor);
+                String name = Constants.Sections.getName(editor);
+                // Create widget
+                Log.v(TAG, "onListItemClick - end - title " + title + " name " + name);
+                createWidget(context, title, name);
+            }
+        });
+
+        Button cancelButton = (Button) findViewById(R.id.button_cancel);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SettingsWidget.this.finish();
+            }
+        });
 
         // Find the widget id from the intent.
         Intent intent = getIntent();
@@ -90,19 +119,6 @@ public class SettingsWidget extends ListActivity {
         }
 
         Log.v(TAG, "onCreate - end");
-    }
-
-    @Override
-    protected void onListItemClick(final ListView l, final View v, final int position, final long id) {
-        Log.d(TAG, "onListItemClick - start - position " + position);
-        Context context = SettingsWidget.this;
-        Constants.Sections editor = Constants.Sections.getEditor(position);
-        // Take name and title reference of editor chosen
-        String title = Constants.Sections.getTitle(editor);
-        String name = Constants.Sections.getName(editor);
-        // Create widget
-        Log.v(TAG, "onListItemClick - end - title " + title + " name " + name);
-        createWidget(context, title, name);
     }
 
     private void createWidget(Context context, String title, String name) {

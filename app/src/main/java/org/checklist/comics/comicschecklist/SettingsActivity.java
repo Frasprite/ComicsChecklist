@@ -1,9 +1,11 @@
 package org.checklist.comics.comicschecklist;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -17,6 +19,9 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.MenuItem;
 
+import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
+import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
 import org.checklist.comics.comicschecklist.receiver.BootReceiver;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -274,7 +279,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(Constants.PREF_LIST_ORDER));
-            MultiSelectListPreference multiSelectListPreference = (MultiSelectListPreference) findPreference((Constants.PREF_AVAILABLE_EDITORS));
+            MultiSelectListPreference multiSelectListPreference = (MultiSelectListPreference) findPreference(Constants.PREF_AVAILABLE_EDITORS);
             multiSelectListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object value) {
@@ -282,6 +287,68 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     return true;
                 }
             });
+
+            Preference preference = findPreference(Constants.PREF_DELETE_CONTENT);
+            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(final Preference preference) {
+                    Log.d(TAG, "onPreferenceClick - preference " + preference.getKey());
+                    launchDeleteContentDialog(preference.getContext());
+                    return true;
+                }
+            });
+        }
+
+        private void launchDeleteContentDialog(final Context context) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);//, R.style.AppCompatAlertDialogStyle);
+            builder.setTitle(R.string.dialog_delete_content_title)
+                    .setItems(R.array.pref_available_editors, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // The 'which' argument contains the index position of the selected item
+                            Constants.Sections section;
+                            switch (which) {
+                                case 0:
+                                    // Delete Marvel content
+                                    section = Constants.Sections.MARVEL;
+                                    break;
+                                case 1:
+                                    // Delete Panini comics content
+                                    section = Constants.Sections.PANINI;
+                                    break;
+                                case 2:
+                                    // Delete Planet Manga content
+                                    section = Constants.Sections.PLANET;
+                                    break;
+                                case 3:
+                                    // Delete Star Comics content
+                                    section = Constants.Sections.STAR;
+                                    break;
+                                case 4:
+                                    // Delete SB content
+                                    section = Constants.Sections.BONELLI;
+                                    break;
+                                case 5:
+                                    // Delete RW content
+                                    section = Constants.Sections.RW;
+                                    break;
+                                default:
+                                    section = null;
+                            }
+                            if (section != null) {
+                                Log.v(TAG, "Selected item on position " + which + " - obtaining section " + section);
+                                String selection = ComicDatabase.COMICS_EDITOR_KEY + " =? AND " +
+                                                    ComicDatabase.COMICS_CART_KEY + " =? AND " +
+                                                    ComicDatabase.COMICS_FAVORITE_KEY + " =?";
+                                String[] selectionArgs = new String[]{section.getName(), "no", "no"};
+                                int result = ComicDatabaseManager.delete(context, ComicContentProvider.CONTENT_URI, selection, selectionArgs);
+                                Log.d(TAG, "Deleted " + result + " entries of " + section + " section");
+                            } else {
+                                Log.w(TAG, "No section found with index " + which);
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+            builder.create().show();
         }
 
         @Override

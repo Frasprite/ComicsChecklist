@@ -109,6 +109,10 @@ public class Constants {
             return nameMap.get(name);
         }
 
+        public static Sections getEditorFromTitle(String title) {
+            return titleMap.get(title);
+        }
+
         public static String getName(Sections editor) {
             return editor.name;
         }
@@ -128,6 +132,10 @@ public class Constants {
         public String getTitle() {
             return title;
         }
+
+        public String getName() {
+            return name;
+        }
     }
 
     /* Data sync preferences */
@@ -135,6 +143,7 @@ public class Constants {
     public static final String PREF_DELETE_FREQUENCY = "delete_frequency";
     public static final String PREF_LIST_ORDER = "data_order";
     public static final String PREF_AVAILABLE_EDITORS = "available_editors";
+    public static final String PREF_DELETE_CONTENT = "delete_content";
 
     /* Preference last scan */
     public static final String PREF_MARVEL_LAST_SCAN = "marvel_lastscan";

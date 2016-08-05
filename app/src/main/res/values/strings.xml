@@ -3,6 +3,7 @@
     <string name="app_name">Comics Checklist</string>
     <string name="activity_title_comic_detail">Dettagli</string>
     <string name="activity_title_add_comic">Aggiungi uscita</string>
+    <string name="activity_title_chose_content">Scegli una lista</string>
 
     <!-- Dialog text -->
     <string name="dialog_help_title">Guida</string>
@@ -43,6 +44,7 @@
     <string name="dialog_picasso_link">http://square.github.io/picasso/</string>
     <string name="dialog_picasso_copyright">Copyright 2013 Square, Inc.</string>
     <string name="dialog_picasso_license">Licensed used under the Apache License, v2.0</string>
+    <string name="dialog_delete_content_title">Scegli un editore</string>
 
     <!-- Navigation drawer text -->
     <string name="drawer_open">Apri la barra di navigazione</string>
@@ -156,7 +158,7 @@
     <string name="pref_title_notification_favorite">Preferiti</string>
     <string name="pref_summary_notification_favorite">Verrai avvertito tramite notifiche push se uno dei tuoi fumetti preferiti è disponibile</string>
 
-    <!-- String set fot editors on Navigation View -->
+    <!-- String set for editors on Navigation View -->
     <string name="pref_title_available_editor">Editori disponibili</string>
     <string name="pref_summary_available_editor">Salva memoria e tempo: seleziona solo gli editori che vuoi seguire</string>
     <string-array name="pref_available_editors">
@@ -183,6 +185,10 @@
         <item>6</item>
         <item>7</item>
     </string-array>
+
+    <!-- String set for deleting editors content -->
+    <string name="pref_title_delete_content">Cancella uscite</string>
+    <string name="pref_summary_delete_content">Seleziona un editore dalla lista per cancellare le relative uscite (ATTENZIONE: le uscite presenti nelle sezioni "Da comprare" o "Liste preferiti" non verranno cancellate)</string>
 
     <!-- Notification text -->
     <string name="notification_comic_out">Oggi esce un solo fumetto, apri la lista dei preferiti!</string>
