@@ -29,9 +29,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +40,6 @@ import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -300,7 +296,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             // There are multiple results which fit the given query, so show this on dialog
 
             // Open a dialog with a list of results
-            AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
 
             // Set negative button
             builder.setNegativeButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
@@ -310,49 +306,25 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 }
             });
 
-            // Preparing list
-            LayoutInflater listInflater = this.getLayoutInflater();
-            View view = listInflater.inflate(R.layout.dialog_search_list, null);
-            final ListView mList = (ListView) view.findViewById(R.id.searchListView);
-
-            // Fields from the database (projection) must include the id column for the adapter to work
-            String[] from = new String[] {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
-            // Fields on the UI to which we map
-            int[] to = new int[] {android.R.id.text1, android.R.id.text2};
-
-            // Preparing map of ID for support
-            final HashMap<String, Long> mIDMap = new HashMap<>();
-            for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                // The Cursor is now set to the right position
-                mIDMap.put(cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY)), cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID)));
-            }
-
-            // Populate list with data
-            SimpleCursorAdapter adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_activated_2, cursor, from, to, 0);
-            mList.setAdapter(adapter);
-
-            // Set item click button
-            mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            builder.setCursor(cursor, new DialogInterface.OnClickListener() {
                 @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    TextView tv = (TextView) view.findViewById(android.R.id.text1);
-                    // Get comic name and find ID from mIDMap
-                    String name = tv.getText().toString();
-                    long ID = mIDMap.get(name);
-                    Log.d(TAG, "onItemClick (dialog) - ID from mIDMap " + ID);
+                public void onClick(DialogInterface dialog, int which) {
+                    // The 'which' argument contains the index position of the selected item);
+                    if (cursor.moveToPosition(which)) {
+                        long comicID = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
+                        Log.d(TAG, "onClick (dialog) - ID " + comicID + " from position " + which);
 
-                    if (ID != 0) {
-                        launchDetailView(ID);
-                        cursor.close();
-                    } else {
-                        Toast.makeText(ActivityMain.this, getResources().getText(R.string.search_error), Toast.LENGTH_SHORT).show();
+                        if (comicID != 0) {
+                            launchDetailView(comicID);
+                        } else {
+                            Toast.makeText(ActivityMain.this, getResources().getText(R.string.search_error), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 }
-            });
+            }, ComicDatabase.COMICS_NAME_KEY);
 
             // Return dialog
             builder.setTitle(R.string.search_result)
-                    .setView(view)
                     .create()
                     .show();
         }
