@@ -1,5 +1,6 @@
 package org.checklist.comics.comicschecklist;
 
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -518,6 +519,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         }
     }
 
+    @SuppressLint("InflateParams")
     private void selectItem(Constants.Sections section) {
         Log.d(TAG, "selectItem - " + section);
         if (mNavigationView != null) {

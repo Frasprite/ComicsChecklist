@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.checklist.comics.comicschecklist" >
+    xmlns:tools="http://schemas.android.com/tools"
+    package="org.checklist.comics.comicschecklist">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -55,6 +56,7 @@
 
         <!-- Database provider -->
         <provider
+            tools:ignore="ExportedContentProvider"
             android:authorities="org.checklist.comics.comicschecklist.contentprovider"
             android:name=".provider.ComicContentProvider"
             android:exported="true"
