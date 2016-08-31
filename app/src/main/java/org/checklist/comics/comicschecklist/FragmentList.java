@@ -161,10 +161,10 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         TextView emptyText = (TextView)view.findViewById(android.R.id.empty);
 
         if (mEditor.equals(Constants.Sections.FAVORITE)) {
-            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_star, 0, 0);
+            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
             emptyText.setText(getString(R.string.empty_favorite_list));
         } else if (mEditor.equals(Constants.Sections.CART)) {
-            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_shopping, 0, 0);
+            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
             emptyText.setText(getString(R.string.empty_cart_list));
         } else {
             emptyText.setText(getString(R.string.empty_editor_list));
