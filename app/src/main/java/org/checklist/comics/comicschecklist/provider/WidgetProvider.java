@@ -11,7 +11,7 @@ import android.widget.RemoteViews;
 
 import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.SettingsWidget;
+import org.checklist.comics.comicschecklist.WidgetSettings;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 
@@ -35,7 +35,7 @@ public class WidgetProvider extends AppWidgetProvider {
     public void onDeleted(Context context, int[] appWidgetIds) {
         // When the user deletes the widget, delete the preference associated with it.
         for (int appWidgetId : appWidgetIds) {
-            SettingsWidget.deleteTitlePref(context, appWidgetId);
+            WidgetSettings.deleteTitlePref(context, appWidgetId);
         }
     }
 
@@ -52,7 +52,7 @@ public class WidgetProvider extends AppWidgetProvider {
     public static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
-        CharSequence widgetText = SettingsWidget.loadTitlePref(context, appWidgetId);
+        CharSequence widgetText = WidgetSettings.loadTitlePref(context, appWidgetId);
         Log.d(TAG, "onUpdate - editor " + widgetText + " id " + appWidgetId);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);

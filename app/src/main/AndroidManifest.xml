@@ -49,7 +49,7 @@
         </activity>
 
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ActivitySettings"
             android:label="@string/dialog_help_settings" >
         </activity>
 
@@ -85,7 +85,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".SettingsWidget"
+            android:name=".WidgetSettings"
             android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>

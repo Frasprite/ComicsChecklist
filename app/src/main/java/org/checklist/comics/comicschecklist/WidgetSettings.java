@@ -28,9 +28,9 @@ import java.util.Set;
  * Created by Francesco Bevilacqua on 05/01/2015.
  * This code is part of Comics Checklist project.
  */
-public class SettingsWidget extends AppCompatActivity {
+public class WidgetSettings extends AppCompatActivity {
 
-    private static final String TAG = SettingsWidget.class.getSimpleName();
+    private static final String TAG = WidgetSettings.class.getSimpleName();
 
     private int mAppWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID;
 
@@ -86,7 +86,7 @@ public class SettingsWidget extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Log.d(TAG, "onListItemClick - start - position " + position);
-                Context context = SettingsWidget.this;
+                Context context = WidgetSettings.this;
                 String editorTitle = mUpdatableSectionList.get(position);
                 Constants.Sections editor = Constants.Sections.getEditorFromTitle(editorTitle);
                 // Take name and title reference of editor chosen
@@ -102,7 +102,7 @@ public class SettingsWidget extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SettingsWidget.this.finish();
+                WidgetSettings.this.finish();
             }
         });
 

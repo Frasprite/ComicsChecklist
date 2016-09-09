@@ -40,9 +40,9 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class ActivitySettings extends AppCompatPreferenceActivity {
 
-    private static final String TAG = SettingsActivity.class.getSimpleName();
+    private static final String TAG = ActivitySettings.class.getSimpleName();
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -84,7 +84,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            //startActivity(new Intent(getActivity(), SettingsActivity.class));
+            //startActivity(new Intent(getActivity(), ActivitySettings.class));
             onBackPressed();
             return true;
         }
@@ -222,7 +222,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                //startActivity(new Intent(getActivity(), SettingsActivity.class));
+                //startActivity(new Intent(getActivity(), ActivitySettings.class));
                 getActivity().onBackPressed();
                 return true;
             }
@@ -254,7 +254,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                //startActivity(new Intent(getActivity(), SettingsActivity.class));
+                //startActivity(new Intent(getActivity(), ActivitySettings.class));
                 getActivity().onBackPressed();
                 return true;
             }
@@ -355,7 +355,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                //startActivity(new Intent(getActivity(), SettingsActivity.class));
+                //startActivity(new Intent(getActivity(), ActivitySettings.class));
                 getActivity().onBackPressed();
                 return true;
             }

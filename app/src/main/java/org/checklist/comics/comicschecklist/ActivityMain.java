@@ -550,7 +550,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 break;
             case SETTINGS:
                 // Open settings
-                Intent launchPreferencesIntent = new Intent().setClass(this, SettingsActivity.class);
+                Intent launchPreferencesIntent = new Intent().setClass(this, ActivitySettings.class);
                 startActivity(launchPreferencesIntent);
                 break;
             case GOOGLE:
