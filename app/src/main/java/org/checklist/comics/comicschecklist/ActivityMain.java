@@ -71,6 +71,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView mNavigationView;
+    private FloatingActionButton fab;
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
@@ -126,7 +127,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -473,6 +474,24 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     public void onItemSelected(long id) {
         Log.d(TAG, "Launching detail for comic with ID " + id);
         launchDetailView(id);
+    }
+
+    /**
+     * Callback method from {@link FragmentList.Callbacks}
+     * indicating that a scroll down has been done.
+     */
+    @Override
+    public void onHideFAB() {
+        fab.hide();
+    }
+
+    /**
+     * Callback method from {@link FragmentList.Callbacks}
+     * indicating that a scroll up has been done.
+     */
+    @Override
+    public void onShowFAB() {
+        fab.show();
     }
 
     /**

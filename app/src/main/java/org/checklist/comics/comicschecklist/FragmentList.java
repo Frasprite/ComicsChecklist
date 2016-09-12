@@ -81,6 +81,16 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
          * Callback for when an item has been selected.
          */
         void onItemSelected(long id);
+
+        /**
+         * Callback for when list is scrolled down / up.
+         */
+        void onHideFAB();
+
+        /**
+         * Callback for when list is scrolled stops.
+         */
+        void onShowFAB();
     }
 
     /**
@@ -90,6 +100,12 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     private static final Callbacks sComicCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(long id) {}
+
+        @Override
+        public void onHideFAB() {}
+
+        @Override
+        public void onShowFAB() {}
     };
 
     /**
@@ -182,6 +198,31 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             @Override
             public void onRefresh() {
                 initiateRefresh();
+            }
+        });
+
+        final int[] mLastFirstVisibleItem = {0};
+        getListView().setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                if (firstVisibleItem > mLastFirstVisibleItem[0]) {
+                    Log.v(TAG, "Scrolling down...");
+                    mCallbacks.onHideFAB();
+
+                } else if (firstVisibleItem < mLastFirstVisibleItem[0]) {
+                    Log.v(TAG, "Scrolling up...");
+                    mCallbacks.onHideFAB();
+                }
+
+                mLastFirstVisibleItem[0] = firstVisibleItem;
+            }
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                if (scrollState == 0) {
+                    Log.v(TAG, "Scrolling stopped...");
+                    mCallbacks.onShowFAB();
+                }
             }
         });
 
