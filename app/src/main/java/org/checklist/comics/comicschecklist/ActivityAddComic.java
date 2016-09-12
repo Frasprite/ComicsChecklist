@@ -3,6 +3,7 @@ package org.checklist.comics.comicschecklist;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NavUtils;
@@ -12,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.DatePicker;
 
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -28,7 +31,21 @@ public class ActivityAddComic extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate - start");
-        setContentView(R.layout.activity_comic_detail);
+        setContentView(R.layout.app_bar_detail);
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Only for Lollipop and newer versions
+            Window window = this.getWindow();
+
+            // Clear FLAG_TRANSLUCENT_STATUS flag:
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+            // Add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+            // Finally change the color
+            window.setStatusBarColor(getResources().getColor(R.color.primary_dark));
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
         setSupportActionBar(toolbar);
