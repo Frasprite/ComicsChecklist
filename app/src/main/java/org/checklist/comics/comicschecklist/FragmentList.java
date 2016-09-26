@@ -558,6 +558,10 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
+        // Quick fix on migration (1.3 --> 1.4)
+        if (rawSortOrder.equalsIgnoreCase("ASC") || rawSortOrder.equalsIgnoreCase("DESC")) {
+            rawSortOrder = "1";
+        }
         String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
         Log.d(TAG, "onCreateLoader - creating loader ordered with " + sortOrder);
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
