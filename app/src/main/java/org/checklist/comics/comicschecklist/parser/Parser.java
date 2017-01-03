@@ -1,6 +1,7 @@
 package org.checklist.comics.comicschecklist.parser;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
@@ -11,6 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.net.URL;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -84,49 +86,15 @@ public class Parser {
 
     /**
      * Method used to search Panini comics.
-     * @param editor the editor to search
      * @return true if search was successful, false otherwise
      */
-    public boolean startParsePanini(String editor) {
+    public boolean startParsePanini() {
         Log.i(TAG, "Start searching for Panini comics");
         comicErrorPanini = false;
 
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int nextYear = year + 1;
-        int weekOfTheYear = calendar.get(Calendar.WEEK_OF_YEAR);
-
-        // Calculating last days of year
-        Date lastDec = DateCreator.elaborateDate("28/12/" + year);
-
-        Calendar futureCalendar = Calendar.getInstance();
-        futureCalendar.setTime(lastDec);
-
-        if (weekOfTheYear <= (futureCalendar.get(Calendar.WEEK_OF_YEAR) - 3)) {
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 3), editor);
-        } else if (weekOfTheYear == (futureCalendar.get(Calendar.WEEK_OF_YEAR) - 2)) {
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 2), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-        } else if (weekOfTheYear == (futureCalendar.get(Calendar.WEEK_OF_YEAR) - 1)) {
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear + 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
-        } else if (weekOfTheYear == futureCalendar.get(Calendar.WEEK_OF_YEAR)) {
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + (weekOfTheYear - 1), editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + year + Constants.THIRDPANINI + weekOfTheYear, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 1, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 2, editor);
-            parsePaniniUrl(Constants.FIRSTPANINI + editor + Constants.SECONDPANINI + nextYear + Constants.THIRDPANINI + 3, editor);
-        }
+        parsePaniniUrl("http://comics.panini.it/calendario/uscite-scorsa-settimana/");
+        parsePaniniUrl("http://comics.panini.it/calendario/uscite-questa-settimana/");
+        parsePaniniUrl("http://comics.panini.it/calendario/uscite-prossime-settimane/");
 
         return comicErrorPanini;
     }
@@ -134,88 +102,140 @@ public class Parser {
     /**
      * Private method used to parse a Panini URL
      * @param url the URL to parse
-     * @param editor the editor of URL
      */
-    private void parsePaniniUrl(String url, String editor) {
-        Log.d(TAG, "Parsing " + editor + " " + url);
-        ArrayList<String> arrayCoverUrl = new ArrayList<>();
-        ArrayList<String> arrayName = new ArrayList<>();
-        ArrayList<String> arrayFeature = new ArrayList<>();
-        ArrayList<String> arrayPrice = new ArrayList<>();
-        ArrayList<String> arrayReleaseDate = new ArrayList<>();
-        ArrayList<String> arrayDescription = new ArrayList<>();
+    private void parsePaniniUrl(String url) {
+        Log.d(TAG, "Parsing Panini Comics " + url);
+
         try {
-            // Take data and save it on document
+            // Take data from URL and save it on document
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .maxBodySize(0)
+                    .timeout(10 * 1000) // timeout to 10 seconds
                     .get();
 
-            // Create array of cover
-            String docPath = doc.select("div.cover").html();
-            Document divPath = Jsoup.parse(docPath);
-            for (Element element5 : divPath.select("img")) {
-                // N.B.: changed due to violation of copyright
-                String rawCover = element5.attr("src");
-                rawCover = "";
-                arrayCoverUrl.add(rawCover);
-                /*if (rawCover.contains(Constants.IMAGE_NOT_AVAILABLE) ||
-                        rawCover.equalsIgnoreCase(Constants.IMAGE_NOT_AVAILABLE_URL)) {
-                    arrayCoverUrl.add("");
+            // Select only a part of document
+            Element content = doc.getElementById("products-list");
+            Elements links = content.getElementsByClass("col-sm-12");
+            // Prompt number of comics found on document
+            Log.d(TAG, "Total links : " + links.size());
+            for (Element link : links) {
+                // Getting link to more info, comic name and release date
+                String linkMoreInfo = link.getElementsByTag("a").attr("href");
+                String comicName = link.getElementsByTag("h3").text();
+                String rawReleaseDate = link.getElementsByTag("p").text();
+                String releaseDate = rawReleaseDate.replace("Data d'uscita:", "").trim();
+                Log.d(TAG, "Comic name : " + comicName+ "\nRelease date : " + releaseDate + "\nLink more info : " + linkMoreInfo);
+
+                // Connecting to URL for more info
+                Document docMoreInfo = Jsoup.connect(linkMoreInfo)
+                        .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                        .maxBodySize(0)
+                        .timeout(10 * 1000) // timeout to 10 seconds
+                        .get();
+
+                // Getting only essential info for comic
+                String docPath = docMoreInfo.select("div.product-essential").html();
+                Document divEssential = Jsoup.parse(docPath);
+
+                // Getting description, price and feature (image is not used due to Copyright violation)
+                Element descriptionElement = divEssential.select("div#description").first();
+                Element priceElement = divEssential.select("p.old-price").first();
+                String description = descriptionElement.text();
+                String price = priceElement.text();
+                //Element imageElement = divEssential.getElementsByTag("a").first(); // use .attr("href");
+                Log.d(TAG, "Description : " + description + "\nPrice " + price);
+
+                // Getting feature and editor
+                Element featureElement = divEssential.select("div.box-additional-info").first();
+                Elements features = featureElement.getElementsByClass("product");
+                String feature = findFeature(features);
+                String editor = findEditor(features);
+                Log.d(TAG, "Feature found : " + feature + "\n" + "Editor " + editor);
+
+                if (editor != null) {
+                    // Insert data on database
+                    StringTokenizer tokenizer = new StringTokenizer(comicName);
+                    String title = tokenizer.nextToken();
+                    if (!title.equalsIgnoreCase("play") && !comicName.equalsIgnoreCase("n.d.")) {
+                        try {
+                            // Calculating date for sql
+                            Date myDate = DateCreator.elaborateDate(releaseDate);
+                            ComicDatabaseManager.insert(mContext, comicName, editor, description, releaseDate,
+                                    myDate, "", feature, price, "no", "no", linkMoreInfo);
+                        } catch (Exception e) {
+                            // Error while comic fetching
+                            Log.w(TAG, title + " " + e.toString());
+                        }
+                    }
                 } else {
-                    arrayCoverUrl.add(rawCover);
-                }*/
-            }
-            // Create array of title and features
-            String docTitle = doc.select("div.title").html();
-            Document divTitle = Jsoup.parse(docTitle);
-            for (Element element4 : divTitle.select("h3")) {
-                arrayName.add(element4.text());
-            }
-            for (Element element3 : divTitle.select("p.features")) {
-                String feature = element3.text();
-                arrayFeature.add(feature);
-            }
-            // Compute comic price
-            String docPrice = doc.select("div.price").html();
-            Document divPrice = Jsoup.parse(docPrice);
-            for (Element element2 : divPrice.select("h4")) {
-                String price = element2.text();
-                try {
-                    price = price.substring(7).replace(".", ",");
-                } catch (Exception e) {
-                    price = "N.D.";
+                    Log.w(TAG, "Editor not found from given link:\n" + linkMoreInfo + "\n" + features);
                 }
-                arrayPrice.add(price.trim());
             }
-            // Compute date release
-            String docDR = doc.select("div.logo_brand").html();
-            Document divDR = Jsoup.parse(docDR);
-            for (Element element1 : divDR.select("span")) arrayReleaseDate.add(element1.text());
-            // Take comic description
-            String docDesc = doc.select("div.desc").html();
-            Document divDesc = Jsoup.parse(docDesc);
-            for (Element element : divDesc.select("p")) arrayDescription.add(element.text());
-        } catch (Exception e) {
-            Log.w(TAG, "Error while comic fetching " + url + " " + e.toString());
+        } catch (IOException e) {
+            Log.w(TAG, "Error while comic search " + url + " " + e.toString());
+            comicErrorPanini = true;
+        }
+    }
+
+    private String findFeature(Elements features) {
+        String feature = "";
+        for (Element element : features) {
+            String ID = element.id();
+            switch (ID) {
+                case "authors":
+                case "pages":
+                case "format":
+                case "includes":
+                    // For other info, take all text
+                    String otherInfo = element.text();
+                    feature = completeFeature(feature, otherInfo);
+                    break;
+            }
         }
 
-        // Insert data on database
-        for (int i = 0; i < arrayCoverUrl.size(); i++) {
-            StringTokenizer tokenizer = new StringTokenizer(arrayName.get(i));
-            String title = tokenizer.nextToken();
-            if (!title.equalsIgnoreCase("play") && !arrayName.get(i).equalsIgnoreCase("n.d.")) {
-                try {
-                    // Calculating date for sql
-                    Date myDate = DateCreator.elaborateDate(arrayReleaseDate.get(i));
-                    ComicDatabaseManager.insert(mContext, arrayName.get(i), editor, arrayDescription.get(i), arrayReleaseDate.get(i),
-                            myDate, Constants.URLPANINI + arrayCoverUrl.get(i), arrayFeature.get(i), arrayPrice.get(i), "no", "no", url);
-                } catch (Exception e) {
-                    // Error while comic fetching
-                    Log.w(TAG, title + " " + e.toString());
-                    comicErrorPanini = true;
-                }
+        if (feature.equals("")) {
+            feature = "N.D.";
+        }
+
+        return feature;
+    }
+
+    @NonNull
+    private String completeFeature(String feature, String info) {
+        // Init correctly feature list
+        if (feature.length() == 0) {
+            return info;
+        } else {
+            return feature + "\n" + info;
+        }
+    }
+
+    private String findEditor(Elements features) {
+        String editor = null;
+        for (Element element : features) {
+            String ID = element.id();
+            if (ID.equals("linea-editoriale")) {
+                editor = element.getElementsByTag("h3").text();
+                break;
             }
+        }
+
+        if (editor == null) {
+            // Editor not found
+            Log.w(TAG, "Editor not found for this element\n" + features.toString());
+            return null;
+        }
+
+        switch (editor) {
+            case "Panini Comics":
+                return Constants.Sections.PANINI.getName();
+            case "Marvel":
+                return Constants.Sections.MARVEL.getName();
+            case "Planet Manga":
+                return Constants.Sections.PLANET.getName();
+            default:
+                return null;
         }
     }
 

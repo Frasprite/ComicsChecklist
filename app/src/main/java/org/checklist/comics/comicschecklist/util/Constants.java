@@ -180,9 +180,6 @@ public class Constants {
      * Constants for parser class.
      */
     // Panini, Planet Manga & Marvel
-    public static final String FIRSTPANINI = "http://www.paninicomics.it/web/guest/";
-    public static final String SECONDPANINI = "/checklist?year=";
-    public static final String THIRDPANINI = "&weekOfYear=";
     public static final String URLPANINI = "http://www.paninicomics.it";
     // RWEdizioni ex.: http://www.rwedizioni.it/news/uscite-9-gennaio-2016/
     public static final String RW_URL = "http://www.rwedizioni.it";

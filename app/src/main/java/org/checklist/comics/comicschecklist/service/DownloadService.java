@@ -191,13 +191,9 @@ public class DownloadService extends IntentService {
         // Select editor
         switch (editor) {
             case MARVEL:
-                error = myParser.startParsePanini(Constants.Sections.getName(Constants.Sections.MARVEL));
-                break;
             case PANINI:
-                error = myParser.startParsePanini(Constants.Sections.getName(Constants.Sections.PANINI));
-                break;
             case PLANET:
-                error = myParser.startParsePanini(Constants.Sections.getName(Constants.Sections.PLANET));
+                error = myParser.startParsePanini();
                 break;
             case STAR:
                 error = myParser.startParseStarC();
