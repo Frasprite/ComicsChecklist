@@ -409,8 +409,9 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * @see android.support.v4.widget.SwipeRefreshLayout#setOnRefreshListener(android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener)
      */
     private void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
-        if (mSwipeRefreshLayout != null) {
-            mSwipeRefreshLayout.setOnRefreshListener(listener);
+        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(listener);
         }
     }
 
@@ -421,7 +422,13 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * @see android.support.v4.widget.SwipeRefreshLayout#isRefreshing()
      */
     public boolean isRefreshing() {
-        return mSwipeRefreshLayout.isRefreshing();
+        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
+        if (swipeRefreshLayout != null) {
+            return swipeRefreshLayout.isRefreshing();
+        } else {
+            Log.v(TAG, "Returning false because swipe refresh layout is null");
+            return false;
+        }
     }
 
     /**
@@ -431,8 +438,9 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * @see android.support.v4.widget.SwipeRefreshLayout#setRefreshing(boolean)
      */
     public void setRefreshing(boolean refreshing) {
-        if (mSwipeRefreshLayout != null) {
-            mSwipeRefreshLayout.setRefreshing(refreshing);
+        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(refreshing);
         }
     }
 

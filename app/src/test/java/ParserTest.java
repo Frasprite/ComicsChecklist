@@ -18,21 +18,21 @@ public class ParserTest {
     @Test
     public void startParseMarvelTest() {
         Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParsePanini("marvelitalia");
+        boolean result = parser.startParsePanini();
         assertThat(result, is(true));
     }
 
     @Test
     public void startParsePaniniTest() {
         Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParsePanini("paninicomics");
+        boolean result = parser.startParsePanini();
         assertThat(result, is(true));
     }
 
     @Test
     public void startParsePlanetTest() {
         Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParsePanini("planetmanga");
+        boolean result = parser.startParsePanini();
         assertThat(result, is(true));
     }
 

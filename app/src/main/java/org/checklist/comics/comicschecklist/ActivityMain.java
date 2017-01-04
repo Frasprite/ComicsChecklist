@@ -86,29 +86,46 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
-                int resultCode = bundle.getInt(Constants.NOTIFICATION_RESULT);
+                Constants.SearchResults result = (Constants.SearchResults) bundle.get(Constants.NOTIFICATION_RESULT);
                 String mCurrentEditor = bundle.getString(Constants.NOTIFICATION_EDITOR);
-                if (resultCode == Constants.RESULT_START) {
-                    Toast.makeText(getApplicationContext(), mCurrentEditor + getString(R.string.search_started), Toast.LENGTH_SHORT).show();
-                } else if (resultCode == Constants.RESULT_FINISHED) {
+                inspectResultCode(result, mCurrentEditor);
+            }
+        }
+
+        /**
+         * Method used to inspect messages from {@link DownloadService}.
+         * @param result the result indicating download status
+         * @param currentEditor the editor searched
+         */
+        private void inspectResultCode(Constants.SearchResults result, String currentEditor) {
+            boolean shouldSetRefresh = false;
+            switch (result) {
+                case RESULT_START:
+                    Toast.makeText(getApplicationContext(), currentEditor + getString(R.string.search_started), Toast.LENGTH_SHORT).show();
+                    shouldSetRefresh = true;
+                    break;
+                case RESULT_FINISHED:
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_completed), Toast.LENGTH_SHORT).show();
-                } else if (resultCode == Constants.RESULT_EDITOR_FINISHED) {
-                    if (mListFragment != null) {
-                        mListFragment.setRefreshing(false);
-                    }
-                    Toast.makeText(getApplicationContext(), mCurrentEditor + getResources().getString(R.string.search_editor_completed), Toast.LENGTH_SHORT).show();
-                } else if (resultCode == Constants.RESULT_CANCELED) {
-                    if (mListFragment != null) {
-                        mListFragment.setRefreshing(false);
-                    }
-                    Toast.makeText(getApplicationContext(), mCurrentEditor + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
-                } else if (resultCode == Constants.RESULT_NOT_CONNECTED) {
+                    break;
+                case RESULT_EDITOR_FINISHED:
+                    Toast.makeText(getApplicationContext(), currentEditor + getResources().getString(R.string.search_editor_completed), Toast.LENGTH_SHORT).show();
+                    break;
+                case RESULT_CANCELED:
+                    Toast.makeText(getApplicationContext(), currentEditor + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
+                    break;
+                case RESULT_NOT_CONNECTED:
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_no_connection), Toast.LENGTH_LONG).show();
-                    if (mListFragment != null) {
-                        mListFragment.setRefreshing(false);
-                    }
-                } else if (resultCode == Constants.RESULT_DESTROYED) {
+                    break;
+                case RESULT_DESTROYED:
                     Log.i(TAG, "Service destroyed");
+                    break;
+            }
+
+            // Set search animation on UI
+            if (mListFragment != null) {
+                boolean isRefreshing = mListFragment.isRefreshing();
+                if (isRefreshing != shouldSetRefresh) {
+                    mListFragment.setRefreshing(shouldSetRefresh);
                 }
             }
         }

@@ -155,12 +155,16 @@ public class Constants {
 
     /* Service & Notification */
     public static final String MANUAL_SEARCH = "manual_search";
-    public static final int RESULT_START = 304;
-    public static final int RESULT_CANCELED = 303;
-    public static final int RESULT_FINISHED = 302;
-    public static final int RESULT_DESTROYED = 301;
-    public static final int RESULT_NOT_CONNECTED = 300;
-    public static final int RESULT_EDITOR_FINISHED = 299;
+
+    public enum SearchResults {
+        RESULT_START,
+        RESULT_CANCELED,
+        RESULT_FINISHED,
+        RESULT_DESTROYED,
+        RESULT_NOT_CONNECTED,
+        RESULT_EDITOR_FINISHED
+    }
+
     public static final String NOTIFICATION_RESULT = "result";
     public static final String NOTIFICATION_EDITOR = "editor";
     public static final String NOTIFICATION = "org.checklist.comics.comicschecklist.service.receiver";

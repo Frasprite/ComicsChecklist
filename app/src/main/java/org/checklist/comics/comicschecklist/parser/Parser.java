@@ -276,6 +276,7 @@ public class Parser {
             Document doc = Jsoup.connect(siteUrl)
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .maxBodySize(0)
+                    .timeout(10 * 1000) // timeout to 10 seconds
                     .get();
             Element content = doc.getElementById("content");
 
@@ -460,12 +461,13 @@ public class Parser {
      * @param url where to find comics
      */
     private void parseUrlBonelli(String url) {
-        Log.d(TAG, "Parsing Bonelli URL " + url);
+        Log.d(TAG, "Parsing Bonelli URL " + url + " - start");
         try {
             // Creating doc file from URL
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .maxBodySize(0)
+                    .timeout(10 * 1000) // timeout to 10 seconds
                     .get();
 
             // Finding release date
@@ -492,6 +494,7 @@ public class Parser {
                     Document docMoreInfo = Jsoup.connect(moreInfoUrl)
                             .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                             .maxBodySize(0)
+                            .timeout(10 * 1000) // timeout to 10 seconds
                             .get();
 
                     // Finding periodicity
@@ -547,5 +550,7 @@ public class Parser {
             Log.w(TAG, "Error while comic fetching " + url + " " + e.toString());
             comicErrorBonelli = true;
         }
+
+        Log.v(TAG, "Parsing Bonelli - end");
     }
 }

@@ -23,8 +23,11 @@ import org.checklist.comics.comicschecklist.util.DateCreator;
 
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,6 +38,19 @@ public class DownloadService extends IntentService {
 
     private static final String TAG = DownloadService.class.getSimpleName();
     private boolean error = false;
+
+    /* Init a static map of editor to search */
+    private static final Map<Constants.Sections, String> mEditorMap;
+    static {
+        Map<Constants.Sections, String> aMap = new HashMap<>();
+        aMap.put(Constants.Sections.RW, Constants.PREF_RW_LAST_SCAN);
+        aMap.put(Constants.Sections.MARVEL, Constants.PREF_MARVEL_LAST_SCAN);
+        aMap.put(Constants.Sections.PANINI, Constants.PREF_PANINI_LAST_SCAN);
+        aMap.put(Constants.Sections.PLANET, Constants.PREF_PLANET_LAST_SCAN);
+        aMap.put(Constants.Sections.BONELLI, Constants.PREF_BONELLI_LAST_SCAN);
+        aMap.put(Constants.Sections.STAR, Constants.PREF_STAR_LAST_SCAN);
+        mEditorMap = Collections.unmodifiableMap(aMap);
+    }
 
     public DownloadService() {
         super(TAG);
@@ -74,62 +90,21 @@ public class DownloadService extends IntentService {
                 Log.i(TAG, "Automatic search launched");
                 boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);
 
-                // RW scan
-                if (calculateDayDifference(Constants.PREF_RW_LAST_SCAN) >= frequency &&
-                        editorSet.contains(String.valueOf(Constants.Sections.RW.getCode()))) {
-                    searchNecessary = true;
-                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.RW);
-                    publishResults(Constants.RESULT_START, editorTitle);
-                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.RW);
-                }
-
-                // Marvel scan
-                if (calculateDayDifference(Constants.PREF_MARVEL_LAST_SCAN) >= frequency &&
-                        editorSet.contains(String.valueOf(Constants.Sections.MARVEL.getCode()))) {
-                    searchNecessary = true;
-                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.MARVEL);
-                    publishResults(Constants.RESULT_START, editorTitle);
-                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.MARVEL);
-                }
-
-                // Panini Comics scan
-                if (calculateDayDifference(Constants.PREF_PANINI_LAST_SCAN) >= frequency &&
-                        editorSet.contains(String.valueOf(Constants.Sections.PANINI.getCode()))) {
-                    searchNecessary = true;
-                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.PANINI);
-                    publishResults(Constants.RESULT_START, editorTitle);
-                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.PANINI);
-                }
-
-                // Planet Manga scan
-                if (calculateDayDifference(Constants.PREF_PLANET_LAST_SCAN) >= frequency &&
-                        editorSet.contains(String.valueOf(Constants.Sections.PLANET.getCode()))) {
-                    searchNecessary = true;
-                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.PLANET);
-                    publishResults(Constants.RESULT_START, editorTitle);
-                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.PLANET);
-                }
-
-                // Bonelli scan
-                if (calculateDayDifference(Constants.PREF_BONELLI_LAST_SCAN) >= frequency &&
-                        editorSet.contains(String.valueOf(Constants.Sections.BONELLI.getCode()))) {
-                    searchNecessary = true;
-                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.BONELLI);
-                    publishResults(Constants.RESULT_START, editorTitle);
-                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.BONELLI);
-                }
-
-                // Star comics scan
-                if (calculateDayDifference(Constants.PREF_STAR_LAST_SCAN) >= frequency &&
-                        editorSet.contains(String.valueOf(Constants.Sections.STAR.getCode()))) {
-                    searchNecessary = true;
-                    String editorTitle = Constants.Sections.getTitle(Constants.Sections.STAR);
-                    publishResults(Constants.RESULT_START, editorTitle);
-                    searchComics(myParser, notificationPref, editorTitle, Constants.Sections.STAR);
+                for (Map.Entry<Constants.Sections, String> entry : mEditorMap.entrySet()) {
+                    Log.d(TAG, "Current editor " + entry.getKey() + " key of last scan" + entry.getValue());
+                    Constants.Sections currentSection = entry.getKey();
+                    // Check if editor is desired by user and if last day of scan has passed limits
+                    if (calculateDayDifference(entry.getValue()) >= frequency &&
+                            editorSet.contains(String.valueOf(currentSection.getCode()))) {
+                        searchNecessary = true;
+                        String editorTitle = Constants.Sections.getTitle(currentSection);
+                        publishResults(Constants.SearchResults.RESULT_START, editorTitle);
+                        searchComics(myParser, notificationPref, editorTitle, currentSection);
+                    }
                 }
 
                 if (searchNecessary) {
-                    publishResults(Constants.RESULT_FINISHED, "noEditor");
+                    publishResults(Constants.SearchResults.RESULT_FINISHED, "noEditor");
                     if (notificationPref) {
                         createNotification(getResources().getString(R.string.search_completed), false);
                     }
@@ -141,14 +116,14 @@ public class DownloadService extends IntentService {
                     Log.i(TAG, "Manual search for editor " + editor.toString());
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(editor);
-                    publishResults(Constants.RESULT_START, editorTitle);
+                    publishResults(Constants.SearchResults.RESULT_START, editorTitle);
                     searchComics(myParser, notificationPref, editorTitle, editor);
                 } else {
                     searchNecessary = false;
                 }
 
                 if (searchNecessary) {
-                    publishResults(Constants.RESULT_FINISHED, "noEditor");
+                    publishResults(Constants.SearchResults.RESULT_FINISHED, "noEditor");
                     if (notificationPref) {
                         createNotification(getResources().getString(R.string.search_completed), false);
                         // Favorite data may have changed, update widget as well
@@ -158,7 +133,7 @@ public class DownloadService extends IntentService {
             }
         } else {
             error = true;
-            publishResults(Constants.RESULT_NOT_CONNECTED, "noEditor");
+            publishResults(Constants.SearchResults.RESULT_NOT_CONNECTED, "noEditor");
             createNotification(getResources().getString(R.string.toast_no_connection), false);
         }
 
@@ -167,7 +142,7 @@ public class DownloadService extends IntentService {
 
     @Override
     public void onDestroy() {
-        publishResults(Constants.RESULT_DESTROYED, "noEditor");
+        publishResults(Constants.SearchResults.RESULT_DESTROYED, "noEditor");
         // Notification is not needed (only if there isn't an error)
         if (!error) {
             String ns = Context.NOTIFICATION_SERVICE;
@@ -208,12 +183,12 @@ public class DownloadService extends IntentService {
 
         // See result
         if (error) {
-            publishResults(Constants.RESULT_CANCELED, editorTitle);
+            publishResults(Constants.SearchResults.RESULT_CANCELED, editorTitle);
             if (notificationPref) {
                 createNotification(editorTitle + getResources().getString(R.string.search_failed), false);
             }
         } else {
-            publishResults(Constants.RESULT_EDITOR_FINISHED, editorTitle);
+            publishResults(Constants.SearchResults.RESULT_EDITOR_FINISHED, editorTitle);
             if (notificationPref) {
                 createNotification(editorTitle + getResources().getString(R.string.search_editor_completed), true);
             }
@@ -284,8 +259,8 @@ public class DownloadService extends IntentService {
      * @param result the result of search
      * @param editor the editor searched
      */
-    private void publishResults(int result, String editor) {
-        Log.v(TAG, "Result of search " + result + " " + editor);
+    private void publishResults(Constants.SearchResults result, String editor) {
+        Log.v(TAG, "Result of search " + result.name() + " " + editor);
         Intent intent = new Intent(Constants.NOTIFICATION);
         intent.putExtra(Constants.NOTIFICATION_RESULT, result);
         intent.putExtra(Constants.NOTIFICATION_EDITOR, editor);
@@ -302,7 +277,7 @@ public class DownloadService extends IntentService {
         long result; // If result is 3, we need a refresh
         String today = DateCreator.getTodayString();
 
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String dateStart = sp.getString(editorLastScan, "01/01/2012");
 
         Log.d(TAG, "calculateDayDifference - date is " + today);
