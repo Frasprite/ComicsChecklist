@@ -418,6 +418,13 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         super.onPause();
         Log.v(TAG, "onPause");
         unregisterReceiver(receiver);
+        // Stop animation
+        if (mListFragment != null) {
+            boolean isRefreshing = mListFragment.isRefreshing();
+            if (isRefreshing) {
+                mListFragment.setRefreshing(false);
+            }
+        }
     }
 
     @Override
