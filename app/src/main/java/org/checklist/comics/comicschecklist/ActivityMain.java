@@ -123,9 +123,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
 
             // Set search animation on UI
             if (mListFragment != null) {
-                boolean isRefreshing = mListFragment.isRefreshing();
-                if (isRefreshing != shouldSetRefresh) {
-                    mListFragment.setRefreshing(shouldSetRefresh);
+                if (!shouldSetRefresh) {
+                    mListFragment.setRefreshing(false);
                 }
             }
         }
@@ -420,8 +419,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         unregisterReceiver(receiver);
         // Stop animation
         if (mListFragment != null) {
-            boolean isRefreshing = mListFragment.isRefreshing();
-            if (isRefreshing) {
+            if (mListFragment.isRefreshing()) {
                 mListFragment.setRefreshing(false);
             }
         }

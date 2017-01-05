@@ -13,7 +13,7 @@ public class DateCreator {
     private static final String TAG = DateCreator.class.getSimpleName();
 
     public static Date elaborateDate(String releaseDate) {
-        Log.d(TAG, "elaborateDate - start");
+        Log.v(TAG, "elaborateDate - start");
         Date date = null;
         try {
             date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(releaseDate);

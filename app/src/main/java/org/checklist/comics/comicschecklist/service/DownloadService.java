@@ -44,9 +44,8 @@ public class DownloadService extends IntentService {
     static {
         Map<Constants.Sections, String> aMap = new HashMap<>();
         aMap.put(Constants.Sections.RW, Constants.PREF_RW_LAST_SCAN);
-        aMap.put(Constants.Sections.MARVEL, Constants.PREF_MARVEL_LAST_SCAN);
+        // By using only Panini, will search for Marvel and Planet Manga as well
         aMap.put(Constants.Sections.PANINI, Constants.PREF_PANINI_LAST_SCAN);
-        aMap.put(Constants.Sections.PLANET, Constants.PREF_PLANET_LAST_SCAN);
         aMap.put(Constants.Sections.BONELLI, Constants.PREF_BONELLI_LAST_SCAN);
         aMap.put(Constants.Sections.STAR, Constants.PREF_STAR_LAST_SCAN);
         mEditorMap = Collections.unmodifiableMap(aMap);
@@ -289,6 +288,11 @@ public class DownloadService extends IntentService {
 
         result = diff / (24 * 60 * 60 * 1000);
         sp.edit().putString(editorLastScan, today).apply();
+        if (editorLastScan.equals(Constants.PREF_PANINI_LAST_SCAN)) {
+            // Update last scan for Marvel and Planet Manga too
+            sp.edit().putString(Constants.PREF_PLANET_LAST_SCAN, today).apply();
+            sp.edit().putString(Constants.PREF_MARVEL_LAST_SCAN, today).apply();
+        }
 
         // Set default value in case of error
         if (result < 0) {
