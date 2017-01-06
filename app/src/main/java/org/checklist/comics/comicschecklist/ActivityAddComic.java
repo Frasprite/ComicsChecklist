@@ -18,10 +18,7 @@ import android.view.WindowManager;
 import android.widget.DatePicker;
 
 import org.checklist.comics.comicschecklist.util.Constants;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
 public class ActivityAddComic extends AppCompatActivity {
 
@@ -91,10 +88,9 @@ public class ActivityAddComic extends AppCompatActivity {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
+            int year = DateCreator.getCurrentDay();
+            int month = DateCreator.getCurrentMonth();
+            int day = DateCreator.getCurrentYear();
 
             // Create a new instance of DatePickerDialog and return it
             Log.d(TAG, "onCreateDialog - date is " + day + "/" + month + "/" + year);
@@ -106,10 +102,7 @@ public class ActivityAddComic extends AppCompatActivity {
             // Set chosen date to text view
             FragmentAddComic articleFrag = (FragmentAddComic)
                     getActivity().getSupportFragmentManager().findFragmentByTag("addComicFragment");
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(year, month, day);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String date = simpleDateFormat.format(calendar.getTime());
+            String date = DateCreator.elaborateDate(year, month, day);
             Log.i(TAG, "onDateSet - returning " + date);
             articleFrag.updateDate(date);
         }

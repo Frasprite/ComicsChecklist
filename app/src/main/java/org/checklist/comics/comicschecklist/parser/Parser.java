@@ -12,14 +12,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.net.URL;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.StringTokenizer;
 
 /**
@@ -92,9 +87,9 @@ public class Parser {
         Log.i(TAG, "Start searching for Panini comics");
         comicErrorPanini = false;
 
-        parsePaniniUrl("http://comics.panini.it/calendario/uscite-scorsa-settimana/");
-        parsePaniniUrl("http://comics.panini.it/calendario/uscite-questa-settimana/");
-        parsePaniniUrl("http://comics.panini.it/calendario/uscite-prossime-settimane/");
+        parseUrlPanini("http://comics.panini.it/calendario/uscite-scorsa-settimana/");
+        parseUrlPanini("http://comics.panini.it/calendario/uscite-questa-settimana/");
+        parseUrlPanini("http://comics.panini.it/calendario/uscite-prossime-settimane/");
 
         return comicErrorPanini;
     }
@@ -103,7 +98,7 @@ public class Parser {
      * Private method used to parse a Panini URL
      * @param url the URL to parse
      */
-    private void parsePaniniUrl(String url) {
+    private void parseUrlPanini(String url) {
         Log.d(TAG, "Parsing Panini Comics " + url);
 
         try {
@@ -172,7 +167,7 @@ public class Parser {
                     Log.w(TAG, "Editor not found from given link:\n" + linkMoreInfo + "\n" + features);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             Log.w(TAG, "Error while comic search " + url + " " + e.toString());
             comicErrorPanini = true;
         }
@@ -247,18 +242,16 @@ public class Parser {
         Log.i(TAG, "Start searching for RW comics");
         comicErrorRw = false;
 
-        Calendar calendar = Calendar.getInstance();
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        int monthInt = calendar.get(Calendar.MONTH);
-        int year = calendar.get(Calendar.YEAR);
-        Log.d(TAG, "startParseRW - date is " + day + "/" + monthInt + "/" + year);
-        String month = DateFormatSymbols.getInstance(Locale.ITALIAN).getMonths()[monthInt];
+        int day = DateCreator.getCurrentDay();
+        String month = DateCreator.getCurrentReadableMonth();
+        int year = DateCreator.getCurrentYear();
+        Log.d(TAG, "startParseRW - limit date is " + DateCreator.getTodayString());
         String url;
-        for (int i = 1; i < day + 3; i++) {
+        String releaseDate;
+        for (int i = 1; i <= day + 3; i++) {
             url = Constants.FIRSTRW + Constants.MIDDLERW + i + Constants.MIDDLERW + month + Constants.MIDDLERW + year + Constants.ENDRW;
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String date = simpleDateFormat.format(calendar.getTime());
-            parseUrlRW(url, date);
+            releaseDate = i < 10 ? "0" + i + "/" + month + "/" + year : i + "/" + month + "/" + year;
+            parseUrlRW(url, releaseDate);
         }
 
         return comicErrorRw;

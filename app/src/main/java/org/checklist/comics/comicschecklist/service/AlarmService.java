@@ -16,10 +16,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
 /**
  * Created by Francesco Bevilacqua on 18/02/2015.
@@ -39,12 +36,9 @@ public class AlarmService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Log.d(TAG, "onHandleIntent");
         // Do the work that requires your app to keep the CPU running.
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        String formattedDate = df.format(calendar.getTime());
         String[] columns = new String[]{ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_RELEASE_KEY};
         String selection = ComicDatabase.COMICS_RELEASE_KEY + " LIKE ? AND " + ComicDatabase.COMICS_FAVORITE_KEY + " LIKE ?";
-        String[] selectionArguments = new String[]{formattedDate, "yes"};
+        String[] selectionArguments = new String[]{DateCreator.getTodayString(), "yes"};
         String order = ComicDatabase.COMICS_DATE_KEY + " " + "ASC";
         Cursor cursor = ComicDatabaseManager.query(this, ComicContentProvider.CONTENT_URI, columns, selection,
                 selectionArguments, order);

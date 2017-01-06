@@ -19,11 +19,6 @@ import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
 public class FragmentAddComic extends Fragment {
 
     private static final String TAG = FragmentAddComic.class.getSimpleName();
@@ -92,10 +87,7 @@ public class FragmentAddComic extends Fragment {
             mCursor.close();
         } else {
             // Leave all form in blank and set default date
-            Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            String date = simpleDateFormat.format(calendar.getTime());
-            updateDate(date);
+            updateDate(DateCreator.getTodayString());
         }
     }
 
@@ -117,19 +109,23 @@ public class FragmentAddComic extends Fragment {
                 name = getString(R.string.text_default_title);
             }
 
-            // Elaborating date
-            Date myDate = DateCreator.elaborateDate(date);
-
             if (mComicId == -1) {
                 // Insert new entry
-                mComicId = ComicDatabaseManager.insert(getActivity(), name, Constants.Sections.getName(Constants.Sections.CART), info, date, myDate, "error", "N.D", "N.D.", "yes", "no", "");
+                mComicId = ComicDatabaseManager.insert(
+                        getActivity(),
+                        name,
+                        Constants.Sections.getName(Constants.Sections.CART),
+                        info,
+                        date,
+                        DateCreator.elaborateDate(date),
+                        "error", "N.D", "N.D.", "yes", "no", "");
                 Log.d(TAG, "INSERTED new entry on database with ID " + mComicId);
             } else {
                 // Update entry
                 ContentValues mUpdateValues = new ContentValues();
                 mUpdateValues.put(ComicDatabase.COMICS_NAME_KEY, name);
                 mUpdateValues.put(ComicDatabase.COMICS_DESCRIPTION_KEY, info);
-                mUpdateValues.put(ComicDatabase.COMICS_DATE_KEY, myDate.getTime());
+                mUpdateValues.put(ComicDatabase.COMICS_DATE_KEY, DateCreator.elaborateDate(date).getTime());
                 mUpdateValues.put(ComicDatabase.COMICS_RELEASE_KEY, date);
                 // Defines selection criteria for the rows you want to update
                 String mSelectionClause = ComicDatabase.ID +  "=?";

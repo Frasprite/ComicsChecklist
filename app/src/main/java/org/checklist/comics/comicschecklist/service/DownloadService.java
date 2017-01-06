@@ -22,9 +22,7 @@ import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -231,13 +229,9 @@ public class DownloadService extends IntentService {
         int frequency = Integer.parseInt(deletePref);
         int rowsDeleted = 0;
         if (frequency > -1) {
-            Calendar calendar = Calendar.getInstance();
-            int x = frequency * -1;
-            calendar.add(Calendar.DAY_OF_YEAR, x);
-            Date sevenDaysAgo = calendar.getTime();
             // Defines selection criteria for the rows to delete
             String mSelectionClause = ComicDatabase.COMICS_DATE_KEY + "<?";
-            String[] mSelectionArgs = {"" + sevenDaysAgo.getTime()};
+            String[] mSelectionArgs = {"" + DateCreator.getPastDay(frequency).getTime()};
             rowsDeleted = ComicDatabaseManager.delete(this,
                     ComicContentProvider.CONTENT_URI,   // the comic content URI
                     mSelectionClause,                   // the column to select on
@@ -279,12 +273,9 @@ public class DownloadService extends IntentService {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String dateStart = sp.getString(editorLastScan, "01/01/2012");
 
-        Log.d(TAG, "calculateDayDifference - date is " + today);
-        Date d1 = DateCreator.elaborateDate(dateStart);
-        Date d2 = DateCreator.elaborateDate(today);
-
+        Log.d(TAG, "calculateDayDifference (in milliseconds) - today is " + today + " target is " + dateStart);
         // Calculate day difference in milliseconds
-        long diff = d2.getTime() - d1.getTime();
+        long diff = DateCreator.getDifferenceInMillis(today, dateStart);
 
         result = diff / (24 * 60 * 60 * 1000);
         sp.edit().putString(editorLastScan, today).apply();

@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import java.util.Calendar;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
 /**
  * Created by Francesco Bevilacqua on 18/02/2015.
@@ -26,13 +26,8 @@ public class BootReceiver extends BroadcastReceiver {
             Intent mIntentReceiver = new Intent(context, AlarmReceiver.class);
             PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, mIntentReceiver, 0);
 
-            // Set the alarm to start at 10:00 a.m.
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.set(Calendar.HOUR_OF_DAY, 10);
-
-            // Specify a non-precise custom interval, in this case every days.
-            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+            // Specify a non-precise custom interval, in this case every days (set the alarm to start at 10:00 a.m.)
+            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, DateCreator.getAlarm().getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY, alarmIntent);
         }
     }

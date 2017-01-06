@@ -144,6 +144,7 @@ public class Constants {
     public static final String PREF_LIST_ORDER = "data_order";
     public static final String PREF_AVAILABLE_EDITORS = "available_editors";
     public static final String PREF_DELETE_CONTENT = "delete_content";
+    public static final String PREF_LAST_SYNC = "last_sync";
 
     /* Preference last scan */
     public static final String PREF_MARVEL_LAST_SCAN = "marvel_lastscan";

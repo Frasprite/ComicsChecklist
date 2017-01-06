@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -25,8 +26,8 @@ import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
 import org.checklist.comics.comicschecklist.receiver.BootReceiver;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -179,13 +180,8 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                         Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);
                         PendingIntent alarmIntent = PendingIntent.getBroadcast(mContext, 0, mIntentReceiver, 0);
 
-                        // Set the alarm to start at 10:00 a.m.
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(System.currentTimeMillis());
-                        calendar.set(Calendar.HOUR_OF_DAY, 10);
-
                         // Specify a non-precise custom interval, in this case every days.
-                        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, DateCreator.getAlarm().getTimeInMillis(),
                                 AlarmManager.INTERVAL_DAY, alarmIntent);
 
                         // Enabling also receiver on boot
@@ -222,7 +218,6 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                //startActivity(new Intent(getActivity(), ActivitySettings.class));
                 getActivity().onBackPressed();
                 return true;
             }
@@ -248,13 +243,48 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(Constants.PREF_SYNC_FREQUENCY));
             bindPreferenceSummaryToValue(findPreference(Constants.PREF_DELETE_FREQUENCY));
+
+            Preference preference = findPreference(Constants.PREF_LAST_SYNC);
+            preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(final Preference preference) {
+                    Log.d(TAG, "onPreferenceClick - preference " + preference.getKey());
+                    launchLastSyncDialog(preference.getContext());
+                    return true;
+                }
+            });
+        }
+
+        private void launchLastSyncDialog(final Context context) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle(R.string.dialog_last_sync_title)
+                    .setMessage(composeLastSyncMessage(context))
+                    .setPositiveButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+            builder.create().show();
+        }
+
+        private String composeLastSyncMessage(Context context) {
+            String message;
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+            message = "Marvel : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_MARVEL_LAST_SCAN, "01/01/2012")) + "\n";
+            message = message + "Panini Comics : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_PANINI_LAST_SCAN, "01/01/2012")) + "\n";
+            message = message + "Planet Manga : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_PLANET_LAST_SCAN, "01/01/2012")) + "\n";
+            message = message + "RW Edizioni : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_RW_LAST_SCAN, "01/01/2012")) + "\n";
+            message = message + "Bonelli : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_BONELLI_LAST_SCAN, "01/01/2012")) + "\n";
+            message = message + "Star Comics : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_STAR_LAST_SCAN, "01/01/2012"));
+            return message;
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                //startActivity(new Intent(getActivity(), ActivitySettings.class));
                 getActivity().onBackPressed();
                 return true;
             }
@@ -300,7 +330,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
         }
 
         private void launchDeleteContentDialog(final Context context) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);//, R.style.AppCompatAlertDialogStyle);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(R.string.dialog_delete_content_title)
                     .setItems(R.array.pref_available_editors, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
@@ -355,7 +385,6 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                //startActivity(new Intent(getActivity(), ActivitySettings.class));
                 getActivity().onBackPressed();
                 return true;
             }

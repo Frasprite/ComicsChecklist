@@ -45,6 +45,7 @@
     <string name="dialog_picasso_copyright">Copyright 2013 Square, Inc.</string>
     <string name="dialog_picasso_license">Licensed used under the Apache License, v2.0</string>
     <string name="dialog_delete_content_title">Scegli un editore</string>
+    <string name="dialog_last_sync_title">Ultime sincronizzazioni</string>
 
     <!-- Navigation drawer text -->
     <string name="drawer_open">Apri la barra di navigazione</string>
@@ -92,6 +93,9 @@
     <!-- Strings related to Settings -->
     <!-- String set for Data & Sync -->
     <string name="pref_header_data_sync">Sincronizzazione dati</string>
+
+    <string name="pref_title_last_sync">Data ultime ricerche</string>
+    <string name="pref_summary_last_sync">Consulta quando sono state effettuate le ultime ricerche per ogni editore</string>
 
     <string name="pref_title_sync_frequency">Frequenza sincronizzazione</string>
     <string-array name="pref_sync_frequency_titles">

@@ -210,13 +210,9 @@ public class FragmentDetail extends Fragment {
                     intent.putExtra(CalendarContract.Events.DESCRIPTION, getString(R.string.calendar_release));
 
                     // Setting dates
-                    Date date = DateCreator.elaborateDate(mComicRelease);
-                    Calendar calDate = Calendar.getInstance();
-                    calDate.setTime(date);
-                    intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME,
-                            calDate.getTimeInMillis());
-                    intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME,
-                            calDate.getTimeInMillis());
+                    long timeInMillis = DateCreator.getTimeInMillis(mComicRelease);
+                    intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, timeInMillis);
+                    intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, timeInMillis);
 
                     // Make it a full day event
                     intent.putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, true);
