@@ -290,7 +290,7 @@ public class DownloadService extends IntentService {
             result = 3;
         }
 
-        Log.v(TAG, "calculateDayDifference " + result + " - end");
+        Log.v(TAG, "calculateDayDifference - result is " + result + " - end");
 
         return result;
     }

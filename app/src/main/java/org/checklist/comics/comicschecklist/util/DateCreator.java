@@ -166,6 +166,6 @@ public class DateCreator {
         Date d2 = DateCreator.elaborateDate(today);
         long difference = d2.getTime() - d1.getTime();
         Log.v(TAG, "getDifferenceInMillis - result is " + difference);
-        return 0;
+        return difference;
     }
 }

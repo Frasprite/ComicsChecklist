@@ -243,14 +243,16 @@ public class Parser {
         comicErrorRw = false;
 
         int day = DateCreator.getCurrentDay();
+        int monthInt = DateCreator.getCurrentMonth() + 1;
         String month = DateCreator.getCurrentReadableMonth();
         int year = DateCreator.getCurrentYear();
         Log.d(TAG, "startParseRW - limit date is " + DateCreator.getTodayString());
         String url;
         String releaseDate;
         for (int i = 1; i <= day + 3; i++) {
+            // Example : http://www.rwedizioni.it/news/uscite-del-7-gennaio-2017/
             url = Constants.FIRSTRW + Constants.MIDDLERW + i + Constants.MIDDLERW + month + Constants.MIDDLERW + year + Constants.ENDRW;
-            releaseDate = i < 10 ? "0" + i + "/" + month + "/" + year : i + "/" + month + "/" + year;
+            releaseDate = (i < 10 ? "0" + i : i) + "/" + (monthInt < 10 ? "0" + monthInt : monthInt) + "/" + year;
             parseUrlRW(url, releaseDate);
         }
 
