@@ -23,20 +23,6 @@ public class ParserTest {
     }
 
     @Test
-    public void startParsePaniniTest() {
-        Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParsePanini();
-        assertThat(result, is(true));
-    }
-
-    @Test
-    public void startParsePlanetTest() {
-        Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParsePanini();
-        assertThat(result, is(true));
-    }
-
-    @Test
     public void startParseRWTest() {
         Parser parser = new Parser(mMockContext);
         boolean result = parser.startParseRW();

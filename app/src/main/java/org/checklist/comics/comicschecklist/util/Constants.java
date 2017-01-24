@@ -197,11 +197,11 @@ public class Constants {
     public static final String COMIC_ROOT = "http://www.starcomics.com/fumetto.aspx?Fumetto=";
     public static final String IMG_URL = "http://www.starcomics.com";
     // Bonelli
-    public static final String EDICOLA_INEDITI = "http://www.sergiobonelli.it/sezioni/1025/inediti";
-    public static final String EDICOLA_RISTAMPE = "http://www.sergiobonelli.it/sezioni/1016/ristampe";
-    public static final String EDICOLA_RACCOLTE = "http://www.sergiobonelli.it/sezioni/1017/raccolte";
-    public static final String PROSSIMAMENTE_INEDITI = "http://www.sergiobonelli.it/sezioni/1026/inediti";
-    public static final String PROSSIMAMENTE_RISTAMPE = "http://www.sergiobonelli.it/sezioni/1018/ristampe";
-    public static final String PROSSIMAMENTE_RACCOLTE = "http://www.sergiobonelli.it/sezioni/1019/raccolte";
+    public static final String EDICOLA_INEDITI = "http://www.sergiobonelli.it/sezioni/1025/inediti1025";
+    public static final String EDICOLA_RISTAMPE = "http://www.sergiobonelli.it/sezioni/1016/ristampe1016";
+    public static final String EDICOLA_RACCOLTE = "http://www.sergiobonelli.it/sezioni/1017/raccolte1017";
+    public static final String PROSSIMAMENTE_INEDITI = "http://www.sergiobonelli.it/sezioni/1026/inediti1026";
+    public static final String PROSSIMAMENTE_RISTAMPE = "http://www.sergiobonelli.it/sezioni/1018/ristampe1018";
+    public static final String PROSSIMAMENTE_RACCOLTE = "http://www.sergiobonelli.it/sezioni/1019/raccolte1019";
     public static final String MAIN_URL = "http://www.sergiobonelli.it/";
 }

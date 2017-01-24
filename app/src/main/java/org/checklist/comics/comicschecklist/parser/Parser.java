@@ -470,20 +470,18 @@ public class Parser {
             Document releasePart = Jsoup.parse(releaseTag);
             Elements spanRelease = releasePart.select("span.valore");
 
-            // Finding comics name with number
-            Elements spanTitle = doc.select("span._summary");
+            // Finding link for other info and title if needed
+            Elements spanOther = doc.select("div.cont_foto");
 
-            // Finding link for other info and title ig needed
-            Elements spanOther = doc.select("span._url");
+            //Log.v(TAG, "Total release " + spanRelease.size() + "\nTotal entries " + spanOther.size());
 
             // Iterate all elements founded
             String name, releaseDate, description = "N.D.", price = "N.D.", feature = "N.D.", coverUrl,
-                    moreInfoUrl, periodicityTag, title = "N.D.";
+                    moreInfoUrl, periodicityTag;
             for (int i = 0; i < spanRelease.size(); i++) {
-                name = spanTitle.get(i).text();
-                moreInfoUrl = spanOther.get(i).text().replace(Constants.MAIN_URL, "");
-                moreInfoUrl = Constants.MAIN_URL + moreInfoUrl;
-                Log.v(TAG, name + " " + moreInfoUrl);
+                // On spanOther element is possible to find title and URL to other info
+                moreInfoUrl = Constants.MAIN_URL + spanOther.get(i).select("a").first().attr("href");
+                Log.v(TAG, "More info URL " + moreInfoUrl);
                 try {
                     // Creating doc file from URL
                     Document docMoreInfo = Jsoup.connect(moreInfoUrl)
@@ -501,13 +499,6 @@ public class Parser {
                         Log.v(TAG, "Comic feature: " + feature);
                     }
 
-                    // Finding comic title
-                    Elements titleIte = docMoreInfo.select("h1");
-                    if (!titleIte.isEmpty()) {
-                        title = titleIte.get(0).text();
-                        Log.v(TAG, "Comic title: " + title);
-                    }
-
                     // Finding comic description
                     Elements desc = docMoreInfo.select("div[class=testo_articolo testo testoResize]");
                     if (!desc.isEmpty()) {
@@ -522,13 +513,22 @@ public class Parser {
                     // N.B.: changed due to violation of copyright
                     coverUrl = "";
 
+                    // Finding comic title
+                    name = docMoreInfo.select("var.atc_title").text();
+                    Log.v(TAG, "Comic name BEFORE: " + name);
                     // Defining comic name
-                    if (name.startsWith("N°.")) {
-                        name = title.trim().replace("n°", "");
-                    } else {
-                        name = name.substring(0, name.indexOf("-")).trim().replace("N°.", "");
+                    if (name.startsWith("N°.")) { // ex.: N°.244 - Raccolta Zagor n°244
+                        name = name.substring(name.indexOf("-") + 1).trim();
                     }
-                    Log.v(TAG, "Comic name: " + name);
+
+                    if (name.contains("N°.")) { // ex.: Almanacco Del West N°.2 - Tex Magazine 2017
+                        name = name.replace("N°.", "");
+                    }
+
+                    if (name.contains("n°")) { // ex.: Maxi Zagor N°.29 - Maxi Zagor n°29
+                        name = name.replace("n°", "");
+                    }
+                    Log.v(TAG, "Comic name AFTER: " + name);
 
                     // Calculating date for sql
                     releaseDate = spanRelease.get(i).text();
@@ -538,11 +538,11 @@ public class Parser {
                     String editor = Constants.Sections.getName(Constants.Sections.BONELLI);
                     ComicDatabaseManager.insert(mContext, name.toUpperCase(), editor, description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
                 } catch (Exception e) {
-                    Log.w(TAG, "Can't take more info from " + moreInfoUrl + " " + e.toString() + " comic not fetched");
+                    Log.e(TAG, "Can't take more info from " + moreInfoUrl + " " + e.toString() + " comic not fetched", e);
                 }
             }
         } catch (Exception e) {
-            Log.w(TAG, "Error while comic fetching " + url + " " + e.toString());
+            Log.e(TAG, "Error while comic fetching " + url + " " + e.toString(), e);
             comicErrorBonelli = true;
         }
 
