@@ -17,7 +17,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.MenuItem;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
@@ -25,6 +24,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
 import org.checklist.comics.comicschecklist.receiver.BootReceiver;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -53,7 +53,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
-            Log.d(TAG, "onPreferenceChange - preference " + preference.getKey() + " value " + stringValue);
+            CCLogger.d(TAG, "onPreferenceChange - preference " + preference.getKey() + " value " + stringValue);
 
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
@@ -174,7 +174,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                     boolean boolValue = (boolean) newValue;
                     Context mContext = getActivity();
                     if (boolValue) {
-                        Log.d(TAG, "Activate notification for favorite");
+                        CCLogger.d(TAG, "onCreate - Activate notification for favorite");
                         // Activate notification for favorite
                         AlarmManager alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
                         Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);
@@ -192,7 +192,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                                 PackageManager.DONT_KILL_APP);
                     } else {
-                        Log.d(TAG, "Disable notification for favorite");
+                        CCLogger.d(TAG, "onCreate - Disable notification for favorite");
                         // Disable notification for favorite
                         AlarmManager alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
                         Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);
@@ -248,7 +248,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
             preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(final Preference preference) {
-                    Log.d(TAG, "onPreferenceClick - preference " + preference.getKey());
+                    CCLogger.d(TAG, "onPreferenceClick - preference " + preference.getKey());
                     launchLastSyncDialog(preference.getContext());
                     return true;
                 }
@@ -313,7 +313,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
             multiSelectListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object value) {
-                    Log.d(TAG, "onPreferenceChange - preference " + preference.getKey() + " value " + value.toString());
+                    CCLogger.d(TAG, "onPreferenceChange - preference " + preference.getKey() + " value " + value.toString());
                     return true;
                 }
             });
@@ -322,7 +322,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
             preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(final Preference preference) {
-                    Log.d(TAG, "onPreferenceClick - preference " + preference.getKey());
+                    CCLogger.d(TAG, "onPreferenceClick - preference " + preference.getKey());
                     launchDeleteContentDialog(preference.getContext());
                     return true;
                 }
@@ -365,15 +365,15 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                                     section = null;
                             }
                             if (section != null) {
-                                Log.v(TAG, "Selected item on position " + which + " - obtaining section " + section);
+                                CCLogger.v(TAG, "Selected item on position " + which + " - obtaining section " + section);
                                 String selection = ComicDatabase.COMICS_EDITOR_KEY + " =? AND " +
                                                     ComicDatabase.COMICS_CART_KEY + " =? AND " +
                                                     ComicDatabase.COMICS_FAVORITE_KEY + " =?";
                                 String[] selectionArgs = new String[]{section.getName(), "no", "no"};
                                 int result = ComicDatabaseManager.delete(context, ComicContentProvider.CONTENT_URI, selection, selectionArgs);
-                                Log.d(TAG, "Deleted " + result + " entries of " + section + " section");
+                                CCLogger.d(TAG, "Deleted " + result + " entries of " + section + " section");
                             } else {
-                                Log.w(TAG, "No section found with index " + which);
+                                CCLogger.w(TAG, "No section found with index " + which);
                                 dialog.dismiss();
                             }
                         }

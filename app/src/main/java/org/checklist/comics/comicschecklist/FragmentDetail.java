@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,11 +24,9 @@ import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.WidgetService;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
-
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * A fragment representing a single Comic detail screen.
@@ -67,24 +64,23 @@ public class FragmentDetail extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate - start");
+        CCLogger.d(TAG, "onCreate - start");
 
         if (getArguments().containsKey(Constants.ARG_COMIC_ID)) {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             // For better performance, use a Loader to load content from a content provider.
             mComicId = getArguments().getLong(Constants.ARG_COMIC_ID);
             mActivityDetailLaunched = getArguments().getBoolean(ARG_ACTIVITY_LAUNCHED);
-            Log.i(TAG, "Loading comic with ID " + mComicId);
+            CCLogger.i(TAG, "onCreate - comic with ID " + mComicId + " / fragment launched by ActivityDetail " + mActivityDetailLaunched);
         }
 
-        Log.i(TAG, "Fragment launched by ActivityDetail " + mActivityDetailLaunched);
         setHasOptionsMenu(mActivityDetailLaunched);
-        Log.v(TAG, "onCreate - end");
+        CCLogger.v(TAG, "onCreate - end");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView - start");
+        CCLogger.d(TAG, "onCreateView - start");
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         // Show the comic contents
@@ -129,7 +125,7 @@ public class FragmentDetail extends Fragment {
         }
 
         if (!mActivityDetailLaunched) {
-            Log.d(TAG, "Inflating detail toolbar");
+            CCLogger.d(TAG, "onCreateView - Inflating detail toolbar");
             // Create detail toolbar
             Toolbar toolbarDetail = (Toolbar) getActivity().findViewById(R.id.toolbarDetail);
             // Inflate a menu to be displayed in the toolbar
@@ -147,7 +143,7 @@ public class FragmentDetail extends Fragment {
             }
         }
 
-        Log.v(TAG, "onCreateView - end");
+        CCLogger.v(TAG, "onCreateView - end");
         return rootView;
     }
 
@@ -202,7 +198,7 @@ public class FragmentDetail extends Fragment {
         switch (item.getItemId()) {
             case R.id.calendar:
                 try {
-                    Log.i(TAG, "Add event on calendar");
+                    CCLogger.i(TAG, "manageItemSelected - Add event on calendar");
                     // ACTION_INSERT does not work on all phones; use Intent.ACTION_EDIT in this case
                     Intent intent = new Intent(Intent.ACTION_INSERT);
                     intent.setType("vnd.android.cursor.item/event");
@@ -231,7 +227,7 @@ public class FragmentDetail extends Fragment {
                 return true;
             case R.id.favorite:
                 if (mFavorite.equalsIgnoreCase("no")) {
-                    Log.i(TAG, "Add comic to favorite");
+                    CCLogger.i(TAG, "manageItemSelected - Add comic to favorite");
                     // Add comic to favorite
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "yes");
@@ -242,7 +238,7 @@ public class FragmentDetail extends Fragment {
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.v(TAG, "Comic already on favorite");
+                    CCLogger.v(TAG, "manageItemSelected - Comic already on favorite");
                 }
 
                 updateMenuItems(mFavorite, mCart);
@@ -251,7 +247,7 @@ public class FragmentDetail extends Fragment {
                 return true;
             case R.id.remove_favorite:
                 if (mFavorite.equalsIgnoreCase("yes")) {
-                    Log.i(TAG, "Delete from favorite");
+                    CCLogger.i(TAG, "manageItemSelected - Delete from favorite");
                     // Delete from favorite
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
@@ -262,7 +258,7 @@ public class FragmentDetail extends Fragment {
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.v(TAG, "Comic already deleted from favorite");
+                    CCLogger.v(TAG, "manageItemSelected - Comic already deleted from favorite");
                 }
 
                 updateMenuItems(mFavorite, mCart);
@@ -271,7 +267,7 @@ public class FragmentDetail extends Fragment {
                 return true;
             case R.id.buy:
                 if (mCart.equalsIgnoreCase("no")) {
-                    Log.i(TAG, "Update entry on comic database: add to cart");
+                    CCLogger.i(TAG, "manageItemSelected - Update entry on comic database: add to cart");
                     // Update entry on comic database
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "yes");
@@ -282,7 +278,7 @@ public class FragmentDetail extends Fragment {
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.v(TAG, "Comic already on cart");
+                    CCLogger.v(TAG, "manageItemSelected - Comic already on cart");
                 }
 
                 updateMenuItems(mFavorite, mCart);
@@ -291,7 +287,7 @@ public class FragmentDetail extends Fragment {
                 return true;
             case R.id.remove_buy:
                 if (mCart.equalsIgnoreCase("yes")) {
-                    Log.i(TAG, "Update entry on comic database: remove from cart");
+                    CCLogger.i(TAG, "manageItemSelected - Update entry on comic database: remove from cart");
                     // Update entry on comic database
                     ContentValues mUpdateValues = new ContentValues();
                     mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
@@ -302,7 +298,7 @@ public class FragmentDetail extends Fragment {
                     ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.v(TAG, "Comic already removed from cart");
+                    CCLogger.v(TAG, "manageItemSelected - Comic already removed from cart");
                 }
 
                 updateMenuItems(mFavorite, mCart);

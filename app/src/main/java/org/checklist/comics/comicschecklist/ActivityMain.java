@@ -25,7 +25,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,6 +37,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 import java.util.Arrays;
@@ -117,7 +117,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_no_connection), Toast.LENGTH_LONG).show();
                     break;
                 case RESULT_DESTROYED:
-                    Log.i(TAG, "Service destroyed");
+                    CCLogger.i(TAG, "Service destroyed");
                     break;
             }
 
@@ -133,7 +133,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate - start");
+        CCLogger.d(TAG, "onCreate - start");
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -158,7 +158,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         // res/values-sw600dp-land). If this view is present, then the
         // activity should be in two-pane mode.
         mTwoPane = findViewById(R.id.comic_detail_container) != null;
-        Log.d(TAG, mTwoPane ? "Application is running on singlePane" : "Application is running on twoPane");
+        CCLogger.d(TAG, mTwoPane ? "Application is running on singlePane" : "Application is running on twoPane");
 
         mTitle = mDrawerTitle = getTitle();
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -213,7 +213,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             version = pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
-            Log.w(TAG, "Can't find app version!", e);
+            CCLogger.w(TAG, "Can't find app version!", e);
         }
         versionTextView.setText(version);
 
@@ -240,23 +240,24 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         if (getIntent() != null) {
             handleIntent(getIntent());
         }
-        Log.v(TAG, "onCreate - end");
+
+        CCLogger.v(TAG, "onCreate - end");
     }
 
     @Override
     public void onBackPressed() {
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            Log.d(TAG, "onBackPressed - closing NavigationView");
+            CCLogger.d(TAG, "onBackPressed - closing NavigationView");
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            Log.d(TAG, "onBackPressed - closing app");
+            CCLogger.d(TAG, "onBackPressed - closing app");
             super.onBackPressed();
         }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        Log.v(TAG, "onNewIntent - " + intent);
+        CCLogger.v(TAG, "onNewIntent - " + intent);
         handleIntent(intent);
     }
 
@@ -270,14 +271,15 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // Handles a search query
             String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.d(TAG, "handleIntent - handling a search query " + query);
+            CCLogger.d(TAG, "handleIntent - handling a search query " + query);
             doMySearch(query);
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_COMIC_WIDGET)) {
             int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
-            Log.d(TAG, "handleIntent - launching detail for comic ID " + comicId);
+            CCLogger.d(TAG, "handleIntent - launching detail for comic ID " + comicId);
             launchDetailView(comicId);
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_WIDGET_ADD)) {
             // Open add comic activity
+            CCLogger.d(TAG, "handleIntent - starting add activity");
             Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
             startActivity(addComicIntent);
         }
@@ -288,13 +290,13 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      * @param query the text to search on database
      */
     private void doMySearch(String query) {
-        Log.d(TAG, "doMySearch - start searching " + query);
+        CCLogger.d(TAG, "doMySearch - start searching " + query);
 
         // Load order for list
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
         String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
-        Log.d(TAG, "doMySearch - ordering by " + sortOrder);
+        CCLogger.d(TAG, "doMySearch - ordering by " + sortOrder);
 
         // Query database
         final Cursor cursor = ComicDatabaseManager.query(this,
@@ -305,12 +307,12 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                                                    sortOrder);
 
         if (cursor != null && cursor.getCount() == 0) {
-            Log.d(TAG, "doMySearch - no data found!");
+            CCLogger.d(TAG, "doMySearch - no data found!");
             // There are no results
             cursor.close();
             Toast.makeText(this, getResources().getText(R.string.search_no_result), Toast.LENGTH_SHORT).show();
         } else if (cursor != null && cursor.getCount() > 0) {
-            Log.d(TAG, "doMySearch - found data: " + cursor.getCount());
+            CCLogger.d(TAG, "doMySearch - found data: " + cursor.getCount());
             // There are multiple results which fit the given query, so show this on dialog
 
             // Open a dialog with a list of results
@@ -330,7 +332,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                     // The 'which' argument contains the index position of the selected item);
                     if (cursor.moveToPosition(which)) {
                         long comicID = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
-                        Log.d(TAG, "onClick (dialog) - ID " + comicID + " from position " + which);
+                        CCLogger.d(TAG, "onClick (dialog) - ID " + comicID + " from position " + which);
 
                         if (comicID != 0) {
                             launchDetailView(comicID);
@@ -346,7 +348,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                     .create()
                     .show();
         }
-        Log.v(TAG, "doMySearch - end searching " + query);
+
+        CCLogger.v(TAG, "doMySearch - end searching " + query);
     }
 
     /**
@@ -355,11 +358,11 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     protected void onStart() {
         super.onStart();
-        Log.v(TAG, "onStart");
+        CCLogger.v(TAG, "onStart");
         if (mTwoPane) {
             // In two-pane mode, list items should be given the 'activated' state when touched
             if (mListFragment != null) {
-                Log.d(TAG, "onStart - two-pane mode, activate item on click");
+                CCLogger.d(TAG, "onStart - two-pane mode, activate item on click");
                 mListFragment.setActivateOnItemClick(true);
             }
         }
@@ -368,7 +371,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v(TAG, "onResume");
+        CCLogger.v(TAG, "onResume");
         registerReceiver(receiver, new IntentFilter(Constants.NOTIFICATION));
         // Populate navigation view menu
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
@@ -415,7 +418,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     @Override
     protected void onPause() {
         super.onPause();
-        Log.v(TAG, "onPause");
+        CCLogger.v(TAG, "onPause");
         unregisterReceiver(receiver);
         // Stop animation
         if (mListFragment != null) {
@@ -465,7 +468,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     public void setTitle(CharSequence title) {
         mTitle = title;
         if (mActionBar != null) {
-            Log.v(TAG, "setTitle - setting " + mTitle + " on mActionBar");
+            CCLogger.v(TAG, "setTitle - setting " + mTitle + " on mActionBar");
             mActionBar.setTitle(mTitle);
         }
     }
@@ -494,7 +497,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      */
     @Override
     public void onItemSelected(long id) {
-        Log.d(TAG, "Launching detail for comic with ID " + id);
+        CCLogger.d(TAG, "Launching detail for comic with ID " + id);
         launchDetailView(id);
     }
 
@@ -528,7 +531,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         mCursor.moveToFirst();
         String rawEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
         mCursor.close();
-        Log.d(TAG, "launchDetailView - comic ID is " + id + " editor is " + rawEditor);
+        CCLogger.d(TAG, "launchDetailView - comic ID is " + id + " editor is " + rawEditor);
         Constants.Sections editor = Constants.Sections.getEditorFromName(rawEditor);
         switch (editor) {
             case CART:
@@ -540,7 +543,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             default:
                 // Show normal comic
                 if (mTwoPane) {
-                    Log.d(TAG, "Launching detail view in two pane mode");
+                    CCLogger.d(TAG, "launchDetailView - Launching detail view in TWO PANE mode");
                     // In two-pane mode, show the detail view in this activity by adding
                     // or replacing the detail fragment using a fragment transaction
                     Bundle arguments = new Bundle();
@@ -549,7 +552,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                     mDetailFragment.setArguments(arguments);
                     getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
                 } else {
-                    Log.d(TAG, "Launching detail view in single pane mode");
+                    CCLogger.d(TAG, "launchDetailView - Launching detail view in SINGLE PANE mode");
                     // In single-pane mode, simply start the detail activity
                     // for the selected item ID
                     Intent detailIntent = new Intent(this, ActivityDetail.class);
@@ -562,7 +565,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
 
     @SuppressLint("InflateParams")
     private void selectItem(Constants.Sections section) {
-        Log.d(TAG, "selectItem - " + section);
+        CCLogger.d(TAG, "selectItem - " + section);
         if (mNavigationView != null) {
             if (mDrawerLayout != null) {
                 if (section == Constants.Sections.FAVORITE || section == Constants.Sections.CART ||
@@ -638,7 +641,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Log.d(TAG, "onNavigationItemSelected - start " + item.getTitle());
+        CCLogger.d(TAG, "onNavigationItemSelected - start " + item.getTitle());
         Constants.Sections section;
         boolean result;
         switch (item.getItemId()) {
@@ -696,7 +699,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 break;
         }
         selectItem(section);
-        Log.v(TAG, "onNavigationItemSelected - end - section " + section + " result " + result);
+        CCLogger.v(TAG, "onNavigationItemSelected - end - section " + section + " result " + result);
         return result;
     }
 }

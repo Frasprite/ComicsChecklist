@@ -2,9 +2,9 @@ package org.checklist.comics.comicschecklist.parser;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 import org.jsoup.Jsoup;
@@ -42,7 +42,7 @@ public class Parser {
      * This method is used for elaborate screenshot of copyright free comics.
      */
     public void startParseFreeComics() {
-        Log.d(TAG, "startParseFreeComics - start");
+        CCLogger.d(TAG, "startParseFreeComics - start");
 
         // Adding 3 comics to cart
         ComicDatabaseManager.insert(mContext, "Sport Stars 4", "da comprare", "N.D.", "29/06/2016",
@@ -76,7 +76,7 @@ public class Parser {
         ComicDatabaseManager.insert(mContext, "Strange World 100", "preferiti", "N.D.", "01/08/2016",
                 DateCreator.elaborateDate("01/08/2016"), "http://digitalcomicmuseum.com/thumbnails/7806.jpg", "N.D.", "Free", "no", "yes", "http://digitalcomicmuseum.com/");
 
-        Log.v(TAG, "startParseFreeComics - stop");
+        CCLogger.v(TAG, "startParseFreeComics - stop");
     }
 
     /**
@@ -84,7 +84,7 @@ public class Parser {
      * @return true if search was successful, false otherwise
      */
     public boolean startParsePanini() {
-        Log.i(TAG, "Start searching for Panini comics");
+        CCLogger.i(TAG, "startParsePanini - Start searching for Panini comics");
         comicErrorPanini = false;
 
         parseUrlPanini("http://comics.panini.it/calendario/uscite-scorsa-settimana/");
@@ -99,7 +99,7 @@ public class Parser {
      * @param url the URL to parse
      */
     private void parseUrlPanini(String url) {
-        Log.d(TAG, "Parsing Panini Comics " + url);
+        CCLogger.d(TAG, "parseUrlPanini - Parsing Panini Comics " + url);
 
         try {
             // Take data from URL and save it on document
@@ -113,14 +113,14 @@ public class Parser {
             Element content = doc.getElementById("products-list");
             Elements links = content.getElementsByClass("col-sm-12");
             // Prompt number of comics found on document
-            Log.d(TAG, "Total links : " + links.size());
+            CCLogger.d(TAG, "parseUrlPanini -Total links : " + links.size());
             for (Element link : links) {
                 // Getting link to more info, comic name and release date
                 String linkMoreInfo = link.getElementsByTag("a").attr("href");
                 String comicName = link.getElementsByTag("h3").text();
                 String rawReleaseDate = link.getElementsByTag("p").text();
                 String releaseDate = rawReleaseDate.replace("Data d'uscita:", "").trim();
-                Log.d(TAG, "Comic name : " + comicName+ "\nRelease date : " + releaseDate + "\nLink more info : " + linkMoreInfo);
+                CCLogger.d(TAG, "parseUrlPanini - Comic name : " + comicName+ "\nRelease date : " + releaseDate + "\nLink more info : " + linkMoreInfo);
 
                 // Connecting to URL for more info
                 Document docMoreInfo = Jsoup.connect(linkMoreInfo)
@@ -139,14 +139,14 @@ public class Parser {
                 String description = descriptionElement.text();
                 String price = priceElement.text();
                 //Element imageElement = divEssential.getElementsByTag("a").first(); // use .attr("href");
-                Log.d(TAG, "Description : " + description + "\nPrice " + price);
+                CCLogger.d(TAG, "parseUrlPanini - Description : " + description + "\nPrice " + price);
 
                 // Getting feature and editor
                 Element featureElement = divEssential.select("div.box-additional-info").first();
                 Elements features = featureElement.getElementsByClass("product");
                 String feature = findFeature(features);
                 String editor = findEditor(features);
-                Log.d(TAG, "Feature found : " + feature + "\n" + "Editor " + editor);
+                CCLogger.d(TAG, "parseUrlPanini - Feature found : " + feature + "\n" + "Editor " + editor);
 
                 if (editor != null) {
                     // Insert data on database
@@ -160,15 +160,15 @@ public class Parser {
                                     myDate, "", feature, price, "no", "no", linkMoreInfo);
                         } catch (Exception e) {
                             // Error while comic fetching
-                            Log.w(TAG, title + " " + e.toString());
+                            CCLogger.w(TAG, "parseUrlPanini - " + title + " " + e.toString());
                         }
                     }
                 } else {
-                    Log.w(TAG, "Editor not found from given link:\n" + linkMoreInfo + "\n" + features);
+                    CCLogger.w(TAG, "parseUrlPanini - Editor not found from given link:\n" + linkMoreInfo + "\n" + features);
                 }
             }
         } catch (Exception e) {
-            Log.w(TAG, "Error while comic search " + url + " " + e.toString());
+            CCLogger.e(TAG, "parseUrlPanini - Error while comic search " + url + " " + e.toString());
             comicErrorPanini = true;
         }
     }
@@ -218,7 +218,7 @@ public class Parser {
 
         if (editor == null) {
             // Editor not found
-            Log.w(TAG, "Editor not found for this element\n" + features.toString());
+            CCLogger.w(TAG, "findEditor - Editor not found for this element\n" + features.toString());
             return null;
         }
 
@@ -239,14 +239,14 @@ public class Parser {
      * @return true if search was successful, false otherwise
      */
     public boolean startParseRW() {
-        Log.i(TAG, "Start searching for RW comics");
+        CCLogger.i(TAG, "startParseRW - Start searching for RW comics");
         comicErrorRw = false;
 
         int day = DateCreator.getCurrentDay();
         int monthInt = DateCreator.getCurrentMonth() + 1;
         String month = DateCreator.getCurrentReadableMonth();
         int year = DateCreator.getCurrentYear();
-        Log.d(TAG, "startParseRW - limit date is " + DateCreator.getTodayString());
+        CCLogger.d(TAG, "startParseRW - limit date is " + DateCreator.getTodayString());
         String url;
         String releaseDate;
         for (int i = 1; i <= day + 3; i++) {
@@ -265,7 +265,7 @@ public class Parser {
      * @param releaseDate the date of comic release
      */
     private void parseUrlRW(String siteUrl, String releaseDate) {
-        Log.d(TAG, "Parsing " + siteUrl);
+        CCLogger.d(TAG, "parseUrlRW - Parsing " + siteUrl);
         try {
             // Take data and save it on document
             Document doc = Jsoup.connect(siteUrl)
@@ -298,11 +298,11 @@ public class Parser {
                             String rawCover = "";
                             coverList.add(rawCover);
                             /* Saving cover
-                            Log.v(TAG, "Cover " + coverUrl);
+                            CCLogger.v(TAG, "parseUrlRW - Cover " + coverUrl);
                             coverList.add(coverUrl);*/
                             title = coverUrl.replace(Constants.MEDIARW, "").replace("_", " ").replace(".jpg", "").toUpperCase();
                             // Title elaborated
-                            Log.v(TAG, "Title " + title);
+                            CCLogger.v(TAG, "parseUrlRW - Title " + title);
                             titleList.add(title);
                         }
                     }
@@ -318,13 +318,13 @@ public class Parser {
 
                         if (elementText.contains("col.") || elementText.contains("b/n")) {
                             // Found a <p> with more info
-                            Log.v(TAG, "Feature " + elementText);
+                            CCLogger.v(TAG, "parseUrlRW - Feature " + elementText);
                             featureList.add(elementText);
                         }
 
                         if (elementText.contains("€")) {
                             // Found price text on <p>
-                            Log.v(TAG, "Price " + elementText);
+                            CCLogger.v(TAG, "parseUrlRW - Price " + elementText);
                             priceList.add(elementText);
                         }
                     }
@@ -336,11 +336,11 @@ public class Parser {
                     }
                 }
             } catch (Exception e) {
-                Log.w(TAG, "Error while comic fetching " + e.toString());
+                CCLogger.w(TAG, "parseUrlRW - Error while comic fetching " + e.toString());
                 comicErrorRw = true;
             }
         } catch (Exception e) {
-            Log.w(TAG, "This url does not exists " + siteUrl + " " + e.toString());
+            CCLogger.e(TAG, "parseUrlRW - This url does not exists " + siteUrl + " " + e.toString());
         }
     }
 
@@ -349,7 +349,7 @@ public class Parser {
      * @return true if search was successful, false otherwise
      */
     public boolean startParseStarC() {
-        Log.i(TAG, "Start searching Star Comics comics");
+        CCLogger.i(TAG, "startParseStarC - Start searching Star Comics comics");
         comicErrorStar = false;
 
         int from = 0, to = 0;
@@ -364,7 +364,7 @@ public class Parser {
             to = Integer.parseInt(myLink) + 40;
         } catch (Exception e) {
             // Unable to find data for Star Comics
-            Log.w(TAG, "Error while searching data from Star Comics site " + e.toString());
+            CCLogger.e(TAG, "startParseStarC - Error while searching data from Star Comics site " + e.toString());
         }
 
         if (from != 0 && to != 0 && from < to)
@@ -379,12 +379,12 @@ public class Parser {
      * @param to to the end
      */
     private void parseUrlStarC(int from, int to) {
-        Log.d(TAG, "Parsing from " + from + " to " + to);
+        CCLogger.d(TAG, "parseUrlStarC - Parsing from " + from + " to " + to);
         // Start parsing every potential URL
         Document doc;
         String name, releaseDate = "", description, price, feature = "N.D.", coverUrl, testata = "", number = "";
         for (int i = from; i <= to; i++) {
-            Log.v(TAG, "Search for comic number " + i);
+            CCLogger.v(TAG, "parseUrlStarC - Search for comic number " + i);
             // Try to open computed URL
             try {
                 // Create doc (ISO-8859-1 CP1252 UTF-8)
@@ -405,11 +405,11 @@ public class Parser {
                     }
                 }
                 name = testata + " " + number;
-                Log.v(TAG, "Data found " + testata + " " + releaseDate + " " + name + " ");
+                CCLogger.v(TAG, "parseUrlStarC - Data found " + testata + " " + releaseDate + " " + name + " ");
                 // Take cover URL
                 //Element linkPathImg = content.select("img").first();
                 //coverUrl = Constants.IMG_URL + linkPathImg.attr("src");
-                //Log.v(TAG, "Cover " + coverUrl);
+                //CCLogger.v(TAG, "parseUrlStarC - Cover " + coverUrl);
                 // N.B.: changed due to violation of copyright
                 coverUrl = "";
                 // Take description and price
@@ -420,14 +420,14 @@ public class Parser {
                 } catch (IndexOutOfBoundsException e) {
                     price = "N.D.";
                 }
-                Log.v(TAG, "Price " + price + " description " + description);
+                CCLogger.v(TAG, "parseUrlStarC - Price " + price + " description " + description);
 
                 // Calculating date for sql
                 Date myDate = DateCreator.elaborateDate(releaseDate);
                 // Insert comic on database
                 ComicDatabaseManager.insert(mContext, name, Constants.Sections.getName(Constants.Sections.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", URL);
             } catch (Exception e) {
-                Log.w(TAG, "Error while searching data for comic id " + i + " " + e.toString());
+                CCLogger.w(TAG, "parseUrlStarC - Error while searching data for comic id " + i + " " + e.toString());
                 comicErrorStar = true;
             }
         }
@@ -438,7 +438,7 @@ public class Parser {
      * @return true if search was successful, false otherwise
      */
     public boolean startParseBonelli() {
-        Log.i(TAG, "Start searching Bonelli comics");
+        CCLogger.i(TAG, "startParseBonelli - Start searching Bonelli comics");
         comicErrorBonelli = false;
 
         parseUrlBonelli(Constants.EDICOLA_INEDITI);
@@ -456,7 +456,7 @@ public class Parser {
      * @param url where to find comics
      */
     private void parseUrlBonelli(String url) {
-        Log.d(TAG, "Parsing Bonelli URL " + url + " - start");
+        CCLogger.d(TAG, "parseUrlBonelli - URL " + url + " - start");
         try {
             // Creating doc file from URL
             Document doc = Jsoup.connect(url)
@@ -473,7 +473,7 @@ public class Parser {
             // Finding link for other info and title if needed
             Elements spanOther = doc.select("div.cont_foto");
 
-            //Log.v(TAG, "Total release " + spanRelease.size() + "\nTotal entries " + spanOther.size());
+            //CCLogger.v(TAG, "parseUrlBonelli - Total release " + spanRelease.size() + "\nTotal entries " + spanOther.size());
 
             // Iterate all elements founded
             String name, releaseDate, description = "N.D.", price = "N.D.", feature = "N.D.", coverUrl,
@@ -481,7 +481,7 @@ public class Parser {
             for (int i = 0; i < spanRelease.size(); i++) {
                 // On spanOther element is possible to find title and URL to other info
                 moreInfoUrl = Constants.MAIN_URL + spanOther.get(i).select("a").first().attr("href");
-                Log.v(TAG, "More info URL " + moreInfoUrl);
+                CCLogger.v(TAG, "parseUrlBonelli - More info URL " + moreInfoUrl);
                 try {
                     // Creating doc file from URL
                     Document docMoreInfo = Jsoup.connect(moreInfoUrl)
@@ -496,26 +496,26 @@ public class Parser {
                     Elements spanPeriod = periodicityPart.select("span.valore");
                     if (!spanPeriod.isEmpty()) {
                         feature = spanPeriod.get(0).text();
-                        Log.v(TAG, "Comic feature: " + feature);
+                        CCLogger.v(TAG, "parseUrlBonelli - Comic feature: " + feature);
                     }
 
                     // Finding comic description
                     Elements desc = docMoreInfo.select("div[class=testo_articolo testo testoResize]");
                     if (!desc.isEmpty()) {
                         description = desc.get(0).text();
-                        Log.v(TAG, "Comic description: " + description);
+                        CCLogger.v(TAG, "parseUrlBonelli - Comic description: " + description);
                     }
 
                     // Finding cover image
                     //Elements linkPathImg = docMoreInfo.select("div.bk-cover img[src]");
                     //coverUrl = Constants.MAIN_URL + linkPathImg.attr("src");
-                    //Log.v(TAG, "Comic cover: " + coverUrl);
+                    //CCLogger.v(TAG, "parseUrlBonelli - Comic cover: " + coverUrl);
                     // N.B.: changed due to violation of copyright
                     coverUrl = "";
 
                     // Finding comic title
                     name = docMoreInfo.select("var.atc_title").text();
-                    Log.v(TAG, "Comic name BEFORE: " + name);
+                    CCLogger.v(TAG, "parseUrlBonelli - Comic name BEFORE: " + name);
                     // Defining comic name
                     if (name.startsWith("N°.")) { // ex.: N°.244 - Raccolta Zagor n°244
                         name = name.substring(name.indexOf("-") + 1).trim();
@@ -528,7 +528,7 @@ public class Parser {
                     if (name.contains("n°")) { // ex.: Maxi Zagor N°.29 - Maxi Zagor n°29
                         name = name.replace("n°", "");
                     }
-                    Log.v(TAG, "Comic name AFTER: " + name);
+                    CCLogger.v(TAG, "parseUrlBonelli - Comic name AFTER: " + name);
 
                     // Calculating date for sql
                     releaseDate = spanRelease.get(i).text();
@@ -538,14 +538,14 @@ public class Parser {
                     String editor = Constants.Sections.getName(Constants.Sections.BONELLI);
                     ComicDatabaseManager.insert(mContext, name.toUpperCase(), editor, description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
                 } catch (Exception e) {
-                    Log.e(TAG, "Can't take more info from " + moreInfoUrl + " " + e.toString() + " comic not fetched", e);
+                    CCLogger.w(TAG, "parseUrlBonelli - Can't take more info from " + moreInfoUrl + " " + e.toString() + " comic not fetched", e);
                 }
             }
         } catch (Exception e) {
-            Log.e(TAG, "Error while comic fetching " + url + " " + e.toString(), e);
+            CCLogger.e(TAG, "parseUrlBonelli - Error while comic fetching " + url + " " + e.toString());
             comicErrorBonelli = true;
         }
 
-        Log.v(TAG, "Parsing Bonelli - end");
+        CCLogger.v(TAG, "parseUrlBonelli - end");
     }
 }

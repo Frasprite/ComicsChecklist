@@ -2,8 +2,8 @@ package org.checklist.comics.comicschecklist.database;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 public class ComicDatabase {
@@ -51,7 +51,7 @@ public class ComicDatabase {
     public static void onUpgrade(SQLiteDatabase database, int oldVersion,
                                  int newVersion) {
         if (oldVersion == 1 && newVersion == 2) {
-            Log.w(TAG, "Upgrading database from version "
+            CCLogger.w(TAG, "onUpgrade - Upgrading database from version "
                     + oldVersion + " to " + newVersion);
             // Update database by adding new column
             database.execSQL("ALTER TABLE " + COMICS_TABLE + " ADD COLUMN " + COMICS_URL_KEY + " TEXT");
@@ -77,6 +77,6 @@ public class ComicDatabase {
         String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY +  "=?";
         String[] mSelectionArgs = new String[]{String.valueOf(editorName)};
         int rows = database.update(COMICS_TABLE, mUpdateValues, mSelectionClause, mSelectionArgs);
-        Log.v(TAG, "Total rows updated: " + rows);
+        CCLogger.v(TAG, "updateRows - Total rows updated: " + rows);
     }
 }

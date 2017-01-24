@@ -10,7 +10,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
@@ -18,6 +17,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.parser.Parser;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -78,17 +78,17 @@ public class DownloadService extends IntentService {
         }
 
         if (isConnected) {
-            Log.d(TAG, "Checking if search is manual or automatic " + frequency);
+            CCLogger.d(TAG, "onHandleIntent - Checking if search is manual or automatic " + frequency);
 
             // Use this code for screenshot
             //myParser.startParseFreeComics();
 
             if (frequency > -1 && !manualSearch) {
-                Log.i(TAG, "Automatic search launched");
+                CCLogger.i(TAG, "onHandleIntent - Automatic search launched");
                 boolean notificationPref = sharedPref.getBoolean("notifications_new_message", true);
 
                 for (Map.Entry<Constants.Sections, String> entry : mEditorMap.entrySet()) {
-                    Log.d(TAG, "Current editor " + entry.getKey() + " key of last scan" + entry.getValue());
+                    CCLogger.d(TAG, "onHandleIntent - Current editor " + entry.getKey() + " key of last scan" + entry.getValue());
                     Constants.Sections currentSection = entry.getKey();
                     // Check if editor is desired by user and if last day of scan has passed limits
                     if (calculateDayDifference(entry.getValue()) >= frequency &&
@@ -110,7 +110,7 @@ public class DownloadService extends IntentService {
                 Constants.Sections editor = (Constants.Sections) intent.getSerializableExtra(Constants.ARG_EDITOR);
                 boolean notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true);
                 if (editor != null) {
-                    Log.i(TAG, "Manual search for editor " + editor.toString());
+                    CCLogger.i(TAG, "onHandleIntent - Manual search for editor " + editor.toString());
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(editor);
                     publishResults(Constants.SearchResults.RESULT_START, editorTitle);
@@ -198,7 +198,7 @@ public class DownloadService extends IntentService {
      * @param bool whether or not to show an indeterminate process
      */
     private void createNotification(String message, boolean bool) {
-        Log.v(TAG, "Creating notification");
+        CCLogger.v(TAG, "createNotification - start");
         // Prepare intent which is triggered if the notification is selected
         Intent intent = new Intent(this, ActivityMain.class);
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
@@ -238,7 +238,7 @@ public class DownloadService extends IntentService {
                     mSelectionArgs                      // the value to compare to
             );
 
-            Log.d(TAG, "Entries deleted: " + rowsDeleted);
+            CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted);
         }
 
         if (rowsDeleted > 0) {
@@ -253,7 +253,7 @@ public class DownloadService extends IntentService {
      * @param editor the editor searched
      */
     private void publishResults(Constants.SearchResults result, String editor) {
-        Log.v(TAG, "Result of search " + result.name() + " " + editor);
+        CCLogger.v(TAG, "publishResults - Result of search " + result.name() + " " + editor);
         Intent intent = new Intent(Constants.NOTIFICATION);
         intent.putExtra(Constants.NOTIFICATION_RESULT, result);
         intent.putExtra(Constants.NOTIFICATION_EDITOR, editor);
@@ -266,14 +266,14 @@ public class DownloadService extends IntentService {
      * @return the difference in long data
      */
     private long calculateDayDifference(String editorLastScan) {
-        Log.v(TAG, "calculateDayDifference " + editorLastScan + " - start");
+        CCLogger.v(TAG, "calculateDayDifference - Editor last scan " + editorLastScan + " - start");
         long result; // If result is 3, we need a refresh
         String today = DateCreator.getTodayString();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String dateStart = sp.getString(editorLastScan, "01/01/2012");
 
-        Log.d(TAG, "calculateDayDifference (in milliseconds) - today is " + today + " target is " + dateStart);
+        CCLogger.d(TAG, "calculateDayDifference - (in milliseconds) today is " + today + " target is " + dateStart);
         // Calculate day difference in milliseconds
         long diff = DateCreator.getDifferenceInMillis(today, dateStart);
 
@@ -290,7 +290,7 @@ public class DownloadService extends IntentService {
             result = 3;
         }
 
-        Log.v(TAG, "calculateDayDifference - result is " + result + " - end");
+        CCLogger.v(TAG, "calculateDayDifference - result is " + result + " - end");
 
         return result;
     }

@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.service.WidgetService;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -38,35 +38,35 @@ public class FragmentAddComic extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView - start");
+        CCLogger.d(TAG, "onCreateView - start");
         View rootView = inflater.inflate(R.layout.fragment_add_comic, container, false);
 
         mNameEditText = (EditText) rootView.findViewById(R.id.name_edit_text);
         mInfoEditText = (EditText) rootView.findViewById(R.id.info_edit_text);
         mDateTextView = (TextView) rootView.findViewById(R.id.date_text_view);
 
-        Log.v(TAG, "onCreateView - end");
+        CCLogger.v(TAG, "onCreateView - end");
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated - start");
+        CCLogger.d(TAG, "onActivityCreated - start");
 
         if (getArguments().containsKey(Constants.ARG_COMIC_ID)) {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             mComicId = getArguments().getLong(Constants.ARG_COMIC_ID, -1);
-            Log.d(TAG, "onActivityCreated - mComicId (initiated from ARGUMENTS) = " + mComicId);
+            CCLogger.d(TAG, "onActivityCreated - mComicId (initiated from ARGUMENTS) = " + mComicId);
         }
 
         if (savedInstanceState != null) {
             // Restore last state for checked position.
             mComicId = savedInstanceState.getLong(Constants.ARG_SAVED_COMIC_ID, -1);
-            Log.d(TAG, "onActivityCreated - mComicId (initiated from BUNDLE) = " + mComicId);
+            CCLogger.d(TAG, "onActivityCreated - mComicId (initiated from BUNDLE) = " + mComicId);
         }
 
-        Log.v(TAG, "onActivityCreated - end");
+        CCLogger.v(TAG, "onActivityCreated - end");
     }
 
     @Override
@@ -94,7 +94,7 @@ public class FragmentAddComic extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState - saving mComicId " + mComicId);
+        CCLogger.d(TAG, "onSaveInstanceState - saving mComicId " + mComicId);
         outState.putLong(Constants.ARG_SAVED_COMIC_ID, mComicId);
     }
 
@@ -119,7 +119,7 @@ public class FragmentAddComic extends Fragment {
                         date,
                         DateCreator.elaborateDate(date),
                         "error", "N.D", "N.D.", "yes", "no", "");
-                Log.d(TAG, "INSERTED new entry on database with ID " + mComicId);
+                CCLogger.d(TAG, "INSERTED new entry on database with ID " + mComicId);
             } else {
                 // Update entry
                 ContentValues mUpdateValues = new ContentValues();
@@ -132,9 +132,9 @@ public class FragmentAddComic extends Fragment {
                 String[] mSelectionArgs = new String[]{String.valueOf(mComicId)};
                 int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
                 if (rowUpdated > 0) {
-                    Log.d(TAG, "UPDATED entry on database with ID " + mComicId);
+                    CCLogger.d(TAG, "UPDATED entry on database with ID " + mComicId);
                 } else {
-                    Log.w(TAG, "UPDATE failed for entry with ID " + mComicId);
+                    CCLogger.w(TAG, "UPDATE failed for entry with ID " + mComicId);
                 }
             }
 

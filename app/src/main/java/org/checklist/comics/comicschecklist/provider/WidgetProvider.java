@@ -6,13 +6,13 @@ import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.WidgetSettings;
 import org.checklist.comics.comicschecklist.service.WidgetService;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 /**
@@ -53,7 +53,7 @@ public class WidgetProvider extends AppWidgetProvider {
                                 int appWidgetId) {
 
         CharSequence widgetText = WidgetSettings.loadTitlePref(context, appWidgetId);
-        Log.d(TAG, "onUpdate - editor " + widgetText + " id " + appWidgetId);
+        CCLogger.d(TAG, "updateAppWidget - editor " + widgetText + " id " + appWidgetId);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
         views.setTextViewText(R.id.widgetTextView, widgetText);
@@ -65,7 +65,7 @@ public class WidgetProvider extends AppWidgetProvider {
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.putExtra(Constants.WIDGET_TITLE, widgetText);
         intent.putExtra(Constants.WIDGET_EDITOR, Constants.Sections.getName((String) widgetText));
-        Log.d(TAG, "updateAppWidget widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
+        CCLogger.d(TAG, "updateAppWidget - widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString());
         intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
         // Set up the RemoteViews object to use a RemoteViews adapter.
         // This adapter connects to a RemoteViewsService  through the specified intent.

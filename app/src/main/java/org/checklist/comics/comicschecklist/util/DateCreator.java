@@ -1,7 +1,5 @@
 package org.checklist.comics.comicschecklist.util;
 
-import android.util.Log;
-
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,20 +17,20 @@ public class DateCreator {
      * @return the date in another format
      */
     public static Date elaborateDate(String releaseDate) {
-        Log.v(TAG, "elaborateDate - start");
+        CCLogger.v(TAG, "elaborateDate - start");
         Date date = null;
         try {
             date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).parse(releaseDate);
         } catch (ParseException e) {
-            Log.w(TAG, "Error while elaborating Date from " + releaseDate + " " + e.toString());
+            CCLogger.w(TAG, "elaborateDate - Error while elaborating Date from " + releaseDate + " " + e.toString());
         } finally {
             if (date == null) {
                 date = new Date();
                 date.setTime(System.currentTimeMillis());
-                Log.d(TAG, "Setting date from current time");
+                CCLogger.d(TAG, "elaborateDate - Setting date from current time");
             }
         }
-        Log.v(TAG, "elaborateDate - end - " + date.toString());
+        CCLogger.v(TAG, "elaborateDate - end - " + date.toString());
         return date;
     }
 
@@ -55,12 +53,12 @@ public class DateCreator {
      * @return the date in a good human format
      */
     public static String elaborateHumanDate(String releaseDate) {
-        Log.v(TAG, "elaborateHumanDate - start with " + releaseDate);
+        CCLogger.v(TAG, "elaborateHumanDate - start with " + releaseDate);
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         calendar.setTime(DateCreator.elaborateDate(releaseDate));
         String resultDate = simpleDateFormat.format(calendar.getTime());
-        Log.v(TAG, "elaborateHumanDate - end with " + resultDate);
+        CCLogger.v(TAG, "elaborateHumanDate - end with " + resultDate);
         return resultDate;
     }
 
@@ -91,7 +89,7 @@ public class DateCreator {
     public static int getCurrentDay() {
         Calendar calendar = Calendar.getInstance();
         int day = calendar.get(Calendar.DAY_OF_MONTH);
-        Log.d(TAG, "getCurrentDay - day is " + day);
+        CCLogger.d(TAG, "getCurrentDay - day is " + day);
         return day;
     }
 
@@ -102,7 +100,7 @@ public class DateCreator {
     public static int getCurrentMonth() {
         Calendar calendar = Calendar.getInstance();
         int month = calendar.get(Calendar.MONTH);
-        Log.d(TAG, "getCurrentMonth - day is " + month);
+        CCLogger.d(TAG, "getCurrentMonth - day is " + month);
         return month;
     }
 
@@ -113,7 +111,7 @@ public class DateCreator {
     public static String getCurrentReadableMonth() {
         int month = DateCreator.getCurrentMonth();
         String monthString = DateFormatSymbols.getInstance(Locale.ITALIAN).getMonths()[month];
-        Log.d(TAG, "getCurrentReadableMonth - day is " + monthString);
+        CCLogger.d(TAG, "getCurrentReadableMonth - day is " + monthString);
         return monthString;
     }
 
@@ -124,7 +122,7 @@ public class DateCreator {
     public static int getCurrentYear() {
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
-        Log.d(TAG, "getCurrentYear - day is " + year);
+        CCLogger.d(TAG, "getCurrentYear - day is " + year);
         return year;
     }
 
@@ -137,7 +135,7 @@ public class DateCreator {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(DateCreator.elaborateDate(date));
         long millis = calendar.getTimeInMillis();
-        Log.d(TAG, "getTimeInMillis - result is " + millis);
+        CCLogger.d(TAG, "getTimeInMillis - result is " + millis);
         return millis;
     }
 
@@ -151,7 +149,7 @@ public class DateCreator {
         int x = frequency * -1;
         calendar.add(Calendar.DAY_OF_YEAR, x);
         Date pastDay = calendar.getTime();
-        Log.d(TAG, "getPastDay - result is " + pastDay.toString());
+        CCLogger.d(TAG, "getPastDay - result is " + pastDay.toString());
         return pastDay;
     }
 
@@ -165,7 +163,7 @@ public class DateCreator {
         Date d1 = DateCreator.elaborateDate(dateStart);
         Date d2 = DateCreator.elaborateDate(today);
         long difference = d2.getTime() - d1.getTime();
-        Log.v(TAG, "getDifferenceInMillis - result is " + difference);
+        CCLogger.v(TAG, "getDifferenceInMillis - result is " + difference);
         return difference;
     }
 }

@@ -8,13 +8,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 
@@ -43,7 +43,7 @@ public class WidgetSettings extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "onCreate - start");
+        CCLogger.d(TAG, "onCreate - start");
         // Set the result to CANCELED.  This will cause the widget host to cancel
         // out of the widget placement if they press the back button.
         setResult(RESULT_CANCELED);
@@ -85,7 +85,7 @@ public class WidgetSettings extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Log.d(TAG, "onListItemClick - start - position " + position);
+                CCLogger.d(TAG, "onListItemClick - start - position " + position);
                 Context context = WidgetSettings.this;
                 String editorTitle = mUpdatableSectionList.get(position);
                 Constants.Sections editor = Constants.Sections.getEditorFromTitle(editorTitle);
@@ -93,7 +93,7 @@ public class WidgetSettings extends AppCompatActivity {
                 String title = Constants.Sections.getTitle(editor);
                 String name = Constants.Sections.getName(editor);
                 // Create widget
-                Log.v(TAG, "onListItemClick - end - title " + title + " name " + name);
+                CCLogger.v(TAG, "onListItemClick - end - title " + title + " name " + name);
                 createWidget(context, title, name);
             }
         });
@@ -118,11 +118,11 @@ public class WidgetSettings extends AppCompatActivity {
             finish();
         }
 
-        Log.v(TAG, "onCreate - end");
+        CCLogger.v(TAG, "onCreate - end");
     }
 
     private void createWidget(Context context, String title, String name) {
-        Log.i(TAG, "createWidget - title " + title + " name " + name);
+        CCLogger.i(TAG, "createWidget - title " + title + " name " + name);
         // Store the string locally
         saveTitlePref(context, mAppWidgetId, title);
 
@@ -141,7 +141,7 @@ public class WidgetSettings extends AppCompatActivity {
 
     // Write the prefix to the SharedPreferences object for this widget
     private static void saveTitlePref(Context context, int appWidgetId, String text) {
-        Log.d(TAG, "saveTitlePref " + PREF_PREFIX_KEY + appWidgetId + " text " + text);
+        CCLogger.d(TAG, "saveTitlePref - " + PREF_PREFIX_KEY + appWidgetId + " text " + text);
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
         prefs.putString(PREF_PREFIX_KEY + appWidgetId, text);
         prefs.apply();
@@ -152,7 +152,7 @@ public class WidgetSettings extends AppCompatActivity {
     public static String loadTitlePref(Context context, int appWidgetId) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
         String titleValue = prefs.getString(PREF_PREFIX_KEY + appWidgetId, null);
-        Log.d(TAG, "loadTitlePref " + PREF_PREFIX_KEY + appWidgetId + " return " + titleValue);
+        CCLogger.d(TAG, "loadTitlePref - " + PREF_PREFIX_KEY + appWidgetId + " return " + titleValue);
         if (titleValue != null) {
             return titleValue;
         } else {
@@ -161,7 +161,7 @@ public class WidgetSettings extends AppCompatActivity {
     }
 
     public static void deleteTitlePref(Context context, int appWidgetId) {
-        Log.d(TAG, "deleteTitlePref " + PREF_PREFIX_KEY + appWidgetId);
+        CCLogger.d(TAG, "deleteTitlePref - " + PREF_PREFIX_KEY + appWidgetId);
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
         prefs.remove(PREF_PREFIX_KEY + appWidgetId);
         prefs.apply();

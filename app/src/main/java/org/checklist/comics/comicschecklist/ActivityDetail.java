@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
@@ -25,12 +25,9 @@ import org.checklist.comics.comicschecklist.util.Constants;
  */
 public class ActivityDetail extends AppCompatActivity {
 
-    private static final String TAG = ActivityDetail.class.getSimpleName();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate - start");
         setContentView(R.layout.app_bar_detail);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -44,7 +41,7 @@ public class ActivityDetail extends AppCompatActivity {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
             // Finally change the color
-            window.setStatusBarColor(getResources().getColor(R.color.primary_dark));
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.primary_dark));
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
@@ -74,8 +71,6 @@ public class ActivityDetail extends AppCompatActivity {
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().add(R.id.comic_detail_container, fragment).commit();
         }
-
-        Log.v(TAG, "onCreate - end");
     }
 
     @Override

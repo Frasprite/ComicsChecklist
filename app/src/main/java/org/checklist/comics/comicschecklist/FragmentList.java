@@ -15,7 +15,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,6 +33,7 @@ import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.service.WidgetService;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -112,7 +112,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * Returns a new instance of this fragment for the given section number.
      */
     public static FragmentList newInstance(Constants.Sections section) {
-        Log.v(TAG, "Creating new instance " + section.toString());
+        CCLogger.v(TAG, "newInstance - " + section.toString());
         FragmentList fragment = new FragmentList();
         Bundle args = new Bundle();
         args.putSerializable(Constants.ARG_EDITOR, section);
@@ -126,21 +126,21 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
 
         // Find editor
         mEditor = (Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR);
-        Log.d(TAG, "onCreate - name " + mEditor);
+        CCLogger.d(TAG, "onCreate - name " + mEditor);
 
         fillData();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView - start");
+        CCLogger.d(TAG, "onCreateView - start");
         // Create the list fragment's content view by calling the super method
         final View listFragmentView = inflater.inflate(R.layout.fragment_main, container, false);//super.onCreateView(inflater, container, savedInstanceState);
 
         getActivity().setTitle(Constants.Sections.getTitle(mEditor));
 
         if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
-            Log.v(TAG, "onCreateView - created a ListFragment - end");
+            CCLogger.v(TAG, "onCreateView - created a ListFragment - end");
             return listFragmentView;
         } else {
             // Now create a SwipeRefreshLayout to wrap the fragment's content view
@@ -160,7 +160,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent);
 
             // Now return the SwipeRefreshLayout as this fragment's content view
-            Log.v(TAG, "onCreateView - created a SwipeRefreshLayout - end");
+            CCLogger.v(TAG, "onCreateView - created a SwipeRefreshLayout - end");
             return mSwipeRefreshLayout;
         }
     }
@@ -168,7 +168,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "onViewCreated - start");
+        CCLogger.d(TAG, "onViewCreated - start");
         // Restore the previously serialized activated item position.
         if (savedInstanceState != null && savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
@@ -206,11 +206,11 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem > mLastFirstVisibleItem[0]) {
-                    Log.v(TAG, "Scrolling down...");
+                    //CCLogger.v(TAG, "onScroll - Scrolling down...");
                     mCallbacks.onHideFAB();
 
                 } else if (firstVisibleItem < mLastFirstVisibleItem[0]) {
-                    Log.v(TAG, "Scrolling up...");
+                    //CCLogger.v(TAG, "onScroll - Scrolling up...");
                     mCallbacks.onHideFAB();
                 }
 
@@ -220,19 +220,19 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (scrollState == 0) {
-                    Log.v(TAG, "Scrolling stopped...");
+                    //CCLogger.v(TAG, "onScroll - Scrolling stopped...");
                     mCallbacks.onShowFAB();
                 }
             }
         });
 
-        Log.v(TAG, "onViewCreated - end");
+        CCLogger.v(TAG, "onViewCreated - end");
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        Log.v(TAG, "onAttach");
+        CCLogger.v(TAG, "onAttach");
         // Activities containing this fragment must implement its callbacks.
         if (!(context instanceof Callbacks)) {
             throw new IllegalStateException("Activity must implement fragment's callbacks.");
@@ -244,7 +244,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.v(TAG, "onDetach");
+        CCLogger.v(TAG, "onDetach");
         // Reset the active callbacks interface to the callback implementation.
         mCallbacks = sComicCallbacks;
     }
@@ -252,7 +252,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     @Override
     public void onActivityCreated(Bundle savedState) {
         super.onActivityCreated(savedState);
-        Log.v(TAG, "onActivityCreated");
+        CCLogger.v(TAG, "onActivityCreated");
         if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
             registerForContextMenu(getListView());
         }
@@ -274,14 +274,14 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                 mUpdateValues = new ContentValues();
                 if (mEditor.equals(Constants.Sections.FAVORITE)) {
                     mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-                    Log.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + info.id);
+                    CCLogger.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + info.id);
                     // Defines selection criteria for the rows you want to update
                     String whereClause = ComicDatabase.ID + "=?";
                     String[] whereArgs = new String[]{String.valueOf(info.id)};
                     int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
-                    Log.v(TAG, "onContextItemSelected - favorite comic UPDATED " + rowUpdated);
+                    CCLogger.v(TAG, "onContextItemSelected - favorite comic UPDATED " + rowUpdated);
                 } else if (mEditor.equals(Constants.Sections.CART)) {
-                    Log.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + info.id);
+                    CCLogger.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + info.id);
                     removeComicFromCart(info.id);
                 }
                 WidgetService.updateWidget(getActivity());
@@ -295,20 +295,20 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
                     updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
                     if (updateResult > 0) {
                         Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "onContextItemSelected - deleting all favorite comic");
+                        CCLogger.d(TAG, "onContextItemSelected - deleting all favorite comic");
                     } else {
                         Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
-                        Log.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
+                        CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
                     }
                 } else if (mEditor.equals(Constants.Sections.CART)) {
                     // Remove comic from cart
                     updateResult = removeAllComicFromCart();
                     if (updateResult > 0) {
                         Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, "onContextItemSelected - deleting " + updateResult + " from cart");
+                        CCLogger.d(TAG, "onContextItemSelected - deleting " + updateResult + " from cart");
                     } else {
                         Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
-                        Log.w(TAG, "onContextItemSelected - error while removing all comic from cart");
+                        CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from cart");
                     }
                 }
 
@@ -326,7 +326,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         cursor.moveToFirst();
         String rawEditor = cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
         Constants.Sections editor = Constants.Sections.getEditorFromName(rawEditor);
-        Log.d(TAG, "rawEditor " + rawEditor + " editor " + editor + " for comicId " + comicId);
+        CCLogger.d(TAG, "removeComicFromCart - rawEditor " + rawEditor + " editor " + editor + " for comicId " + comicId);
         cursor.close();
         // Defines selection criteria for the rows you want to update / remove
         String whereClause = ComicDatabase.ID + "=?";
@@ -334,13 +334,13 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         switch (editor) {
             case CART:
                 int rowRemoved = ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, whereClause, whereArgs);
-                Log.v(TAG, "removeComicFromCart - row REMOVED " + rowRemoved);
+                CCLogger.v(TAG, "removeComicFromCart - row REMOVED " + rowRemoved);
                 break;
             default:
                 ContentValues mUpdateValues = new ContentValues();
                 mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
                 int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
-                Log.v(TAG, "removeComicFromCart - row UPDATED " + rowUpdated);
+                CCLogger.v(TAG, "removeComicFromCart - row UPDATED " + rowUpdated);
                 break;
         }
     }
@@ -394,7 +394,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         } else {
             getListView().setItemChecked(position, true);
         }
-        Log.v(TAG, "setActivatedPosition - position activated is " + position);
+        CCLogger.v(TAG, "setActivatedPosition - position activated is " + position);
         mActivatedPosition = position;
     }
 
@@ -426,7 +426,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         if (swipeRefreshLayout != null) {
             return swipeRefreshLayout.isRefreshing();
         } else {
-            Log.v(TAG, "Returning false because swipe refresh layout is null");
+            CCLogger.v(TAG, "isRefreshing - Returning FALSE because swipe refresh layout is null");
             return false;
         }
     }
@@ -497,7 +497,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
      */
     private void initiateRefresh() {
-        Log.i(TAG, "initiateRefresh - start for editor " + mEditor);
+        CCLogger.i(TAG, "initiateRefresh - start for editor " + mEditor);
 
         String today = DateCreator.getTodayString();
 
@@ -540,7 +540,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * Method used to fill data on list.
      */
     private void fillData() {
-        Log.d(TAG, "fillData - start");
+        CCLogger.d(TAG, "fillData - start");
         // Fields from the database (projection) must include the id column for the adapter to work
         String[] from = new String[] {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
         // Fields on the UI to which we map
@@ -558,7 +558,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             }
         };
         setListAdapter(adapter);
-        Log.d(TAG, "fillData - end");
+        CCLogger.d(TAG, "fillData - end");
     }
 
     @Override
@@ -571,25 +571,25 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             rawSortOrder = "1";
         }
         String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
-        Log.d(TAG, "onCreateLoader - creating loader ordered with " + sortOrder);
+        CCLogger.d(TAG, "onCreateLoader - creating loader ordered with " + sortOrder);
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
         String whereClause;
         String[] whereArgs;
         switch (mEditor) {
             case CART:
-                Log.d(TAG, "Loading CART content");
+                CCLogger.d(TAG, "onCreateLoader - Loading CART content");
                 // Load comic with special editor name and buy flag to true
                 whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? OR " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
                 whereArgs = new String[]{Constants.Sections.getName(mEditor), "yes"};
                 break;
             case FAVORITE:
-                Log.d(TAG, "Loading FAVORITE content");
+                CCLogger.d(TAG, "onCreateLoader - Loading FAVORITE content");
                 // Load only comic with positive favorite flag
                 whereClause = ComicDatabase.COMICS_FAVORITE_KEY + "=?";
                 whereArgs = new String[]{"yes"};
                 break;
             default:
-                Log.d(TAG, "Loading " + mEditor + " content");
+                CCLogger.d(TAG, "onCreateLoader - Loading " + mEditor + " content");
                 // Do a simple load from editor name
                 whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
                 whereArgs = new String[]{Constants.Sections.getName(mEditor)};

@@ -8,10 +8,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,7 +50,7 @@ public class ComicContentProvider extends ContentProvider {
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        Log.v(TAG, "query " + uri);
+        CCLogger.v(TAG, "query " + uri);
         // Using SQLiteQueryBuilder instead of query() method
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 
@@ -177,7 +177,7 @@ public class ComicContentProvider extends ContentProvider {
     }
 
     private void checkColumns(String[] projection) {
-        Log.v(TAG, "checkColumns - start\nProjection is " + java.util.Arrays.toString(projection));
+        CCLogger.v(TAG, "checkColumns - start\nProjection is " + java.util.Arrays.toString(projection));
         String[] available = {ComicDatabase.COMICS_NAME_KEY, ComicDatabase.ID,
                 ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
@@ -192,6 +192,6 @@ public class ComicContentProvider extends ContentProvider {
                 throw new IllegalArgumentException("Unknown columns in projection");
             }
         }
-        Log.v(TAG, "checkColumns - end");
+        CCLogger.v(TAG, "checkColumns - end");
     }
 }

@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -17,6 +16,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.WidgetItem;
 
@@ -55,7 +55,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     private final String mEditor, mTitle;
     private Cursor mCursor;
 
-    public ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {
+    ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {
         mContext = applicationContext;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
         mEditor = intent.getStringExtra(Constants.WIDGET_EDITOR);
@@ -64,7 +64,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     @Override
     public void onCreate() {
-        Log.i(TAG, "WidgetService onCreate " + mEditor + " " + mTitle  + " " + mAppWidgetId);
+        CCLogger.i(TAG, "onCreate - WidgetService onCreate " + mEditor + " " + mTitle  + " " + mAppWidgetId);
         // In onCreate() you setup any connections / cursors to your data source. Heavy lifting,
         // for example downloading or creating content etc, should be deferred to onDataSetChanged()
         // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.
@@ -80,9 +80,9 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         String[] whereArgs;
         String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
         String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
-        Log.d(TAG, "populateWidget - ordering by " + sortOrder);
+        CCLogger.d(TAG, "populateWidget - ordering by " + sortOrder);
 
-        Log.d(TAG, "populateWidget - editor founded, query database " + mEditor);
+        CCLogger.d(TAG, "populateWidget - editor founded, query database " + mEditor);
         Uri uri = ComicContentProvider.CONTENT_URI;
         String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
                 ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
@@ -90,7 +90,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
         // Load data based on selected editor
         Constants.Sections editor = Constants.Sections.getEditorFromName(mEditor);
-        Log.v(TAG, "populateWidget - preparing entry for widget, mEditor is " + mEditor + " found editor is " + editor);
+        CCLogger.v(TAG, "populateWidget - preparing entry for widget, mEditor is " + mEditor + " found editor is " + editor);
         switch (editor) {
             case CART:
                 // Load comic with special editor name and buy flag to true
@@ -114,7 +114,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         String mName;
         String mRelease;
         if (mCursor != null) {
-            Log.d(TAG, "populateWidget - cursor has data: " + mCursor.getCount());
+            CCLogger.d(TAG, "populateWidget - cursor has data: " + mCursor.getCount());
             for (int i = 0; i < mCursor.getCount(); i++) {
                 mCursor.moveToNext();
                 mID = mCursor.getInt(mCursor.getColumnIndex(ComicDatabase.ID));
@@ -146,7 +146,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.i(TAG, "WidgetService getViewAt for position: " + position);
+        CCLogger.i(TAG, "getViewAt - position: " + position);
         RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.list_item_widget);
         rv.setTextViewText(R.id.widget_tv1, mWidgetItems.get(position)._name);
         rv.setTextViewText(R.id.widget_tv2, mWidgetItems.get(position)._release);

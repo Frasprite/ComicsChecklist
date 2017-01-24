@@ -5,18 +5,20 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.DatePicker;
 
+import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -27,7 +29,6 @@ public class ActivityAddComic extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate - start");
         setContentView(R.layout.app_bar_detail);
 
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -41,7 +42,7 @@ public class ActivityAddComic extends AppCompatActivity {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
             // Finally change the color
-            window.setStatusBarColor(getResources().getColor(R.color.primary_dark));
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.primary_dark));
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
@@ -59,8 +60,6 @@ public class ActivityAddComic extends AppCompatActivity {
         FragmentAddComic fragment = new FragmentAddComic();
         fragment.setArguments(arguments);
         getSupportFragmentManager().beginTransaction().add(R.id.comic_detail_container, fragment, "addComicFragment").commit();
-
-        Log.v(TAG, "onCreate - end");
     }
 
     @Override
@@ -85,6 +84,7 @@ public class ActivityAddComic extends AppCompatActivity {
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
 
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
@@ -93,7 +93,7 @@ public class ActivityAddComic extends AppCompatActivity {
             int day = DateCreator.getCurrentYear();
 
             // Create a new instance of DatePickerDialog and return it
-            Log.d(TAG, "onCreateDialog - date is " + day + "/" + month + "/" + year);
+            CCLogger.d(TAG, "onCreateDialog - date is " + day + "/" + month + "/" + year);
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
@@ -103,7 +103,7 @@ public class ActivityAddComic extends AppCompatActivity {
             FragmentAddComic articleFrag = (FragmentAddComic)
                     getActivity().getSupportFragmentManager().findFragmentByTag("addComicFragment");
             String date = DateCreator.elaborateDate(year, month, day);
-            Log.i(TAG, "onDateSet - returning " + date);
+            CCLogger.i(TAG, "onDateSet - returning " + date);
             articleFrag.updateDate(date);
         }
     }

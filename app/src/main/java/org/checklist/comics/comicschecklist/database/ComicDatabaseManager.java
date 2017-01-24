@@ -5,9 +5,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.util.CCLogger;
 
 import java.util.Date;
 
@@ -20,7 +20,7 @@ public class ComicDatabaseManager {
 
     public static long insert(Context context, String name, String editor, String description, String releaseDate,
                               Date date, String coverUrl, String feature, String price, String cartKey, String favoriteKey, String URL) {
-        Log.v(TAG, "Insert comic " + name + " " + editor + " " + releaseDate);
+        CCLogger.v(TAG, "insert - Insert comic " + name + " " + editor + " " + releaseDate);
         ContentValues values = new ContentValues();
         values.put(ComicDatabase.COMICS_NAME_KEY, name);
         values.put(ComicDatabase.COMICS_EDITOR_KEY, editor);
