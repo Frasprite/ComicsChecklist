@@ -1,5 +1,6 @@
 package org.checklist.comics.comicschecklist;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -24,10 +25,60 @@ import org.checklist.comics.comicschecklist.util.RecyclerItemClickListener;
 
 public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    // TODO highlight selected item
+    // http://stackoverflow.com/questions/27194044/how-to-properly-highlight-selected-item-on-recyclerview
+    // http://stackoverflow.com/questions/26682277/how-do-i-get-the-position-selected-in-a-recyclerview
+    // TODO add expanded FAB menu
+    // http://stackoverflow.com/questions/30699302/android-design-support-library-fab-menu
+    // https://github.com/pmahsky/FloatingActionMenuAndroid
+
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
     private Constants.Sections mEditor;
     private CustomCursorRecyclerViewAdapter mAdapter;
+
+    /**
+     * The fragment's current callback object, which is notified of list item
+     * clicks.
+     */
+    private Callbacks mCallbacks = sComicCallbacks;
+
+    /**
+     * A callback interface that all activities containing this fragment must
+     * implement. This mechanism allows activities to be notified of item
+     * selections.
+     */
+    public interface Callbacks {
+        /**
+         * Callback for when an item has been selected.
+         */
+        void onItemSelected(long id);
+
+        /**
+         * Callback for when list is scrolled down / up.
+         */
+        void onHideFAB();
+
+        /**
+         * Callback for when list is scrolled stops.
+         */
+        void onShowFAB();
+    }
+
+    /**
+     * An implementation of the {@link FragmentRecycler.Callbacks} interface that does
+     * nothing. Used only when this fragment is not attached to an activity.
+     */
+    private static final FragmentRecycler.Callbacks sComicCallbacks = new FragmentRecycler.Callbacks() {
+        @Override
+        public void onItemSelected(long id) {}
+
+        @Override
+        public void onHideFAB() {}
+
+        @Override
+        public void onShowFAB() {}
+    };
 
     /**
      * Returns a new instance of this fragment for the given section number.
@@ -71,9 +122,18 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState != RecyclerView.SCROLL_STATE_IDLE) {
+                    mCallbacks.onHideFAB();
+                } else {
+                    mCallbacks.onShowFAB();
+                }
+            }
+
+            @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
             }
         });
 
@@ -84,6 +144,9 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
                             public void onItemClick(View view, int position) {
                                 long id = mAdapter.getItemId(position);
                                 CCLogger.d(TAG, "onItemClick - item ID " + id);
+                                // Notify the active callbacks interface (the activity, if the
+                                // fragment is attached to one) that an item has been selected.
+                                mCallbacks.onItemSelected(id);
                             }
 
                             @Override
@@ -98,6 +161,26 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         return view;
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        CCLogger.v(TAG, "onAttach");
+        // Activities containing this fragment must implement its callbacks.
+        if (!(context instanceof Callbacks)) {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+        }
+
+        mCallbacks = (Callbacks) context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        CCLogger.v(TAG, "onDetach");
+        // Reset the active callbacks interface to the callback implementation.
+        mCallbacks = sComicCallbacks;
+    }
+
     /**
      * Method used to fill data on list.
      */
@@ -108,6 +191,10 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
 
         CCLogger.d(TAG, "fillData - end");
     }
+
+    /* ****************************************************************************************
+     * LoaderManager methods
+     ******************************************************************************************/
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
