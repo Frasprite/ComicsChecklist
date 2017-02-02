@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.checklist.comics.comicschecklist.R;
+
 public class CustomCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter {
 
     public CustomCursorRecyclerViewAdapter(Context context, Cursor cursor) {
@@ -20,7 +22,7 @@ public class CustomCursorRecyclerViewAdapter extends CursorRecyclerViewAdapter {
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(mContext).inflate(android.R.layout.simple_list_item_activated_2, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.list_item_recycler_view, parent, false);
         return new CustomViewHolder(v);
     }
 

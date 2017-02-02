@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,12 +20,11 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.RecyclerItemClickListener;
 
 public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = FragmentRecycler.class.getSimpleName();
-
-    private RecyclerView mRecyclerView;
 
     private Constants.Sections mEditor;
     private CustomCursorRecyclerViewAdapter mAdapter;
@@ -61,9 +61,13 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mAdapter = new CustomCursorRecyclerViewAdapter(getActivity(), null);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        RecyclerView mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
+                mLayoutManager.getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -72,6 +76,22 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
 
             }
         });
+
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getActivity(), mRecyclerView,
+                        new RecyclerItemClickListener.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                long id = mAdapter.getItemId(position);
+                                CCLogger.d(TAG, "onItemClick - item ID " + id);
+                            }
+
+                            @Override
+                            public void onLongItemClick(View view, int position) {
+                                CCLogger.d(TAG, "onLongItemClick");
+                            }
+                        })
+        );
 
         getActivity().getSupportLoaderManager().restartLoader(0, null, this);
 
