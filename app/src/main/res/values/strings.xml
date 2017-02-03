@@ -46,6 +46,11 @@
     <string name="dialog_picasso_license">Licensed used under the Apache License, v2.0</string>
     <string name="dialog_delete_content_title">Scegli un editore</string>
     <string name="dialog_last_sync_title">Ultime sincronizzazioni</string>
+    <string name="dialog_context_action">Scegli cosa fare</string>
+    <string-array name="dialog_available_actions">
+        <item>Togli dalla lista</item>
+        <item>Cancella tutta la lista</item>
+    </string-array>
 
     <!-- Navigation drawer text -->
     <string name="drawer_open">Apri la barra di navigazione</string>
