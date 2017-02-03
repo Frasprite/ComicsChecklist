@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.adapter.CustomCursorRecyclerViewAdapter;
@@ -41,13 +42,13 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
     // https://github.com/pmahsky/FloatingActionMenuAndroid
     // TODO add refresh on FAB sub-menu
     // TODO add refresh progress on UI
-    // TODO add empty list UI
 
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
     private Constants.Sections mEditor;
     private CustomCursorRecyclerViewAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private TextView mEmptyText;
 
     /**
      * The fragment's current callback object, which is notified of list item
@@ -154,6 +155,26 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         getActivity().getSupportLoaderManager().restartLoader(0, null, this);
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        CCLogger.d(TAG, "onViewCreated - start");
+
+        mEmptyText = (TextView)view.findViewById(R.id.empty_view);
+
+        if (mEditor.equals(Constants.Sections.FAVORITE)) {
+            mEmptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
+            mEmptyText.setText(getString(R.string.empty_favorite_list));
+        } else if (mEditor.equals(Constants.Sections.CART)) {
+            mEmptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
+            mEmptyText.setText(getString(R.string.empty_cart_list));
+        } else {
+            mEmptyText.setText(getString(R.string.empty_editor_list));
+        }
+
+        CCLogger.v(TAG, "onViewCreated - end");
     }
 
     @Override
@@ -414,6 +435,13 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
+        if (data.getCount() == 0) {
+            mRecyclerView.setVisibility(View.GONE);
+            mEmptyText.setVisibility(View.VISIBLE);
+        } else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            mEmptyText.setVisibility(View.GONE);
+        }
     }
 
     @Override
