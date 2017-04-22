@@ -352,11 +352,11 @@ public class Parser {
         Document doc;
         String name, releaseDate = "", description, price, feature = "N.D.", coverUrl, testata = "", number = "";
         for (int i = from; i <= to; i++) {
-            CCLogger.v(TAG, "parseUrlStarC - Search for comic number " + i);
+            String URL = Constants.COMIC_ROOT + i;
+            CCLogger.v(TAG, "parseUrlStarC - Search for comic number " + i + "\n" + URL);
             // Try to open computed URL
             try {
                 // Create doc (ISO-8859-1 CP1252 UTF-8)
-                String URL = Constants.COMIC_ROOT + i;
                 doc = Jsoup.parse(new URL(URL).openStream(), "UTF-8", Constants.COMIC_ROOT + i);
                 Element content = doc.getElementsByTag("article").first();
                 // Take various info (name, release date and number)
@@ -395,7 +395,7 @@ public class Parser {
                 // Insert comic on database
                 ComicDatabaseManager.insert(mContext, name, Constants.Sections.getName(Constants.Sections.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", URL);
             } catch (Exception e) {
-                CCLogger.w(TAG, "parseUrlStarC - Error while searching data for comic id " + i + " " + e.toString());
+                CCLogger.w(TAG, "parseUrlStarC - Error while searching data for comic id " + i + " " + e.toString() + "\n" + URL);
                 comicErrorStar = true;
             }
         }

@@ -189,8 +189,8 @@ public class Constants {
     public static final String ENDRW = "/";
     public static final String MEDIARW = "http://www.rwedizioni.it/media/";
     // Star Comics
-    public static final String ROOT = "http://www.starcomics.com/UsciteMensili.aspx";
-    public static final String COMIC_ROOT = "http://www.starcomics.com/fumetto.aspx?Fumetto=";
+    public static final String ROOT = "https://www.starcomics.com/UsciteMensili.aspx?AspxAutoDetectCookieSupport=1";
+    public static final String COMIC_ROOT = "https://www.starcomics.com/fumetto.aspx?Fumetto=";
     public static final String IMG_URL = "http://www.starcomics.com";
     // Bonelli
     public static final String EDICOLA_INEDITI = "http://www.sergiobonelli.it/sezioni/1025/inediti1025";
