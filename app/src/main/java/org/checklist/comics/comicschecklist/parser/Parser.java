@@ -145,26 +145,22 @@ public class Parser {
                 Element featureElement = divEssential.select("div.box-additional-info").first();
                 Elements features = featureElement.getElementsByClass("product");
                 String feature = findFeature(features);
-                String editor = findEditor(features);
+                String editor = Constants.Sections.PANINI.getName();
                 CCLogger.d(TAG, "parseUrlPanini - Feature found : " + feature + "\n" + "Editor " + editor);
 
-                if (editor != null) {
-                    // Insert data on database
-                    StringTokenizer tokenizer = new StringTokenizer(comicName);
-                    String title = tokenizer.nextToken();
-                    if (!title.equalsIgnoreCase("play") && !comicName.equalsIgnoreCase("n.d.")) {
-                        try {
-                            // Calculating date for sql
-                            Date myDate = DateCreator.elaborateDate(releaseDate);
-                            ComicDatabaseManager.insert(mContext, comicName, editor, description, releaseDate,
-                                    myDate, "", feature, price, "no", "no", linkMoreInfo);
-                        } catch (Exception e) {
-                            // Error while comic fetching
-                            CCLogger.w(TAG, "parseUrlPanini - " + title + " " + e.toString());
-                        }
+                // Insert data on database
+                StringTokenizer tokenizer = new StringTokenizer(comicName);
+                String title = tokenizer.nextToken();
+                if (!title.equalsIgnoreCase("play") && !comicName.equalsIgnoreCase("n.d.")) {
+                    try {
+                        // Calculating date for sql
+                        Date myDate = DateCreator.elaborateDate(releaseDate);
+                        ComicDatabaseManager.insert(mContext, comicName, editor, description, releaseDate,
+                                myDate, "", feature, price, "no", "no", linkMoreInfo);
+                    } catch (Exception e) {
+                        // Error while comic fetching
+                        CCLogger.w(TAG, "parseUrlPanini - " + title + " " + e.toString());
                     }
-                } else {
-                    CCLogger.w(TAG, "parseUrlPanini - Editor not found from given link:\n" + linkMoreInfo + "\n" + features);
                 }
             }
         } catch (Exception e) {
@@ -203,30 +199,6 @@ public class Parser {
             return info;
         } else {
             return feature + "\n" + info;
-        }
-    }
-
-    private String findEditor(Elements features) {
-        String editor = null;
-        for (Element element : features) {
-            String ID = element.id();
-            if (ID.equals("linea-editoriale")) {
-                editor = element.getElementsByTag("h3").text();
-                break;
-            }
-        }
-
-        if (editor == null) {
-            // Editor not found
-            CCLogger.w(TAG, "findEditor - Editor not found for this element\n" + features.toString());
-            return null;
-        }
-
-        switch (editor) {
-            case "Panini Comics":
-                return Constants.Sections.PANINI.getName();
-            default:
-                return null;
         }
     }
 
