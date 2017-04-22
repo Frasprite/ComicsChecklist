@@ -111,9 +111,9 @@ public class Parser {
 
             // Select only a part of document
             Element content = doc.getElementById("products-list");
-            Elements links = content.getElementsByClass("col-sm-12");
+            Elements links = content.getElementsByAttributeValueContaining("class", "row list-group-item");
             // Prompt number of comics found on document
-            CCLogger.d(TAG, "parseUrlPanini -Total links : " + links.size());
+            CCLogger.d(TAG, "parseUrlPanini - Total links : " + links.size());
             for (Element link : links) {
                 // Getting link to more info, comic name and release date
                 String linkMoreInfo = link.getElementsByTag("a").attr("href");
