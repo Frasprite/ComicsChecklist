@@ -293,15 +293,22 @@ public class Parser {
                         if (elementText.contains("€")) {
                             // Found price text on <p>
                             CCLogger.v(TAG, "parseUrlRW - Price " + elementText);
-                            priceList.add(elementText);
+                            if (priceList.size() < featureList.size()) {
+                                priceList.add(elementText);
+                            }
                         }
                     }
                 }
 
                 if (coverList.size() == titleList.size() && featureList.size() == priceList.size()) {
+                    CCLogger.v(TAG, "parseUrlRW - List are all equals, saving entries");
                     for (int i = 0; i < coverList.size(); i++) {
                         ComicDatabaseManager.insert(mContext, titleList.get(i), Constants.Sections.getName(Constants.Sections.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i), "no", "no", siteUrl);
                     }
+                } else {
+                    CCLogger.w(TAG, "parseUrlRW - List don't have same size:\ncoverList " + coverList.size() +
+                    "\ntitleList " + titleList.size() + "\nfeatureList " + featureList.size() +
+                            "\npriceList " + priceList.size());
                 }
             } catch (Exception e) {
                 CCLogger.w(TAG, "parseUrlRW - Error while comic fetching " + e.toString());
