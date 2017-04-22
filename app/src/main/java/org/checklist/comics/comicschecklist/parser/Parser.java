@@ -106,7 +106,7 @@ public class Parser {
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .maxBodySize(0)
-                    .timeout(10 * 1000) // timeout to 10 seconds
+                    .timeout(30 * 1000) // timeout to 30 seconds
                     .get();
 
             // Select only a part of document
@@ -126,7 +126,7 @@ public class Parser {
                 Document docMoreInfo = Jsoup.connect(linkMoreInfo)
                         .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                         .maxBodySize(0)
-                        .timeout(10 * 1000) // timeout to 10 seconds
+                        .timeout(30 * 1000) // timeout to 30 seconds
                         .get();
 
                 // Getting only essential info for comic
@@ -239,7 +239,7 @@ public class Parser {
             Document doc = Jsoup.connect(siteUrl)
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .maxBodySize(0)
-                    .timeout(10 * 1000) // timeout to 10 seconds
+                    .timeout(30 * 1000) // timeout to 30 seconds
                     .get();
             Element content = doc.getElementById("content");
 
@@ -430,7 +430,7 @@ public class Parser {
             Document doc = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                     .maxBodySize(0)
-                    .timeout(10 * 1000) // timeout to 10 seconds
+                    .timeout(30 * 1000) // timeout to 30 seconds
                     .get();
 
             // Finding release date
@@ -455,7 +455,7 @@ public class Parser {
                     Document docMoreInfo = Jsoup.connect(moreInfoUrl)
                             .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
                             .maxBodySize(0)
-                            .timeout(10 * 1000) // timeout to 10 seconds
+                            .timeout(30 * 1000) // timeout to 30 seconds
                             .get();
 
                     // Finding periodicity
