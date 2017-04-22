@@ -65,9 +65,7 @@ public class Constants {
     public enum Sections {
         FAVORITE(0, "preferiti", "Lista preferiti"),
         CART    (1, "da comprare", "Da comprare"),
-        MARVEL  (2, "marvelitalia", "Marvel"),
         PANINI  (3, "paninicomics", "Panini Comics"),
-        PLANET  (4, "planetmanga", "Planet Manga"),
         STAR    (5, "star", "Star Comics"),
         BONELLI (6, "bonelli", "Sergio Bonelli"),
         RW      (7, "rw", "RW Edizioni"),
@@ -147,9 +145,7 @@ public class Constants {
     public static final String PREF_LAST_SYNC = "last_sync";
 
     /* Preference last scan */
-    public static final String PREF_MARVEL_LAST_SCAN = "marvel_lastscan";
     public static final String PREF_PANINI_LAST_SCAN = "panini_lastscan";
-    public static final String PREF_PLANET_LAST_SCAN = "planet_lastscan";
     public static final String PREF_STAR_LAST_SCAN = "star_lastscan";
     public static final String PREF_BONELLI_LAST_SCAN = "bonelli_lastscan";
     public static final String PREF_RW_LAST_SCAN = "rw_lastscan";

@@ -162,9 +162,7 @@ public class DownloadService extends IntentService {
 
         // Select editor
         switch (editor) {
-            case MARVEL:
             case PANINI:
-            case PLANET:
                 error = myParser.startParsePanini();
                 break;
             case STAR:
@@ -279,11 +277,6 @@ public class DownloadService extends IntentService {
 
         result = diff / (24 * 60 * 60 * 1000);
         sp.edit().putString(editorLastScan, today).apply();
-        if (editorLastScan.equals(Constants.PREF_PANINI_LAST_SCAN)) {
-            // Update last scan for Marvel and Planet Manga too
-            sp.edit().putString(Constants.PREF_PLANET_LAST_SCAN, today).apply();
-            sp.edit().putString(Constants.PREF_MARVEL_LAST_SCAN, today).apply();
-        }
 
         // Set default value in case of error
         if (result < 0) {

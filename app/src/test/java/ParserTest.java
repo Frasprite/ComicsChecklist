@@ -16,7 +16,7 @@ public class ParserTest {
     Context mMockContext;
 
     @Test
-    public void startParseMarvelTest() {
+    public void startParsePaniniTest() {
         Parser parser = new Parser(mMockContext);
         boolean result = parser.startParsePanini();
         assertThat(result, is(true));

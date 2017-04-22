@@ -225,10 +225,6 @@ public class Parser {
         switch (editor) {
             case "Panini Comics":
                 return Constants.Sections.PANINI.getName();
-            case "Marvel":
-                return Constants.Sections.MARVEL.getName();
-            case "Planet Manga":
-                return Constants.Sections.PLANET.getName();
             default:
                 return null;
         }

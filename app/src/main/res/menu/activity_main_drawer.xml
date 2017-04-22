@@ -15,17 +15,9 @@
             <menu>
                 <group android:checkableBehavior="single">
                     <item
-                        android:id="@+id/list_marvel"
-                        android:icon="@drawable/ic_comic"
-                        android:title="@string/title_section3" />
-                    <item
                         android:id="@+id/list_panini"
                         android:icon="@drawable/ic_comic"
                         android:title="@string/title_section4" />
-                    <item
-                        android:id="@+id/list_planet"
-                        android:icon="@drawable/ic_comic"
-                        android:title="@string/title_section5" />
                     <item
                         android:id="@+id/list_star"
                         android:icon="@drawable/ic_comic"

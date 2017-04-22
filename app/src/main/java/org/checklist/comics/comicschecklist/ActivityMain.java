@@ -383,20 +383,10 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         }
 
         // Populate menu
-        if (editorSet.contains(String.valueOf(Constants.Sections.MARVEL.getCode()))) {
-            mNavigationView.getMenu().findItem(R.id.list_marvel).setVisible(true);
-        } else {
-            mNavigationView.getMenu().findItem(R.id.list_marvel).setVisible(false);
-        }
         if (editorSet.contains(String.valueOf(Constants.Sections.PANINI.getCode()))) {
             mNavigationView.getMenu().findItem(R.id.list_panini).setVisible(true);
         } else {
             mNavigationView.getMenu().findItem(R.id.list_panini).setVisible(false);
-        }
-        if (editorSet.contains(String.valueOf(Constants.Sections.PLANET.getCode()))) {
-            mNavigationView.getMenu().findItem(R.id.list_planet).setVisible(true);
-        } else {
-            mNavigationView.getMenu().findItem(R.id.list_planet).setVisible(false);
         }
         if (editorSet.contains(String.valueOf(Constants.Sections.STAR.getCode()))) {
             mNavigationView.getMenu().findItem(R.id.list_star).setVisible(true);
@@ -569,7 +559,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         if (mNavigationView != null) {
             if (mDrawerLayout != null) {
                 if (section == Constants.Sections.FAVORITE || section == Constants.Sections.CART ||
-                        section == Constants.Sections.MARVEL || section == Constants.Sections.PLANET ||
                         section == Constants.Sections.PANINI || section == Constants.Sections.BONELLI ||
                         section == Constants.Sections.RW || section == Constants.Sections.STAR) {
                     // Update selected item title, then close the drawer
@@ -582,8 +571,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         switch (section) {
             case FAVORITE:
             case CART:
-            case MARVEL:
-            case PLANET:
             case PANINI:
             case BONELLI:
             case RW:
@@ -653,16 +640,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 section = Constants.Sections.CART;
                 result = true;
                 break;
-            case R.id.list_marvel:
-                section = Constants.Sections.MARVEL;
-                result = true;
-                break;
             case R.id.list_panini:
                 section = Constants.Sections.PANINI;
-                result = true;
-                break;
-            case R.id.list_planet:
-                section = Constants.Sections.PLANET;
                 result = true;
                 break;
             case R.id.list_star:

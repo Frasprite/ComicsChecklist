@@ -59,9 +59,7 @@
     <string name="drawer_title_3">Varie</string>
     <string name="title_section1">Lista preferiti</string>
     <string name="title_section2">Da comprare</string>
-    <string name="title_section3">Marvel</string>
     <string name="title_section4">Panini Comics</string>
-    <string name="title_section5">Planet Manga</string>
     <string name="title_section6">Star Comics</string>
     <string name="title_section7">Sergio Bonelli</string>
     <string name="title_section8">RW Edizioni</string>
@@ -171,9 +169,7 @@
     <string name="pref_title_available_editor">Editori disponibili</string>
     <string name="pref_summary_available_editor">Salva memoria e tempo: seleziona solo gli editori che vuoi seguire</string>
     <string-array name="pref_available_editors">
-        <item>Marvel</item>
         <item>Panini Comics</item>
-        <item>Planet Manga</item>
         <item>Star Comics</item>
         <item>Sergio Bonelli</item>
         <item>RW Edizioni</item>

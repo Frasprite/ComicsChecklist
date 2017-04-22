@@ -272,9 +272,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
         private String composeLastSyncMessage(Context context) {
             String message;
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
-            message = "Marvel : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_MARVEL_LAST_SCAN, "01/01/2012")) + "\n";
-            message = message + "Panini Comics : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_PANINI_LAST_SCAN, "01/01/2012")) + "\n";
-            message = message + "Planet Manga : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_PLANET_LAST_SCAN, "01/01/2012")) + "\n";
+            message = "Panini Comics : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_PANINI_LAST_SCAN, "01/01/2012")) + "\n";
             message = message + "RW Edizioni : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_RW_LAST_SCAN, "01/01/2012")) + "\n";
             message = message + "Bonelli : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_BONELLI_LAST_SCAN, "01/01/2012")) + "\n";
             message = message + "Star Comics : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_STAR_LAST_SCAN, "01/01/2012"));
@@ -338,26 +336,18 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                             Constants.Sections section;
                             switch (which) {
                                 case 0:
-                                    // Delete Marvel content
-                                    section = Constants.Sections.MARVEL;
-                                    break;
-                                case 1:
                                     // Delete Panini comics content
                                     section = Constants.Sections.PANINI;
                                     break;
-                                case 2:
-                                    // Delete Planet Manga content
-                                    section = Constants.Sections.PLANET;
-                                    break;
-                                case 3:
+                                case 1:
                                     // Delete Star Comics content
                                     section = Constants.Sections.STAR;
                                     break;
-                                case 4:
+                                case 2:
                                     // Delete SB content
                                     section = Constants.Sections.BONELLI;
                                     break;
-                                case 5:
+                                case 3:
                                     // Delete RW content
                                     section = Constants.Sections.RW;
                                     break;

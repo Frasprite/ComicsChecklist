@@ -504,14 +504,8 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         // Update shared preference of editor that must be refreshed
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         switch (mEditor) {
-            case MARVEL:
-                sp.edit().putString(Constants.PREF_MARVEL_LAST_SCAN, today).apply();
-                break;
             case PANINI:
                 sp.edit().putString(Constants.PREF_PANINI_LAST_SCAN, today).apply();
-                break;
-            case PLANET:
-                sp.edit().putString(Constants.PREF_PLANET_LAST_SCAN, today).apply();
                 break;
             case BONELLI:
                 sp.edit().putString(Constants.PREF_BONELLI_LAST_SCAN, today).apply();
