@@ -59,14 +59,14 @@
     <string name="drawer_title_3">Varie</string>
     <string name="title_section1">Lista preferiti</string>
     <string name="title_section2">Da comprare</string>
-    <string name="title_section4">Panini Comics</string>
-    <string name="title_section6">Star Comics</string>
-    <string name="title_section7">Sergio Bonelli</string>
-    <string name="title_section8">RW Edizioni</string>
-    <string name="title_section9">Impostazioni</string>
-    <string name="title_section10">Segui su Google+</string>
-    <string name="title_section11">Guida</string>
-    <string name="title_section12">Info</string>
+    <string name="title_section3">Panini Comics</string>
+    <string name="title_section4">Star Comics</string>
+    <string name="title_section5">Sergio Bonelli</string>
+    <string name="title_section6">RW Edizioni</string>
+    <string name="title_section7">Impostazioni</string>
+    <string name="title_section8">Segui su Google+</string>
+    <string name="title_section9">Guida</string>
+    <string name="title_section10">Info</string>
 
     <!-- Widget text -->
     <string-array name="widget_sections_array">
@@ -179,16 +179,12 @@
         <item>3</item>
         <item>4</item>
         <item>5</item>
-        <item>6</item>
-        <item>7</item>
     </string-array>
     <string-array name="pref_basic_editors">
         <item>2</item>
         <item>3</item>
         <item>4</item>
         <item>5</item>
-        <item>6</item>
-        <item>7</item>
     </string-array>
 
     <!-- String set for deleting editors content -->

@@ -56,21 +56,29 @@ public class ComicDatabase {
             // Update database by adding new column
             database.execSQL("ALTER TABLE " + COMICS_TABLE + " ADD COLUMN " + COMICS_URL_KEY + " TEXT");
             // Populate new column
-            updateRows(database, Constants.URLPANINI, Constants.Sections.getName(Constants.Sections.PANINI));
-            updateRows(database, Constants.IMG_URL, Constants.Sections.getName(Constants.Sections.STAR));
-            updateRows(database, Constants.MAIN_URL, Constants.Sections.getName(Constants.Sections.BONELLI));
-            updateRows(database, Constants.RW_URL, Constants.Sections.getName(Constants.Sections.RW));
+            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.URLPANINI, Constants.Sections.getName(Constants.Sections.PANINI));
+            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.IMG_URL, Constants.Sections.getName(Constants.Sections.STAR));
+            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.MAIN_URL, Constants.Sections.getName(Constants.Sections.BONELLI));
+            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.RW_URL, Constants.Sections.getName(Constants.Sections.RW));
         }
 
         // N.B.:
         // http://www.sqlite.org/lang_altertable.html
         // It is not possible to remove a column on SQLite.
+
+        if (oldVersion == 2 && newVersion == 3) {
+            CCLogger.w(TAG, "onUpgrade - Upgrading database from version "
+                    + oldVersion + " to " + newVersion);
+            // Change all comics with "marvelitalia" and "planetmanga" to "paninicomics"
+            updateRows(database, ComicDatabase.COMICS_EDITOR_KEY, Constants.Sections.getName(Constants.Sections.PANINI), "marvelitalia");
+            updateRows(database, ComicDatabase.COMICS_EDITOR_KEY, Constants.Sections.getName(Constants.Sections.PANINI), "planetmanga");
+        }
     }
 
-    private static void updateRows(SQLiteDatabase database, String URL, String editorName) {
+    private static void updateRows(SQLiteDatabase database, String columnName, String data, String editorName) {
         // Add default value to new column
         ContentValues mUpdateValues = new ContentValues();
-        mUpdateValues.put(ComicDatabase.COMICS_URL_KEY, URL);
+        mUpdateValues.put(columnName, data);
         // Defines selection criteria for the rows you want to update
         String mSelectionClause = ComicDatabase.COMICS_EDITOR_KEY +  "=?";
         String[] mSelectionArgs = new String[]{String.valueOf(editorName)};

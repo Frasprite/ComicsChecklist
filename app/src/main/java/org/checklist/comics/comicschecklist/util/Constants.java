@@ -65,14 +65,14 @@ public class Constants {
     public enum Sections {
         FAVORITE(0, "preferiti", "Lista preferiti"),
         CART    (1, "da comprare", "Da comprare"),
-        PANINI  (3, "paninicomics", "Panini Comics"),
-        STAR    (5, "star", "Star Comics"),
-        BONELLI (6, "bonelli", "Sergio Bonelli"),
-        RW      (7, "rw", "RW Edizioni"),
-        SETTINGS(8, "settings", "Impostazioni"),
-        GOOGLE  (9, "google plus", "Segui su Google+"),
-        GUIDA   (10,"guida", "Guida"),
-        INFO    (11,"info", "Info");
+        PANINI  (2, "paninicomics", "Panini Comics"),
+        STAR    (3, "star", "Star Comics"),
+        BONELLI (4, "bonelli", "Sergio Bonelli"),
+        RW      (5, "rw", "RW Edizioni"),
+        SETTINGS(6, "settings", "Impostazioni"),
+        GOOGLE  (7, "google plus", "Segui su Google+"),
+        GUIDA   (8, "guida", "Guida"),
+        INFO    (9, "info", "Info");
 
         private static final HashMap<Integer, Sections> map;
         private static final HashMap<String, Sections> nameMap;
@@ -191,7 +191,7 @@ public class Constants {
     // Star Comics
     public static final String ROOT = "https://www.starcomics.com/UsciteMensili.aspx?AspxAutoDetectCookieSupport=1";
     public static final String COMIC_ROOT = "https://www.starcomics.com/fumetto.aspx?Fumetto=";
-    public static final String IMG_URL = "http://www.starcomics.com";
+    public static final String IMG_URL = "https://www.starcomics.com";
     // Bonelli
     public static final String EDICOLA_INEDITI = "http://www.sergiobonelli.it/sezioni/1025/inediti1025";
     public static final String EDICOLA_RISTAMPE = "http://www.sergiobonelli.it/sezioni/1016/ristampe1016";
