@@ -74,7 +74,9 @@ public class WidgetSettings extends AppCompatActivity {
         for (String editor : editorSet) {
             // Get section and add it to list
             Constants.Sections section = Constants.Sections.getEditor(Integer.parseInt(editor));
-            mUpdatableSectionList.add(section.getTitle());
+            if (section != null) {
+                mUpdatableSectionList.add(section.getTitle());
+            }
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
