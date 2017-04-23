@@ -96,7 +96,7 @@ public class FragmentDetail extends Fragment {
             mComicRelease = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY));
             String mComicDescription = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY));
             if (mComicDescription.length() == 0)
-                mComicDescription = "N.D";
+                mComicDescription = "N.D.";
             String mComicPrice = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY));
             if (mComicPrice.length() == 0)
                 mComicPrice = "N.D.";

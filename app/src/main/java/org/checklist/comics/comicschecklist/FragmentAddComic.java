@@ -118,7 +118,7 @@ public class FragmentAddComic extends Fragment {
                         info,
                         date,
                         DateCreator.elaborateDate(date),
-                        "error", "N.D", "N.D.", "yes", "no", "");
+                        "error", "N.D.", "N.D.", "yes", "no", "");
                 CCLogger.d(TAG, "INSERTED new entry on database with ID " + mComicId);
             } else {
                 // Update entry
