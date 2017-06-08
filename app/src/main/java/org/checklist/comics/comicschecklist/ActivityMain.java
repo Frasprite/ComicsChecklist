@@ -15,7 +15,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -29,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,7 +71,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView mNavigationView;
-    private FloatingActionButton fab;
+    private RelativeLayout mBottomBar;
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
@@ -143,13 +143,25 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mBottomBar = (RelativeLayout) findViewById(R.id.bottom_toolbar);
+
+        findViewById(R.id.layout_add_comic).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Open add comic activity
                 Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
                 startActivity(addComicIntent);
+            }
+        });
+
+        findViewById(R.id.layout_search_store).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Search for comics shops nearby
+                Uri gmmIntentUri = Uri.parse("geo:0,0?q=fumetteria");
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
             }
         });
 
@@ -497,7 +509,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      */
     @Override
     public void onHideFAB() {
-        fab.hide();
+        mBottomBar.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -506,7 +518,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      */
     @Override
     public void onShowFAB() {
-        fab.show();
+        mBottomBar.setVisibility(View.VISIBLE);
     }
 
     /**

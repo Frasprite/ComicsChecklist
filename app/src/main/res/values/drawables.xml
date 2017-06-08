@@ -15,4 +15,5 @@
     <item name="ic_social" type="drawable">@drawable/ic_plus_one_white_24dp</item>
     <item name="ic_public" type="drawable">@drawable/ic_public_white_24dp</item>
     <item name="ic_filter" type="drawable">@drawable/ic_filter_list_white_24dp</item>
+    <item name="ic_store" type="drawable">@drawable/ic_action_store</item>
 </resources>
