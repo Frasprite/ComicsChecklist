@@ -27,21 +27,23 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/bottom_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal"
         android:layout_gravity="bottom|end"
-        android:background="?attr/colorPrimary">
+        android:background="?attr/colorPrimary"
+        android:weightSum="3"
+        android:baselineAligned="false">
 
         <LinearLayout
             android:id="@+id/layout_search_store"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_toLeftOf="@+id/bottom_bar_divider"
-            android:layout_toStartOf="@+id/bottom_bar_divider"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_weight="1">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -58,24 +60,13 @@
 
         </LinearLayout>
 
-        <View
-            android:id="@+id/bottom_bar_divider"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="@color/white"
-            android:layout_centerInParent="true"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            />
-
         <LinearLayout
             android:id="@+id/layout_add_comic"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/bottom_bar_divider"
-            android:layout_toEndOf="@+id/bottom_bar_divider"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_weight="1">
 
             <ImageView
                 android:layout_width="match_parent"
@@ -92,6 +83,29 @@
 
         </LinearLayout>
 
-    </RelativeLayout>
+        <LinearLayout
+            android:id="@+id/layout_refresh"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cached"
+                android:contentDescription="@string/bottom_bar_image_description"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/activity_bottom_text_refresh"
+                android:textColor="@color/white"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

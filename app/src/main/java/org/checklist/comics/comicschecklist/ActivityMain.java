@@ -28,7 +28,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +39,7 @@ import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.DateCreator;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -71,7 +72,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView mNavigationView;
-    private RelativeLayout mBottomBar;
+    private LinearLayout mBottomBar;
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
@@ -143,7 +144,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mBottomBar = (RelativeLayout) findViewById(R.id.bottom_toolbar);
+        mBottomBar = (LinearLayout) findViewById(R.id.bottom_toolbar);
 
         findViewById(R.id.layout_add_comic).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,6 +163,13 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 startActivity(mapIntent);
+            }
+        });
+
+        findViewById(R.id.layout_refresh).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Refresh data
             }
         });
 
@@ -508,7 +516,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      * indicating that a scroll down has been done.
      */
     @Override
-    public void onHideFAB() {
+    public void onHideBottomView() {
         mBottomBar.setVisibility(View.INVISIBLE);
     }
 
@@ -517,8 +525,51 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
      * indicating that a scroll up has been done.
      */
     @Override
-    public void onShowFAB() {
+    public void onShowBottomView() {
         mBottomBar.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * By abstracting the refresh process to a single method, the app allows both the
+     * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
+     * @param mEditor the editor picked by user
+     */
+    protected void initiateRefresh(Constants.Sections mEditor) {
+        CCLogger.i(TAG, "initiateRefresh - start for editor " + mEditor);
+
+        String today = DateCreator.getTodayString();
+
+        // TODO error while we are on cart or favorite list
+
+        // Update shared preference of editor that must be refreshed
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        switch (mEditor) {
+            case PANINI:
+                sp.edit().putString(Constants.PREF_PANINI_LAST_SCAN, today).apply();
+                break;
+            case BONELLI:
+                sp.edit().putString(Constants.PREF_BONELLI_LAST_SCAN, today).apply();
+                break;
+            case STAR:
+                sp.edit().putString(Constants.PREF_STAR_LAST_SCAN, today).apply();
+                break;
+            case RW:
+                sp.edit().putString(Constants.PREF_RW_LAST_SCAN, today).apply();
+                break;
+        }
+
+        // Execute the background task, used on DownloadService to load the data
+        Intent intent = new Intent(this, DownloadService.class);
+        intent.putExtra(Constants.ARG_EDITOR, mEditor);
+        intent.putExtra(Constants.MANUAL_SEARCH, true);
+        startService(intent);
+
+        // Update refresh spinner
+        if (mListFragment != null) {
+            if (mListFragment.isRefreshing()) {
+                mListFragment.setRefreshing(false);
+            }
+        }
     }
 
     /**

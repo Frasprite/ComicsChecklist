@@ -7,8 +7,9 @@
     <string name="activity_title_comic_detail">Dettagli</string>
     <string name="activity_title_add_comic">Aggiungi uscita</string>
     <string name="activity_title_chose_content">Scegli una lista</string>
-    <string name="activity_bottom_text_store">Cerca fumetteria</string>
-    <string name="activity_bottom_text_add">Aggiungi uscita</string>
+    <string name="activity_bottom_text_store">Fumetterie</string>
+    <string name="activity_bottom_text_add">Aggiungi</string>
+    <string name="activity_bottom_text_refresh">Aggiorna</string>
 
     <!-- Dialog text -->
     <string name="dialog_help_title">Guida</string>

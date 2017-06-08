@@ -69,9 +69,8 @@ public class DownloadService extends IntentService {
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         // Loading user editor preference
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String[] rawArray = getResources().getStringArray(R.array.pref_basic_editors);
-        Set<String> editorSet = sp.getStringSet(Constants.PREF_AVAILABLE_EDITORS, null);
+        Set<String> editorSet = sharedPref.getStringSet(Constants.PREF_AVAILABLE_EDITORS, null);
 
         if (editorSet == null) {
             editorSet = new HashSet<>(Arrays.asList(rawArray));
@@ -142,8 +141,7 @@ public class DownloadService extends IntentService {
         publishResults(Constants.SearchResults.RESULT_DESTROYED, "noEditor");
         // Notification is not needed (only if there isn't an error)
         if (!error) {
-            String ns = Context.NOTIFICATION_SERVICE;
-            NotificationManager nMgr = (NotificationManager) this.getSystemService(ns);
+            NotificationManager nMgr = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
             nMgr.cancel(Constants.NOTIFICATION_ID);
         }
     }

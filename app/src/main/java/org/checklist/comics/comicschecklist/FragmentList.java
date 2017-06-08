@@ -2,7 +2,6 @@ package org.checklist.comics.comicschecklist;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -31,11 +30,9 @@ import android.widget.Toast;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.DateCreator;
 
 /**
  * A list fragment representing a list of Comics. This fragment
@@ -76,7 +73,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * implement. This mechanism allows activities to be notified of item
      * selections.
      */
-    public interface Callbacks {
+    interface Callbacks {
         /**
          * Callback for when an item has been selected.
          */
@@ -85,12 +82,12 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         /**
          * Callback for when list is scrolled down / up.
          */
-        void onHideFAB();
+        void onHideBottomView();
 
         /**
          * Callback for when list is scrolled stops.
          */
-        void onShowFAB();
+        void onShowBottomView();
     }
 
     /**
@@ -102,10 +99,10 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         public void onItemSelected(long id) {}
 
         @Override
-        public void onHideFAB() {}
+        public void onHideBottomView() {}
 
         @Override
-        public void onShowFAB() {}
+        public void onShowBottomView() {}
     };
 
     /**
@@ -186,18 +183,19 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             emptyText.setText(getString(R.string.empty_editor_list));
         }
 
-        /**
-         * Implement {@link SwipeRefreshLayout.OnRefreshListener}. When users do the "swipe to
-         * refresh" gesture, SwipeRefreshLayout invokes
-         * {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}. In
-         * {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}, call a method that
-         * refreshes the content. Call the same method in response to the Refresh action from the
-         * action bar.
+        /*
+          Implement {@link SwipeRefreshLayout.OnRefreshListener}. When users do the "swipe to
+          refresh" gesture, SwipeRefreshLayout invokes
+          {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}. In
+          {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}, call a method that
+          refreshes the content. Call the same method in response to the Refresh action from the
+          action bar.
          */
         setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                initiateRefresh();
+                ActivityMain activityMain = (ActivityMain) getActivity();
+                activityMain.initiateRefresh(mEditor);
             }
         });
 
@@ -207,11 +205,11 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem > mLastFirstVisibleItem[0]) {
                     //CCLogger.v(TAG, "onScroll - Scrolling down...");
-                    mCallbacks.onHideFAB();
+                    mCallbacks.onHideBottomView();
 
                 } else if (firstVisibleItem < mLastFirstVisibleItem[0]) {
                     //CCLogger.v(TAG, "onScroll - Scrolling up...");
-                    mCallbacks.onHideFAB();
+                    mCallbacks.onHideBottomView();
                 }
 
                 mLastFirstVisibleItem[0] = firstVisibleItem;
@@ -221,7 +219,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (scrollState == 0) {
                     //CCLogger.v(TAG, "onScroll - Scrolling stopped...");
-                    mCallbacks.onShowFAB();
+                    mCallbacks.onShowBottomView();
                 }
             }
         });
@@ -490,40 +488,6 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      */
     private static boolean canListViewScrollUp(ListView listView) {
         return ViewCompat.canScrollVertically(listView, -1);
-    }
-
-    /**
-     * By abstracting the refresh process to a single method, the app allows both the
-     * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
-     */
-    private void initiateRefresh() {
-        CCLogger.i(TAG, "initiateRefresh - start for editor " + mEditor);
-
-        String today = DateCreator.getTodayString();
-
-        // Update shared preference of editor that must be refreshed
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        switch (mEditor) {
-            case PANINI:
-                sp.edit().putString(Constants.PREF_PANINI_LAST_SCAN, today).apply();
-                break;
-            case BONELLI:
-                sp.edit().putString(Constants.PREF_BONELLI_LAST_SCAN, today).apply();
-                break;
-            case STAR:
-                sp.edit().putString(Constants.PREF_STAR_LAST_SCAN, today).apply();
-                break;
-            case RW:
-                sp.edit().putString(Constants.PREF_RW_LAST_SCAN, today).apply();
-                break;
-        }
-
-        // Execute the background task, used on DownloadService to load the data
-        Intent intent = new Intent(getActivity(), DownloadService.class);
-        intent.putExtra(Constants.ARG_EDITOR, mEditor);
-        intent.putExtra(Constants.MANUAL_SEARCH, true);
-        getActivity().startService(intent);
-        setRefreshing(true);
     }
 
     /* ****************************************************************************************
