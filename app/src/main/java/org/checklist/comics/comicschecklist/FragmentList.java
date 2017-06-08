@@ -396,6 +396,14 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         mActivatedPosition = position;
     }
 
+    /**
+     * Method used to return current editor.
+     * @return the editor showed on UI.
+     */
+    public Constants.Sections getCurrentEditor() {
+        return mEditor;
+    }
+
     /* ****************************************************************************************
      * SwipeRefreshLayout methods
      ******************************************************************************************/

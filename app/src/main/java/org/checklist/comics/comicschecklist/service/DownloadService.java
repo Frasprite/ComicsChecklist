@@ -114,6 +114,23 @@ public class DownloadService extends IntentService {
                     String editorTitle = Constants.Sections.getTitle(editor);
                     publishResults(Constants.SearchResults.RESULT_START, editorTitle);
                     searchComics(myParser, notificationPref, editorTitle, editor);
+
+                    // Update last scan for editor on shared preference
+                    String today = DateCreator.getTodayString();
+                    switch (editor) {
+                        case PANINI:
+                            sharedPref.edit().putString(Constants.PREF_PANINI_LAST_SCAN, today).apply();
+                            break;
+                        case BONELLI:
+                            sharedPref.edit().putString(Constants.PREF_BONELLI_LAST_SCAN, today).apply();
+                            break;
+                        case STAR:
+                            sharedPref.edit().putString(Constants.PREF_STAR_LAST_SCAN, today).apply();
+                            break;
+                        case RW:
+                            sharedPref.edit().putString(Constants.PREF_RW_LAST_SCAN, today).apply();
+                            break;
+                    }
                 } else {
                     searchNecessary = false;
                 }

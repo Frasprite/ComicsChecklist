@@ -39,7 +39,6 @@ import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.DateCreator;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -170,6 +169,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             @Override
             public void onClick(View v) {
                 // Refresh data
+                if (mListFragment != null) {
+                    initiateRefresh(mListFragment.getCurrentEditor());
+                }
             }
         });
 
@@ -537,30 +539,55 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     protected void initiateRefresh(Constants.Sections mEditor) {
         CCLogger.i(TAG, "initiateRefresh - start for editor " + mEditor);
 
-        String today = DateCreator.getTodayString();
+        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.dialog_pick_editor_title)
+                    .setItems(R.array.pref_available_editors, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // The 'which' argument contains the index position of the selected item
+                            CCLogger.v(TAG, "onClick - Selected position " + which);
+                            Constants.Sections pickedEditor = null;
+                            switch (which) {
+                                case 0:
+                                    pickedEditor = Constants.Sections.PANINI;
+                                    break;
+                                case 1:
+                                    pickedEditor = Constants.Sections.STAR;
+                                    break;
+                                case 2:
+                                    pickedEditor = Constants.Sections.BONELLI;
+                                    break;
+                                case 3:
+                                    pickedEditor = Constants.Sections.RW;
+                                    break;
+                            }
 
-        // TODO error while we are on cart or favorite list
-
-        // Update shared preference of editor that must be refreshed
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        switch (mEditor) {
-            case PANINI:
-                sp.edit().putString(Constants.PREF_PANINI_LAST_SCAN, today).apply();
-                break;
-            case BONELLI:
-                sp.edit().putString(Constants.PREF_BONELLI_LAST_SCAN, today).apply();
-                break;
-            case STAR:
-                sp.edit().putString(Constants.PREF_STAR_LAST_SCAN, today).apply();
-                break;
-            case RW:
-                sp.edit().putString(Constants.PREF_RW_LAST_SCAN, today).apply();
-                break;
+                            if (pickedEditor != null) {
+                                startRefresh(pickedEditor);
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+            builder.setNegativeButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
+        } else {
+            startRefresh(mEditor);
         }
+    }
 
+    /**
+     * Method used to start refresh.
+     * @param editor the editor picked by user
+     */
+    private void startRefresh(Constants.Sections editor) {
         // Execute the background task, used on DownloadService to load the data
         Intent intent = new Intent(this, DownloadService.class);
-        intent.putExtra(Constants.ARG_EDITOR, mEditor);
+        intent.putExtra(Constants.ARG_EDITOR, editor);
         intent.putExtra(Constants.MANUAL_SEARCH, true);
         startService(intent);
 

@@ -57,6 +57,7 @@
         <item>Togli dalla lista</item>
         <item>Cancella tutta la lista</item>
     </string-array>
+    <string name="dialog_pick_editor_title">Scegli un editore</string>
 
     <!-- Navigation drawer text -->
     <string name="drawer_open">Apri la barra di navigazione</string>
