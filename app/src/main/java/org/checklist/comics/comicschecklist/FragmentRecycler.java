@@ -34,14 +34,9 @@ import org.checklist.comics.comicschecklist.util.Constants;
 
 public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, RecyclerView.OnItemTouchListener {
 
-    // TODO highlight selected item (and dave it on save instance state)
+    // TODO highlight selected item (and save it on save instance state)
     // http://stackoverflow.com/questions/27194044/how-to-properly-highlight-selected-item-on-recyclerview
     // http://stackoverflow.com/questions/26682277/how-do-i-get-the-position-selected-in-a-recyclerview
-    // TODO add expanded FAB menu
-    // http://stackoverflow.com/questions/30699302/android-design-support-library-fab-menu
-    // https://github.com/pmahsky/FloatingActionMenuAndroid
-    // TODO add refresh on FAB sub-menu
-    // TODO add refresh progress on UI
 
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
