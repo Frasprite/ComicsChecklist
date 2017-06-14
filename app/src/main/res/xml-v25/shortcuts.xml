@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="add_comic"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_add"
+        android:shortcutShortLabel="@string/add_shortcut_short_label"
+        android:shortcutLongLabel="@string/add_shortcut_long_label"
+        android:shortcutDisabledMessage="@string/add_disabled_message">
+        <intent
+            android:action="org.checklist.comics.comicschecklist.ADD_COMIC"
+            android:targetPackage="org.checklist.comics.comicschecklist"
+            android:targetClass="org.checklist.comics.comicschecklist.ActivityMain" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="search_shop"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_store"
+        android:shortcutShortLabel="@string/search_shortcut_short_label"
+        android:shortcutLongLabel="@string/search_shortcut_long_label"
+        android:shortcutDisabledMessage="@string/search_disabled_message">
+        <intent
+            android:action="org.checklist.comics.comicschecklist.SEARCH_STORE"
+            android:targetPackage="org.checklist.comics.comicschecklist"
+            android:targetClass="org.checklist.comics.comicschecklist.ActivityMain" />
+    </shortcut>
+</shortcuts>

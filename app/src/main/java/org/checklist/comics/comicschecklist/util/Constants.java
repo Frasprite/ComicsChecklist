@@ -169,13 +169,15 @@ public class Constants {
     public static final String PREF_SEARCH_NOTIFICATION = "notifications_new_message";
     public static final String PREF_FAVORITE_NOTIFICATION = "notifications_favorite_available";
 
-    /* Widget */
+    /* Widget & shortcut */
     public static final String WIDGET_EDITOR = "WIDGET_EDITOR";
     public static final String WIDGET_TITLE = "WIDGET_TITLE";
     public static final String COMIC_ID_FROM_WIDGET = "COMIC_ID_FROM_WIDGET";
     public static final String ACTION_COMIC_WIDGET = "comic_widget";
     public static final String ACTION_WIDGET_ADD = "action_add_comic";
     public static final String ACTION_WIDGET_OPEN_APP = "action_open_app";
+    public static final String ACTION_ADD_COMIC = "org.checklist.comics.comicschecklist.ADD_COMIC";
+    public static final String ACTION_SEARCH_STORE = "org.checklist.comics.comicschecklist.SEARCH_STORE";
 
     /**
      * Constants for parser class.

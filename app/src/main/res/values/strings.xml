@@ -11,6 +11,14 @@
     <string name="activity_bottom_text_add">Aggiungi</string>
     <string name="activity_bottom_text_refresh">Aggiorna</string>
 
+    <!-- Shortcut text -->
+    <string name="add_shortcut_short_label">Aggiungi uscita</string>
+    <string name="add_shortcut_long_label">Aggiungi un fumetto alla lista</string>
+    <string name="add_disabled_message">Aggiungi uscita disabilitata</string>
+    <string name="search_shortcut_short_label">Cerca fumetterie</string>
+    <string name="search_shortcut_long_label">Cerca fumetterie nelle vicinanze</string>
+    <string name="search_disabled_message">Cerca fumetterie disabilitata</string>
+
     <!-- Dialog text -->
     <string name="dialog_help_title">Guida</string>
     <string name="dialog_og_text">Applicazione sviluppata da un idea di Francesco Bevilacqua, fondatore e admin di www.opengeek.it .\nPotete seguirne l\'evoluzione sulla pagina ufficiale di Google+!</string>

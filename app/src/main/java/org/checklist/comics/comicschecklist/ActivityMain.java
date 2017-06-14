@@ -149,19 +149,15 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             @Override
             public void onClick(View v) {
                 // Open add comic activity
-                Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
-                startActivity(addComicIntent);
+                addComic();
             }
         });
 
         findViewById(R.id.layout_search_store).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Search for comics shops nearby
-                Uri gmmIntentUri = Uri.parse("geo:0,0?q=fumetteria");
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                startActivity(mapIntent);
+                // Search store on Maps
+                searchStore();
             }
         });
 
@@ -302,9 +298,34 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_WIDGET_ADD)) {
             // Open add comic activity
             CCLogger.d(TAG, "handleIntent - starting add activity");
-            Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
-            startActivity(addComicIntent);
+            addComic();
+        } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_ADD_COMIC)) {
+            // Intent is coming from shortcut, so open relative action
+            addComic();
+        } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_SEARCH_STORE)) {
+            // Intent is coming from shortcut, so search nearby store
+            searchStore();
         }
+    }
+
+    /**
+     * Method used to call new UI for add comic note.
+     */
+    private void addComic() {
+        // Open add comic activity
+        Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
+        startActivity(addComicIntent);
+    }
+
+    /**
+     * Method used to launch Google maps for searching nearby store.
+     */
+    private void searchStore() {
+        // Search for comics shops nearby
+        Uri gmmIntentUri = Uri.parse("geo:0,0?q=fumetteria");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
     }
 
     /**
