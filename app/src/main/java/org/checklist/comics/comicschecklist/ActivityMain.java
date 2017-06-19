@@ -699,21 +699,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://plus.google.com/115824315702252939905/posts")));
                 break;
             case GUIDA:
-                // Open help dialog
-                AlertDialog.Builder helpBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-                helpBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Send the negative button event back to the host activity
-                        dialog.dismiss();
-                    }
-                });
-                // Get the layout inflater
-                LayoutInflater inflaterHelp = this.getLayoutInflater();
-                // Inflate and set the layout for the dialog; pass null as the parent view because its going in the dialog layout
-                helpBuilder.setView(inflaterHelp.inflate(R.layout.dialog_help, null));
-                // Set title
-                helpBuilder.setTitle(R.string.dialog_help_title);
-                helpBuilder.show();
+                // Open help UI
+                Intent launchGuideIntent = new Intent().setClass(this, ActivityGuide.class);
+                startActivity(launchGuideIntent);
                 break;
             case INFO:
                 // Open info dialog

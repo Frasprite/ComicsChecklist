@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
+        tools:replace="android:supportsRtl"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -37,6 +38,9 @@
 
         </activity>
 
+        <activity android:name=".ActivityGuide"
+            android:label="@string/activity_title_guide" />
+
         <activity
             android:name=".ActivityDetail"
             android:label="@string/activity_title_comic_detail"
@@ -51,7 +55,7 @@
 
         <activity
             android:name=".ActivitySettings"
-            android:label="@string/dialog_help_settings" >
+            android:label="@string/activity_help_settings" >
         </activity>
 
         <!-- Service which launch search & download data -->

@@ -3,13 +3,30 @@
     <string name="app_name">Comics Checklist</string>
     <string name="bottom_bar_image_description">Bottom image</string>
 
-    <!-- Activity text -->
+    <!-- Activity title -->
     <string name="activity_title_comic_detail">Dettagli</string>
     <string name="activity_title_add_comic">Aggiungi uscita</string>
     <string name="activity_title_chose_content">Scegli una lista</string>
     <string name="activity_bottom_text_store">Fumetterie</string>
     <string name="activity_bottom_text_add">Aggiungi</string>
     <string name="activity_bottom_text_refresh">Aggiorna</string>
+    <string name="activity_title_guide">Guida</string>
+
+    <!-- Activity guide -->
+    <string name="activity_help_home">Home</string>
+    <string name="activity_help_home_text">Clicca sull\'icona in alto a sinistra per aprire il menu laterale (oppure effettua uno swipe da sinistra verso destra).</string>
+    <string name="activity_help_list">Lista delle uscite</string>
+    <string name="activity_help_list_text">Clicca su un elemento della lista per avere più informazioni. Puoi aggiornare la lista facendo scorrere verso il basso la lista.</string>
+    <string name="activity_help_detail">Schermata dettagli (I)</string>
+    <string name="activity_help_detail_text">In questa schermata potrai avere maggiori informazioni sull\'uscita del fumetto…</string>
+    <string name="activity_help_detail_options">Schermata dettagli (II)</string>
+    <string name="activity_help_detail_options_text">…e salvare l\'uscita sul calendario, salvare la serie tra i tuoi preferiti oppure aggiungerlo alla lista da comprare.</string>
+    <string name="activity_help_favorite">Lista preferiti</string>
+    <string name="activity_help_favorite_text">Qui troverai solo i fumetti che sono stati inseriti tra i preferiti.</string>
+    <string name="activity_help_buy">Da comprare</string>
+    <string name="activity_help_buy_text">Puoi aggiungere manualmente uno o più fumetti alla lista, cliccando sul bottone + .</string>
+    <string name="activity_help_settings">Impostazioni</string>
+    <string name="activity_help_settings_text">Gestisci le notifiche, impostare i tempi della ricerca automatica, scegliere l\'ordinamento delle liste e molto altro.</string>
 
     <!-- Shortcut text -->
     <string name="add_shortcut_short_label">Aggiungi uscita</string>
@@ -20,7 +37,6 @@
     <string name="search_disabled_message">Cerca fumetterie disabilitata</string>
 
     <!-- Dialog text -->
-    <string name="dialog_help_title">Guida</string>
     <string name="dialog_og_text">Applicazione sviluppata da un idea di Francesco Bevilacqua, fondatore e admin di www.opengeek.it .\nPotete seguirne l\'evoluzione sulla pagina ufficiale di Google+!</string>
     <string name="dialog_bp_text">Realizzazione grafica, ottimizzazione, pubblicazione e promozione di Purple Soc. Coop. www.bitpurple.com .</string>
     <string name="dialog_other_text">Launcher icon design by Alexis Boudal www.behance.net/boudalalexis .</string>
@@ -28,18 +44,6 @@
     <string name="dialog_changelog_title_text">Changelog</string>
     <string name="dialog_changelog_text"><i>1.8</i>\n&#8195;&#8226;&#8195;Aggiornata la ricerca dei fumetti\n&#8195;&#8226;&#8195;Le uscite Marvel e Planet Manga sono integrate nella sezione Panini Comics\n&#8195;&#8226;&#8195;Nuova icona circolare (per restare alla moda!)\n<i>1.7</i>\n&#8195;&#8226;&#8195;Fix nella ricerca dei fumetti SB\n<i>1.6</i>\n&#8195;&#8226;&#8195;Aggiunta nuova opzione nelle impostazioni\n<i>1.5</i>\n&#8195;&#8226;&#8195;Fix nella ricerca dei fumetti\n&#8195;&#8226;&#8195;Minor UI bug fix\n<i>1.4</i>\n&#8195;&#8226;&#8195;Android Nougat ready\n&#8195;&#8226;&#8195;Data backup su Google account (se abilitato)\n&#8195;&#8226;&#8195;Nuove opzioni di ordinamento e gestione dati\n&#8195;&#8226;&#8195;Minor bug fix\n<i>1.3</i>\n&#8195;&#8226;&#8195;Nuovo menu di navigazione\n&#8195;&#8226;&#8195;Link all\'editore del fumetto\n&#8195;&#8226;&#8195;Nuovo pulsante \'Aggiungi fumetto\' sui widget\n&#8195;&#8226;&#8195;UI \'Aggiungi fumetto\' migliorata\n&#8195;&#8226;&#8195;Minor bug fix\n<i>1.2</i>\n&#8195;&#8226;&#8195;Migliorata UI delle impostazioni\n&#8195;&#8226;&#8195;Migliorata la visibilità dei titoli dei fumetti\n&#8195;&#8226;&#8195;Widget degli editori\n&#8195;&#8226;&#8195;Nuova icona dell\’app (Mark II)\n&#8195;&#8226;&#8195;Bug fix nella ricerca in linea dei fumetti\n&#8195;&#8226;&#8195;Bug fix lista dei prefereti e da comprare\n<i>1.1</i>\n&#8195;&#8226;&#8195;Widget dei fumetti preferiti\n&#8195;&#8226;&#8195;Notifiche push (disattivabili)\n&#8195;&#8226;&#8195;Ricerca interna dei fumetti\n&#8195;&#8226;&#8195;Nuovo costume in Material Design</string>
     <string name="dialog_libraries_title_text">Librerie</string>
-    <string name="dialog_help_home">Home</string>
-    <string name="dialog_help_home_text">Clicca su l\'icona nel menu in alto a sinistra per aprire la schermata laterale (oppure effettua uno swipe da sinistra verso destra) e seleziona una delle opzioni per visualizzare le prossime uscite.</string>
-    <string name="dialog_help_list">Lista delle uscite</string>
-    <string name="dialog_help_list_text">Clicca su un elemento della lista per avere più informazioni. Puoi aggiornare la lista di un editore facendo scorrere verso il basso la lista.</string>
-    <string name="dialog_help_detail">Schermata dettagli</string>
-    <string name="dialog_help_detail_text">In questa schermata potrai salvare l\'uscita del fumetto sul calendario, salvare la serie tra i tuoi preferiti oppure aggiungerlo alla lista da comprare.</string>
-    <string name="dialog_help_favorite">Lista preferiti</string>
-    <string name="dialog_help_favorite_text">Questa sezione caricherà solo i fumetti che sono stati inseriti tra i preferiti. Puoi togliere i fumetti effettuando un long-click su un elemento.</string>
-    <string name="dialog_help_buy">Da comprare</string>
-    <string name="dialog_help_buy_text">In questa sezione trovi tutti i fumetti contrassegnati come "da comprare". Puoi aggiungere manualmente uno o pi\ù fumetti alla lista, cliccando sul bottone + presente in tutte le schermate. Puoi togliere i fumetti dalla lista effettuando un long-click su un elemento.</string>
-    <string name="dialog_help_settings">Impostazioni</string>
-    <string name="dialog_help_settings_text">Nelle impostazioni potrai:\n - scegliere se visualizzare le notifiche durante la ricerca delle uscite;\n - abilitare le notifiche push quando un fumetto tra i preferiti è disponibile in edicola o fumetteria;\n - impostare ogni quanto effettuare la ricerca automatica e dopo quanto tempo cancellare le uscite più vecchie;\n - scegliere l\'ordinamento delle uscite nella lista;\n - scegliere gli editori da seguire.\nPotrai sempre decidere se fare la ricerca manualmente e/o mantenere le uscite più vecchie.</string>
     <string name="dialog_rate_text">Comics Checklist non usa nessun banner pubblicitario, è completamente gratuita e non richiede permessi invasivi.\nSe l\'applicazione ti è stata utile lascia un commento su Google Play.\nGrazie per il tuo supporto!</string>
     <string name="dialog_rate_button">Recensisci ora!</string>
     <string name="dialog_late_button">Più tardi</string>
