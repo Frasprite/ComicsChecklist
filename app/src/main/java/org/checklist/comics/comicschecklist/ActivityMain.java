@@ -28,7 +28,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -71,7 +70,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView mNavigationView;
-    private LinearLayout mBottomBar;
 
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
@@ -142,8 +140,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         setContentView(R.layout.activity_comic_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        mBottomBar = (LinearLayout) findViewById(R.id.bottom_toolbar);
 
         findViewById(R.id.layout_add_comic).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -532,24 +528,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     public void onItemSelected(long id) {
         CCLogger.d(TAG, "Launching detail for comic with ID " + id);
         launchDetailView(id);
-    }
-
-    /**
-     * Callback method from {@link FragmentList.Callbacks}
-     * indicating that a scroll down has been done.
-     */
-    @Override
-    public void onHideBottomView() {
-        mBottomBar.setVisibility(View.INVISIBLE);
-    }
-
-    /**
-     * Callback method from {@link FragmentList.Callbacks}
-     * indicating that a scroll up has been done.
-     */
-    @Override
-    public void onShowBottomView() {
-        mBottomBar.setVisibility(View.VISIBLE);
     }
 
     /**

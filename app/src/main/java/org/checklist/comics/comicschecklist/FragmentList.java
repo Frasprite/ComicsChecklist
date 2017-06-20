@@ -78,16 +78,6 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
          * Callback for when an item has been selected.
          */
         void onItemSelected(long id);
-
-        /**
-         * Callback for when list is scrolled down / up.
-         */
-        void onHideBottomView();
-
-        /**
-         * Callback for when list is scrolled stops.
-         */
-        void onShowBottomView();
     }
 
     /**
@@ -97,12 +87,6 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
     private static final Callbacks sComicCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(long id) {}
-
-        @Override
-        public void onHideBottomView() {}
-
-        @Override
-        public void onShowBottomView() {}
     };
 
     /**
@@ -204,12 +188,9 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 if (firstVisibleItem > mLastFirstVisibleItem[0]) {
-                    //CCLogger.v(TAG, "onScroll - Scrolling down...");
-                    mCallbacks.onHideBottomView();
-
+                    CCLogger.v(TAG, "onScroll - Scrolling down...");
                 } else if (firstVisibleItem < mLastFirstVisibleItem[0]) {
-                    //CCLogger.v(TAG, "onScroll - Scrolling up...");
-                    mCallbacks.onHideBottomView();
+                    CCLogger.v(TAG, "onScroll - Scrolling up...");
                 }
 
                 mLastFirstVisibleItem[0] = firstVisibleItem;
@@ -218,8 +199,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 if (scrollState == 0) {
-                    //CCLogger.v(TAG, "onScroll - Scrolling stopped...");
-                    mCallbacks.onShowBottomView();
+                    CCLogger.v(TAG, "onScroll - Scrolling stopped...");
                 }
             }
         });
