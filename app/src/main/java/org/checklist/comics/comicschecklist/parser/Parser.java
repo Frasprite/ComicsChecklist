@@ -490,6 +490,12 @@ public class Parser {
 
                     // Finding comic title
                     name = docMoreInfo.select("var.atc_title").text();
+
+                    if (name.equals("")) {
+                        // Title is empty, take it from page title
+                        name = docMoreInfo.title();
+                    }
+
                     CCLogger.v(TAG, "parseUrlBonelli - Comic name BEFORE: " + name);
                     // Defining comic name
                     if (name.startsWith("N°.")) { // ex.: N°.244 - Raccolta Zagor n°244
@@ -502,6 +508,10 @@ public class Parser {
 
                     if (name.contains("n°")) { // ex.: Maxi Zagor N°.29 - Maxi Zagor n°29
                         name = name.replace("n°", "");
+                    }
+
+                    if (name.contains("- Sergio Bonelli")) { // ex.: Montales el Desperado - Sergio Bonelli
+                        name = name.replace("- Sergio Bonelli", "").trim();
                     }
                     CCLogger.v(TAG, "parseUrlBonelli - Comic name AFTER: " + name);
 
