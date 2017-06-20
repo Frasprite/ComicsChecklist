@@ -24,7 +24,7 @@
     <string name="activity_help_favorite">Lista preferiti</string>
     <string name="activity_help_favorite_text">Qui troverai solo i fumetti che sono stati inseriti tra i preferiti.</string>
     <string name="activity_help_buy">Da comprare</string>
-    <string name="activity_help_buy_text">Puoi aggiungere manualmente uno o più fumetti alla lista, cliccando sul bottone + .</string>
+    <string name="activity_help_buy_text">Puoi aggiungere manualmente uno o più fumetti alla lista, cliccando sul bottone aggiungi.</string>
     <string name="activity_help_settings">Impostazioni</string>
     <string name="activity_help_settings_text">Gestisci le notifiche, impostare i tempi della ricerca automatica, scegliere l\'ordinamento delle liste e molto altro.</string>
 
@@ -228,7 +228,7 @@
 
     <string name="empty_list">La lista è vuota!</string>
     <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nCerca le tue collane preferite tra gli editori disponibili dal menu laterale.</string>
-    <string name="empty_cart_list">Nessun fumetto da comprare!\nPuoi crera una nota cliccando sul tasto <b>+</b>.</string>
+    <string name="empty_cart_list">Nessun fumetto da comprare!\nPuoi crera una nota cliccando sul tasto <b>aggiungi</b>.</string>
     <string name="empty_editor_list">La lista per questo editore è vuota! Effettua una ricerca rapida facendo uno <i>swipe</i> verso il basso.</string>
 
     <string name="search_started">: ricerca in corso&#8230;</string>
