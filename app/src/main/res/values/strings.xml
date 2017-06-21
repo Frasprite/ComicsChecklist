@@ -17,10 +17,8 @@
     <string name="activity_help_home_text">Clicca sull\'icona in alto a sinistra per aprire il menu laterale (oppure effettua uno swipe da sinistra verso destra).</string>
     <string name="activity_help_list">Lista delle uscite</string>
     <string name="activity_help_list_text">Clicca su un elemento della lista per avere più informazioni. Puoi aggiornare la lista facendo scorrere verso il basso la lista.</string>
-    <string name="activity_help_detail">Schermata dettagli (I)</string>
-    <string name="activity_help_detail_text">In questa schermata potrai avere maggiori informazioni sull\'uscita del fumetto…</string>
-    <string name="activity_help_detail_options">Schermata dettagli (II)</string>
-    <string name="activity_help_detail_options_text">…e salvare l\'uscita sul calendario, salvare la serie tra i tuoi preferiti oppure aggiungerlo alla lista da comprare.</string>
+    <string name="activity_help_detail">Schermata dettagli</string>
+    <string name="activity_help_detail_text">Dettagli sul fumetto, salva l\'uscita sul calendario, salva la serie tra i tuoi preferiti oppure aggiungi alla lista da comprare.</string>
     <string name="activity_help_favorite">Lista preferiti</string>
     <string name="activity_help_favorite_text">Qui troverai solo i fumetti che sono stati inseriti tra i preferiti.</string>
     <string name="activity_help_buy">Da comprare</string>
