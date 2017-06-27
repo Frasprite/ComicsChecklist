@@ -155,7 +155,7 @@ public class Parser {
                     try {
                         // Calculating date for sql
                         Date myDate = DateCreator.elaborateDate(releaseDate);
-                        ComicDatabaseManager.insert(mContext, comicName, editor, description, releaseDate,
+                        ComicDatabaseManager.insert(mContext, comicName.toUpperCase(), editor, description, releaseDate,
                                 myDate, "", feature, price, "no", "no", linkMoreInfo);
                     } catch (Exception e) {
                         // Error while comic fetching
@@ -268,7 +268,7 @@ public class Parser {
                             /* Saving cover
                             CCLogger.v(TAG, "parseUrlRW - Cover " + coverUrl);
                             coverList.add(coverUrl);*/
-                            title = coverUrl.replace(Constants.MEDIARW, "").replace("_", " ").replace(".jpg", "").toUpperCase();
+                            title = coverUrl.replace(Constants.MEDIARW, "").replace("_", " ").replace(".jpg", "");
                             // Title elaborated
                             CCLogger.v(TAG, "parseUrlRW - Title " + title);
                             titleList.add(title);
@@ -303,7 +303,7 @@ public class Parser {
                 if (coverList.size() == titleList.size() && featureList.size() == priceList.size()) {
                     CCLogger.v(TAG, "parseUrlRW - List are all equals, saving entries");
                     for (int i = 0; i < coverList.size(); i++) {
-                        ComicDatabaseManager.insert(mContext, titleList.get(i), Constants.Sections.getName(Constants.Sections.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i), "no", "no", siteUrl);
+                        ComicDatabaseManager.insert(mContext, titleList.get(i).toUpperCase(), Constants.Sections.getName(Constants.Sections.RW), description, releaseDate, myDate, coverList.get(i), featureList.get(i), priceList.get(i), "no", "no", siteUrl);
                     }
                 } else {
                     CCLogger.w(TAG, "parseUrlRW - List don't have same size:\ncoverList " + coverList.size() +
@@ -400,7 +400,7 @@ public class Parser {
                 // Calculating date for sql
                 Date myDate = DateCreator.elaborateDate(releaseDate);
                 // Insert comic on database
-                ComicDatabaseManager.insert(mContext, name, Constants.Sections.getName(Constants.Sections.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", URL);
+                ComicDatabaseManager.insert(mContext, name.toUpperCase(), Constants.Sections.getName(Constants.Sections.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", URL);
             } catch (Exception e) {
                 CCLogger.w(TAG, "parseUrlStarC - Error while searching data for comic id " + i + " " + e.toString() + "\n" + URL);
                 comicErrorStar = true;
