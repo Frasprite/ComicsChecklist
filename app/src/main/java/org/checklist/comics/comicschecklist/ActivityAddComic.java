@@ -88,9 +88,9 @@ public class ActivityAddComic extends AppCompatActivity {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
-            int year = DateCreator.getCurrentDay();
+            int year = DateCreator.getCurrentYear();
             int month = DateCreator.getCurrentMonth();
-            int day = DateCreator.getCurrentYear();
+            int day = DateCreator.getCurrentDay();
 
             // Create a new instance of DatePickerDialog and return it
             CCLogger.d(TAG, "onCreateDialog - date is " + day + "/" + month + "/" + year);
