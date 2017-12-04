@@ -29,8 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by Francesco Bevilacqua on 25/10/2014.
- * This code is part of ComicsChecklist project.
+ * Class used to download on background info about comics.
  */
 public class DownloadService extends IntentService {
 
@@ -217,6 +216,7 @@ public class DownloadService extends IntentService {
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         // Build notification
+        // TODO update notification class
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setContentTitle(getResources().getString(R.string.app_name))
                 .setContentText(message).setSmallIcon(R.drawable.ic_stat_notification)

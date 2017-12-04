@@ -9,6 +9,9 @@ import android.support.v7.app.ActionBar;
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 
+/**
+ * Activity used to show to user a guide about application.
+ */
 public class ActivityGuide extends AppIntro {
 
     @Override
@@ -20,7 +23,7 @@ public class ActivityGuide extends AppIntro {
             actionBar.hide();
         }
 
-        // TODO add screenshot on fragments
+        // TODO add screenshot on fragments and update code
         // Instead of fragments, you can also use our default slide
         addSlide(AppIntroFragment.newInstance(getResources().getString(R.string.activity_help_home),
                 getResources().getString(R.string.activity_help_home_text),

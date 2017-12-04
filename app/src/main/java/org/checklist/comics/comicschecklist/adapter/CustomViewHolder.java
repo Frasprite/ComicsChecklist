@@ -14,8 +14,8 @@ public class CustomViewHolder extends RecyclerView.ViewHolder {
 
     public CustomViewHolder(View itemView) {
         super(itemView);
-        textViewTitle = (TextView) itemView.findViewById(android.R.id.text1);
-        textViewReleaseDate = (TextView) itemView.findViewById(android.R.id.text2);
+        textViewTitle = itemView.findViewById(android.R.id.text1);
+        textViewReleaseDate = itemView.findViewById(android.R.id.text2);
     }
 
     public void setData(Cursor cursor) {

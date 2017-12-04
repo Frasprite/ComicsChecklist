@@ -10,8 +10,7 @@ import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
 /**
- * Created by Francesco Bevilacqua on 18/02/2015.
- * This code is part of Comics Checklist project.
+ * Class used to check alarm status on boot.
  */
 public class BootReceiver extends BroadcastReceiver {
 

@@ -1,8 +1,7 @@
 package org.checklist.comics.comicschecklist.util;
 
 /**
- * Created by Francesco Bevilacqua on 05/01/2015.
- * This code is part of Comics Checklist project.
+ * Class used to create a widget row.
  */
 public class WidgetItem {
     public final Integer _comicID;

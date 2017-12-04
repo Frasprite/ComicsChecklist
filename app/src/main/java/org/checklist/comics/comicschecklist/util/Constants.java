@@ -5,8 +5,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import java.util.HashMap;
 
 /**
- * Created by Francesco Bevilacqua on 25/10/2014.
- * This code is part of ComicsChecklist project.
+ * Class which contains constants.
  */
 public class Constants {
 

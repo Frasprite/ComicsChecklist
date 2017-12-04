@@ -17,13 +17,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 /**
- * Created by Francesco Bevilacqua on 24/10/2014.
- * This code is part of ComicsChecklist project.
+ * Bridge class from database to view.
  */
 public class ComicContentProvider extends ContentProvider {
 
     private static final String TAG = ComicContentProvider.class.getSimpleName();
-    // Database
+
     private ComicDatabaseHelper database;
 
     // Used for the UriMatcher

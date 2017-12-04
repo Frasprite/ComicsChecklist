@@ -140,7 +140,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         mUserLearnedDrawer = sp.getBoolean(Constants.PREF_USER_LEARNED_DRAWER, false);
 
         setContentView(R.layout.activity_comic_list);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         findViewById(R.id.layout_add_comic).setOnClickListener(new View.OnClickListener() {
@@ -177,7 +177,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         CCLogger.d(TAG, mTwoPane ? "Application is running on singlePane" : "Application is running on twoPane");
 
         mTitle = mDrawerTitle = getTitle();
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
 
         // Set action bar
         mActionBar = getSupportActionBar();
@@ -219,10 +219,10 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         };
         mDrawerLayout.addDrawerListener(mDrawerToggle);
 
-        mNavigationView = (NavigationView) findViewById(R.id.navigation_drawer);
+        mNavigationView = findViewById(R.id.navigation_drawer);
         mNavigationView.setNavigationItemSelectedListener(this);
         View headerLayout = mNavigationView.getHeaderView(0);
-        TextView versionTextView = (TextView) headerLayout.findViewById(R.id.versionTextView);
+        TextView versionTextView = headerLayout.findViewById(R.id.versionTextView);
         PackageInfo pInfo;
         String version = "";
         try {
@@ -250,7 +250,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         startService(intent);
 
         // Launch AppRater
-        AppRater.app_launched(this);
+        AppRater.appLaunched(this);
 
         // Handle search intent
         if (getIntent() != null) {

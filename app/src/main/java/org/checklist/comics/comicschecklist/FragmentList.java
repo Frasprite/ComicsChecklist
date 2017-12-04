@@ -155,7 +155,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             setActivatedPosition(savedInstanceState.getInt(STATE_ACTIVATED_POSITION));
         }
 
-        TextView emptyText = (TextView)view.findViewById(android.R.id.empty);
+        TextView emptyText = view.findViewById(android.R.id.empty);
 
         if (mEditor.equals(Constants.Sections.FAVORITE)) {
             emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
@@ -475,6 +475,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * needed.
      */
     private static boolean canListViewScrollUp(ListView listView) {
+        // TODO update code
         return ViewCompat.canScrollVertically(listView, -1);
     }
 
@@ -497,7 +498,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
-                TextView text1 = (TextView) view.findViewById(android.R.id.text1);
+                TextView text1 = view.findViewById(android.R.id.text1);
                 text1.setMaxLines(1);
                 text1.setEllipsize(TextUtils.TruncateAt.END);
                 return view;

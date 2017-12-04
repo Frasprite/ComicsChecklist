@@ -16,8 +16,7 @@ import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 /**
- * Created by Francesco Bevilacqua on 05/01/2015.
- * This code is part of Comics Checklist project.
+ * Bridge class for widgets UI.
  */
 public class WidgetProvider extends AppWidgetProvider {
 

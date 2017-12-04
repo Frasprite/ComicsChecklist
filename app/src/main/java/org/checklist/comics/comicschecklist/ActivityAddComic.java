@@ -22,6 +22,9 @@ import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
+/**
+ * Activity used to add a comic on database.
+ */
 public class ActivityAddComic extends AppCompatActivity {
 
     private static final String TAG = ActivityAddComic.class.getSimpleName();
@@ -45,7 +48,7 @@ public class ActivityAddComic extends AppCompatActivity {
             window.setStatusBarColor(ContextCompat.getColor(this, R.color.primary_dark));
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
+        Toolbar toolbar = findViewById(R.id.toolbarDetail);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();

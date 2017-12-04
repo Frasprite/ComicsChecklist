@@ -7,6 +7,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Class used to centralizes date method.
+ */
 public class DateCreator {
 
     private static final String TAG = DateCreator.class.getSimpleName();

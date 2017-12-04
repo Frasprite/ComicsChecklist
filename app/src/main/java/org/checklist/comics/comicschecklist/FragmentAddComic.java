@@ -19,6 +19,9 @@ import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
+/**
+ * Fragment which manage the comic creation.
+ */
 public class FragmentAddComic extends Fragment {
 
     private static final String TAG = FragmentAddComic.class.getSimpleName();
@@ -41,9 +44,9 @@ public class FragmentAddComic extends Fragment {
         CCLogger.d(TAG, "onCreateView - start");
         View rootView = inflater.inflate(R.layout.fragment_add_comic, container, false);
 
-        mNameEditText = (EditText) rootView.findViewById(R.id.name_edit_text);
-        mInfoEditText = (EditText) rootView.findViewById(R.id.info_edit_text);
-        mDateTextView = (TextView) rootView.findViewById(R.id.date_text_view);
+        mNameEditText = rootView.findViewById(R.id.name_edit_text);
+        mInfoEditText = rootView.findViewById(R.id.info_edit_text);
+        mDateTextView = rootView.findViewById(R.id.date_text_view);
 
         CCLogger.v(TAG, "onCreateView - end");
         return rootView;

@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Francesco Bevilacqua on 05/01/2015.
- * This code is part of Comics Checklist project.
+ * Service class which support widgets.
  */
 public class WidgetService extends RemoteViewsService {
     @Override

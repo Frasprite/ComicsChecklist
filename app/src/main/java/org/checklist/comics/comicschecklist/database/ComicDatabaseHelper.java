@@ -1,16 +1,11 @@
 package org.checklist.comics.comicschecklist.database;
 
-/**
- * Created by Francesco Bevilacqua on 24/10/2014.
- * This code is part of ParserTest project.
- */
-
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Classe interna di supporto che ci aiuta nella creazione del database.
+ * Internal class which supports database creation.
  * @author Francesco Bevilacqua
  */
 public class ComicDatabaseHelper extends SQLiteOpenHelper {

@@ -10,15 +10,14 @@ import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 
 /**
- * Classe che lancia la finestra di dialogo per invitare l'utente a recensire l'app.
- * @author Francesco Bevilacqua
+ * Class which launch a dialog asking for rate the app.
  */
 public class AppRater {
 
     /**
-     * Metodo che conta quante volte è stata lanciata l'app ed i giorni passati dall'installazione.
+     * Method which is launched every time the app is opened.
      */
-    public static void app_launched (final Context mContext) {
+    public static void appLaunched(final Context mContext) {
         SharedPreferences prefs = mContext.getSharedPreferences (Constants.PREF_APP_RATER, 0);
         if (prefs.getBoolean (Constants.PREF_USER_DONT_RATE, false)) {
             return ;

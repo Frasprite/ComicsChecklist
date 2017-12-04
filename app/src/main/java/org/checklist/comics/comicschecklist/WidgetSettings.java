@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by Francesco Bevilacqua on 05/01/2015.
- * This code is part of Comics Checklist project.
+ * Activity used to managed widget options.
  */
 public class WidgetSettings extends AppCompatActivity {
 
@@ -82,7 +81,7 @@ public class WidgetSettings extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1, mUpdatableSectionList);
 
-        ListView listView = (ListView) findViewById(R.id.widget_list) ;
+        ListView listView = findViewById(R.id.widget_list) ;
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -100,7 +99,7 @@ public class WidgetSettings extends AppCompatActivity {
             }
         });
 
-        Button cancelButton = (Button) findViewById(R.id.button_cancel);
+        Button cancelButton = findViewById(R.id.button_cancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

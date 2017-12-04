@@ -120,7 +120,7 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
         mAdapter = new CustomCursorRecyclerViewAdapter(getActivity(), null);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        mRecyclerView = view.findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -157,7 +157,7 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         super.onViewCreated(view, savedInstanceState);
         CCLogger.d(TAG, "onViewCreated - start");
 
-        mEmptyText = (TextView)view.findViewById(R.id.empty_view);
+        mEmptyText = view.findViewById(R.id.empty_view);
 
         if (mEditor.equals(Constants.Sections.FAVORITE)) {
             mEmptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);

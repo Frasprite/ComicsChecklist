@@ -8,8 +8,8 @@ import org.checklist.comics.comicschecklist.service.AlarmService;
 import org.checklist.comics.comicschecklist.util.CCLogger;
 
 /**
- * Created by Francesco Bevilacqua on 18/02/2015.
- * This code is part of Comics Checklist project.
+ * Class used to fire an alarm when a comic is out.
+ * TODO replace deprecated class
  */
 public class AlarmReceiver extends WakefulBroadcastReceiver {
 

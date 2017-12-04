@@ -109,13 +109,13 @@ public class FragmentDetail extends Fragment {
             mComicURL = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_URL_KEY));
             mCursor.close();
             // Populating view
-            TextView titleTextView = ((TextView) rootView.findViewById(R.id.title_text_view));
+            TextView titleTextView = (rootView.findViewById(R.id.title_text_view));
             titleTextView.setText(mComicName);
             ((TextView) rootView.findViewById(R.id.release_text_view)).setText(mComicRelease);
             ((TextView) rootView.findViewById(R.id.description_text_view)).setText(mComicDescription);
             ((TextView) rootView.findViewById(R.id.feature_text_view)).setText(mComicFeature);
             ((TextView) rootView.findViewById(R.id.price_text_view)).setText(mComicPrice);
-            ImageView coverView = (ImageView) rootView.findViewById(R.id.cover_image_view);
+            ImageView coverView = rootView.findViewById(R.id.cover_image_view);
             Picasso.with(getActivity())
                     .load(R.drawable.comic_placeholder)
                     .placeholder(R.drawable.comic_placeholder)
@@ -127,7 +127,7 @@ public class FragmentDetail extends Fragment {
         if (!mActivityDetailLaunched) {
             CCLogger.d(TAG, "onCreateView - Inflating detail toolbar");
             // Create detail toolbar
-            Toolbar toolbarDetail = (Toolbar) getActivity().findViewById(R.id.toolbarDetail);
+            Toolbar toolbarDetail = getActivity().findViewById(R.id.toolbarDetail);
             // Inflate a menu to be displayed in the toolbar
             if (toolbarDetail != null) {
                 toolbarDetail.inflateMenu(R.menu.menu_detail);

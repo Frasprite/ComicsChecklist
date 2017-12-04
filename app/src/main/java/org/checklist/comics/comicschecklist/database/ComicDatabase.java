@@ -10,7 +10,6 @@ public class ComicDatabase {
 
     private static final String TAG = ComicDatabase.class.getSimpleName();
 
-    // Metadati della tabella
     public static final String COMICS_TABLE = "comic";
     public static final String ID = "_id";
     public static final String COMICS_NAME_KEY = "name";
@@ -26,7 +25,7 @@ public class ComicDatabase {
     public static final String COMICS_URL_KEY = "url";
 
     /**
-     * Codice SQL di creazione della tabella.
+     * Table creation code.
      */
     private static final String COMICS_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
             + COMICS_TABLE + " ("

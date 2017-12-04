@@ -18,8 +18,7 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 /**
- * Created by Francesco Bevilacqua on 20/10/2014.
- * This code is part of ComicsChecklist project.
+ * Class which parse data from HTML pages.
  */
 public class Parser {
 
