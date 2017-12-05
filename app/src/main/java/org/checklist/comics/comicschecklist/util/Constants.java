@@ -1,5 +1,7 @@
 package org.checklist.comics.comicschecklist.util;
 
+import android.util.SparseArray;
+
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 
 import java.util.HashMap;
@@ -20,12 +22,12 @@ public class Constants {
     public static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
 
     /* AppRater */
-    public static final String PREF_USER_DONT_RATE = "dont_show_again";
-    public static final String PREF_APP_RATER = "app_rater";
-    public static final String PREF_LAUNCH_COUNT = "launch_count";
-    public static final String PREF_DATE_FIRST_LAUNCH = "date_first_launch";
-    public final static int DAYS_UNTIL_PROMPT = 7;
-    public final static int LAUNCHES_UNTIL_PROMPT = 7;
+    static final String PREF_USER_DONT_RATE = "dont_show_again";
+    static final String PREF_APP_RATER = "app_rater";
+    static final String PREF_LAUNCH_COUNT = "launch_count";
+    static final String PREF_DATE_FIRST_LAUNCH = "date_first_launch";
+    final static int DAYS_UNTIL_PROMPT = 7;
+    final static int LAUNCHES_UNTIL_PROMPT = 7;
 
     /* Enum of filters for list */
     public enum Filters {
@@ -34,10 +36,10 @@ public class Constants {
         NAME_ASC (3, ComicDatabase.COMICS_NAME_KEY + " ASC"),
         NAME_DESC(4, ComicDatabase.COMICS_NAME_KEY + " DESC");
 
-        private static final HashMap<Integer, Filters> map;
+        private static final SparseArray<Filters> map;
 
         static {
-            map = new HashMap<>();
+            map = new SparseArray<>();
             for (Filters filter : Filters.values()) {
                 map.put(filter.code, filter);
             }
@@ -73,12 +75,12 @@ public class Constants {
         GUIDA   (8, "guida", "Guida"),
         INFO    (9, "info", "Info");
 
-        private static final HashMap<Integer, Sections> map;
+        private static final SparseArray<Sections> map;
         private static final HashMap<String, Sections> nameMap;
         private static final HashMap<String, Sections> titleMap;
 
         static {
-            map = new HashMap<>();
+            map = new SparseArray<>();
             nameMap = new HashMap<>();
             titleMap = new HashMap<>();
             for (Sections editor : Sections.values()) {
