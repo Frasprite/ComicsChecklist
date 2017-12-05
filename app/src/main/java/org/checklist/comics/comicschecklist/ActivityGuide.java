@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBar;
 
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
+import com.github.paolorotolo.appintro.model.SliderPage;
 
 /**
  * Activity used to show to user a guide about application.
@@ -23,37 +24,41 @@ public class ActivityGuide extends AppIntro {
             actionBar.hide();
         }
 
-        // TODO add screenshot on fragments and update code
-        // Instead of fragments, you can also use our default slide
-        addSlide(AppIntroFragment.newInstance(getResources().getString(R.string.activity_help_home),
-                getResources().getString(R.string.activity_help_home_text),
-                R.drawable.intro_main,
-                ContextCompat.getColor(this, R.color.primary)));
+        // Adding a slide for each guide
+        SliderPage sliderPage1 = new SliderPage();
+        sliderPage1.setTitle(getResources().getString(R.string.activity_help_home));
+        sliderPage1.setDescription(getResources().getString(R.string.activity_help_home_text));
+        sliderPage1.setImageDrawable(R.drawable.intro_main);
+        sliderPage1.setBgColor(ContextCompat.getColor(this, R.color.primary));
+        addSlide(AppIntroFragment.newInstance(sliderPage1));
 
-        addSlide(AppIntroFragment.newInstance(getResources().getString(R.string.activity_help_list),
-                getResources().getString(R.string.activity_help_list_text),
-                R.drawable.intro_editori,
-                ContextCompat.getColor(this, R.color.primary)));
+        SliderPage sliderPage2 = new SliderPage();
+        sliderPage2.setTitle(getResources().getString(R.string.activity_help_list));
+        sliderPage2.setDescription(getResources().getString(R.string.activity_help_list_text));
+        sliderPage2.setImageDrawable(R.drawable.intro_editori);
+        sliderPage2.setBgColor(ContextCompat.getColor(this, R.color.primary));
+        addSlide(AppIntroFragment.newInstance(sliderPage2));
 
-        addSlide(AppIntroFragment.newInstance(getResources().getString(R.string.activity_help_detail),
-                getResources().getString(R.string.activity_help_detail_text),
-                R.drawable.intro_dettagli,
-                ContextCompat.getColor(this, R.color.primary)));
+        SliderPage sliderPage3 = new SliderPage();
+        sliderPage3.setTitle(getResources().getString(R.string.activity_help_detail));
+        sliderPage3.setDescription(getResources().getString(R.string.activity_help_detail_text));
+        sliderPage3.setImageDrawable(R.drawable.intro_dettagli);
+        sliderPage3.setBgColor(ContextCompat.getColor(this, R.color.primary));
+        addSlide(AppIntroFragment.newInstance(sliderPage3));
 
-        /*addSlide(AppIntroFragment.newInstance(getResources().getString(R.string.activity_help_favorite),
-                getResources().getString(R.string.activity_help_favorite_text),
-                R.drawable.preferiti,
-                ContextCompat.getColor(this, R.color.primary)));*/
+        SliderPage sliderPage4 = new SliderPage();
+        sliderPage4.setTitle(getResources().getString(R.string.activity_help_buy));
+        sliderPage4.setDescription(getResources().getString(R.string.activity_help_buy_text));
+        sliderPage4.setImageDrawable(R.drawable.intro_comprare);
+        sliderPage4.setBgColor(ContextCompat.getColor(this, R.color.primary));
+        addSlide(AppIntroFragment.newInstance(sliderPage4));
 
-        addSlide(AppIntroFragment.newInstance(getResources().getString(R.string.activity_help_buy),
-                getResources().getString(R.string.activity_help_buy_text),
-                R.drawable.intro_comprare,
-                ContextCompat.getColor(this, R.color.primary)));
-
-        addSlide(AppIntroFragment.newInstance(getResources().getString(R.string.activity_help_settings),
-                getResources().getString(R.string.activity_help_settings_text),
-                R.drawable.intro_impostazioni,
-                ContextCompat.getColor(this, R.color.primary)));
+        SliderPage sliderPage5 = new SliderPage();
+        sliderPage5.setTitle(getResources().getString(R.string.activity_help_settings));
+        sliderPage5.setDescription(getResources().getString(R.string.activity_help_settings_text));
+        sliderPage5.setImageDrawable(R.drawable.intro_impostazioni);
+        sliderPage5.setBgColor(ContextCompat.getColor(this, R.color.primary));
+        addSlide(AppIntroFragment.newInstance(sliderPage5));
 
         setDoneText(getResources().getText(R.string.dialog_confirm_button));
 
