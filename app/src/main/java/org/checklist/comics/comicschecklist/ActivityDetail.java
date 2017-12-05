@@ -44,7 +44,7 @@ public class ActivityDetail extends AppCompatActivity {
             window.setStatusBarColor(ContextCompat.getColor(this, R.color.primary_dark));
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbarDetail);
+        Toolbar toolbar = findViewById(R.id.toolbarDetail);
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
