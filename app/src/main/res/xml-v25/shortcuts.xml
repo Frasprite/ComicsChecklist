@@ -3,7 +3,7 @@
     <shortcut
         android:shortcutId="add_comic"
         android:enabled="true"
-        android:icon="@drawable/ic_shortcut_add"
+        android:icon="@drawable/ic_add"
         android:shortcutShortLabel="@string/add_shortcut_short_label"
         android:shortcutDisabledMessage="@string/add_disabled_message">
         <intent
@@ -15,7 +15,7 @@
     <shortcut
         android:shortcutId="search_shop"
         android:enabled="true"
-        android:icon="@drawable/ic_shortcut_store"
+        android:icon="@drawable/ic_store"
         android:shortcutShortLabel="@string/search_shortcut_short_label"
         android:shortcutDisabledMessage="@string/search_disabled_message">
         <intent

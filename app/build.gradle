@@ -10,8 +10,9 @@ android {
         targetSdkVersion 26
         versionCode 18
         versionName "1.9"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        vectorDrawables.useSupportLibrary = true
     }
 
     testOptions {
@@ -44,4 +45,5 @@ dependencies {
     // UI test stuff
     androidTestCompile 'com.android.support:support-annotations:26.1.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
 }
