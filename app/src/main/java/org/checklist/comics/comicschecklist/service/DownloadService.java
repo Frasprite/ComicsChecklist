@@ -100,7 +100,7 @@ public class DownloadService extends IntentService {
                 if (searchNecessary) {
                     publishResults(Constants.SearchResults.RESULT_FINISHED, "noEditor");
                     if (notificationPref) {
-                        CCNotificationManager.updateNotification(this, getResources().getString(R.string.search_completed), false);
+                        CCNotificationManager.deleteNotification(this);
                     }
                 }
             } else {
@@ -136,7 +136,7 @@ public class DownloadService extends IntentService {
                 if (searchNecessary) {
                     publishResults(Constants.SearchResults.RESULT_FINISHED, "noEditor");
                     if (notificationPref) {
-                        CCNotificationManager.updateNotification(this, getResources().getString(R.string.search_completed), false);
+                        CCNotificationManager.deleteNotification(this);
                         // Favorite data may have changed, update widget as well
                         WidgetService.updateWidget(this);
                     }

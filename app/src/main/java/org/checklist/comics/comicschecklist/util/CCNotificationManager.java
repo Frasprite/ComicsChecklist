@@ -67,6 +67,7 @@ public class CCNotificationManager {
                 .setContentText(text)
                 .setSound(sound)
                 .setContentIntent(pIntent)
+                .setAutoCancel(true)
                 .setProgress(0, 0, showProgress);
 
         notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
@@ -74,7 +75,7 @@ public class CCNotificationManager {
 
     /**
      * Private method which will update the notification according to parameter.
-     * @param context the {@link Context} to use for creating the channel
+     * @param context the {@link Context} to use for updating the notification
      * @param text the message to use on notification
      * @param showProgress whether the notification should show a progress bar
      */
@@ -94,10 +95,21 @@ public class CCNotificationManager {
                 .setContentTitle(context.getString(R.string.app_name))
                 .setContentText(text)
                 .setContentIntent(pIntent)
+                .setAutoCancel(true)
                 .setProgress(0, 0, showProgress);
 
         notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
-    public static void deleteNotification(Context context) {}
+    /**
+     * Method used to delete the notification when search is done.
+     * the {@link Context} to use for deleting the notification
+     */
+    public static void deleteNotification(Context context) {
+        // Then create notification
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.cancel(NOTIFICATION_ID);
+    }
 }
