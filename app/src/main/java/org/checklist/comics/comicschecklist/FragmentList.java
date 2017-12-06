@@ -11,7 +11,6 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
 import android.view.ContextMenu;
@@ -465,18 +464,8 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
         @Override
         public boolean canChildScrollUp() {
             final ListView listView = getListView();
-            return listView.getVisibility() == View.VISIBLE && canListViewScrollUp(listView);
+            return listView.getVisibility() == View.VISIBLE && listView.canScrollVertically(-1);
         }
-    }
-
-    /**
-     * Utility method to check whether a {@link ListView} can scroll up from it's current position.
-     * Handles platform version differences, providing backwards compatible functionality where
-     * needed.
-     */
-    private static boolean canListViewScrollUp(ListView listView) {
-        // TODO  update code
-        return ViewCompat.canScrollVertically(listView, -1);
     }
 
     /* ****************************************************************************************
