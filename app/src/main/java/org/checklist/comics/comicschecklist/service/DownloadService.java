@@ -2,14 +2,12 @@ package org.checklist.comics.comicschecklist.service;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
 
 import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
@@ -18,6 +16,7 @@ import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.parser.Parser;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.CCLogger;
+import org.checklist.comics.comicschecklist.util.CCNotificationManager;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -101,7 +100,7 @@ public class DownloadService extends IntentService {
                 if (searchNecessary) {
                     publishResults(Constants.SearchResults.RESULT_FINISHED, "noEditor");
                     if (notificationPref) {
-                        createNotification(getResources().getString(R.string.search_completed), false);
+                        CCNotificationManager.updateNotification(this, getResources().getString(R.string.search_completed), false);
                     }
                 }
             } else {
@@ -137,7 +136,7 @@ public class DownloadService extends IntentService {
                 if (searchNecessary) {
                     publishResults(Constants.SearchResults.RESULT_FINISHED, "noEditor");
                     if (notificationPref) {
-                        createNotification(getResources().getString(R.string.search_completed), false);
+                        CCNotificationManager.updateNotification(this, getResources().getString(R.string.search_completed), false);
                         // Favorite data may have changed, update widget as well
                         WidgetService.updateWidget(this);
                     }
@@ -146,7 +145,7 @@ public class DownloadService extends IntentService {
         } else {
             error = true;
             publishResults(Constants.SearchResults.RESULT_NOT_CONNECTED, "noEditor");
-            createNotification(getResources().getString(R.string.toast_no_connection), false);
+            CCNotificationManager.createNotification(this, getResources().getString(R.string.toast_no_connection), false);
         }
 
         deleteOldRows();
@@ -171,7 +170,7 @@ public class DownloadService extends IntentService {
      */
     private void searchComics(Parser myParser, boolean notificationPref, String editorTitle, Constants.Sections editor) {
         if (notificationPref) {
-            createNotification(editorTitle + getResources().getString(R.string.search_started), true);
+            CCNotificationManager.createNotification(this, editorTitle + getResources().getString(R.string.search_started), true);
         }
 
         // Select editor
@@ -194,43 +193,14 @@ public class DownloadService extends IntentService {
         if (error) {
             publishResults(Constants.SearchResults.RESULT_CANCELED, editorTitle);
             if (notificationPref) {
-                createNotification(editorTitle + getResources().getString(R.string.search_failed), false);
+                CCNotificationManager.updateNotification(this, editorTitle + getResources().getString(R.string.search_failed), false);
             }
         } else {
             publishResults(Constants.SearchResults.RESULT_EDITOR_FINISHED, editorTitle);
             if (notificationPref) {
-                createNotification(editorTitle + getResources().getString(R.string.search_editor_completed), true);
+                CCNotificationManager.updateNotification(this, editorTitle + getResources().getString(R.string.search_editor_completed), true);
             }
         }
-    }
-
-    /**
-     * Method which create the notification.
-     * @param message the message to show
-     * @param bool whether or not to show an indeterminate process
-     */
-    private void createNotification(String message, boolean bool) {
-        CCLogger.v(TAG, "createNotification - start");
-        // Prepare intent which is triggered if the notification is selected
-        Intent intent = new Intent(this, ActivityMain.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-
-        // Build notification
-        // TODO update notification class
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
-                .setContentTitle(getResources().getString(R.string.app_name))
-                .setContentText(message).setSmallIcon(R.drawable.ic_stat_notification)
-                .setContentIntent(pIntent);
-
-        if (bool) {
-            mBuilder.setProgress(0, 0, true);
-        }
-
-        mBuilder.setContentIntent(pIntent);
-        // Sets an ID for the notification and gets an instance of the NotificationManager service
-        NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // Builds the notification and issues it.
-        mNotifyMgr.notify(Constants.NOTIFICATION_ID, mBuilder.build());
     }
 
     /**

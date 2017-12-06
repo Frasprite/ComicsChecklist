@@ -9,7 +9,7 @@ import org.checklist.comics.comicschecklist.util.CCLogger;
 
 /**
  * Class used to fire an alarm when a comic is out.
- * TODO replace deprecated class
+ * TODO  replace deprecated class
  */
 public class AlarmReceiver extends WakefulBroadcastReceiver {
 

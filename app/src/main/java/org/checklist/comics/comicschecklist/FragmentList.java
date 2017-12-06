@@ -475,7 +475,7 @@ public class FragmentList extends ListFragment implements LoaderManager.LoaderCa
      * needed.
      */
     private static boolean canListViewScrollUp(ListView listView) {
-        // TODO update code
+        // TODO  update code
         return ViewCompat.canScrollVertically(listView, -1);
     }
 
