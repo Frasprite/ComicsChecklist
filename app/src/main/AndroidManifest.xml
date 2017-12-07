@@ -3,25 +3,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="org.checklist.comics.comicschecklist">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
-        tools:replace="android:supportsRtl"
+        android:name=".CCApp"
         android:allowBackup="true"
+        android:fullBackupContent="@xml/cc_backup_scheme"
         android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
-        android:fullBackupContent="@xml/cc_backup_scheme" >
+        android:theme="@style/AppTheme"
+        tools:replace="android:supportsRtl">
+
         <activity
             android:name=".ActivityMain"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -31,85 +33,70 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
 
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
 
-            <meta-data android:name="android.app.shortcuts"
+            <meta-data
+                android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
 
         </activity>
 
-        <activity android:name=".ActivityGuide"
+        <activity
+            android:name=".ActivityGuide"
             android:label="@string/activity_title_guide" />
 
         <activity
             android:name=".ActivityDetail"
             android:label="@string/activity_title_comic_detail"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".ActivityAddComic"
             android:label="@string/activity_title_add_comic"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".ActivitySettings"
-            android:label="@string/activity_help_settings" >
-        </activity>
+            android:label="@string/activity_help_settings" />
 
         <!-- Service which launch search & download data -->
-        <service
-            android:name="org.checklist.comics.comicschecklist.service.DownloadService" >
-        </service>
+        <service android:name="org.checklist.comics.comicschecklist.service.DownloadService" />
 
         <!-- Database provider -->
         <provider
-            tools:ignore="ExportedContentProvider"
-            android:authorities="org.checklist.comics.comicschecklist.contentprovider"
             android:name=".provider.ComicContentProvider"
+            android:authorities="org.checklist.comics.comicschecklist.contentprovider"
             android:exported="true"
-            android:multiprocess="true" >
-        </provider>
+            android:multiprocess="true"
+            tools:ignore="ExportedContentProvider" />
 
         <!-- Widget stuff -->
         <receiver
+            android:name=".provider.WidgetProvider"
             android:icon="@mipmap/ic_launcher"
-            android:label="@string/widget_label"
-            android:name=".provider.WidgetProvider" >
+            android:label="@string/widget_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <!--<action android:name="android.appwidget.action.ACTION_WIDGET_ADD"/> -->
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
+            <meta-data
+                android:name="android.appwidget.provider"
                 android:resource="@xml/widget_info" />
         </receiver>
 
-        <service android:name=".service.WidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"
-            android:exported="false" />
+        <service
+            android:name=".service.WidgetService"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity
             android:name=".WidgetSettings"
             android:excludeFromRecents="true">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-
-        <!-- Alarm stuff -->
-        <service android:name=".service.AlarmService"
-            android:enabled="true" />
-
-        <receiver android:name=".receiver.AlarmReceiver"/>
-
-        <receiver android:name=".receiver.BootReceiver"
-            android:enabled="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
 
     </application>
 

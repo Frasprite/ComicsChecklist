@@ -1,14 +1,9 @@
 package org.checklist.comics.comicschecklist;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -19,11 +14,12 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
 
+import com.evernote.android.job.JobManager;
+
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.receiver.AlarmReceiver;
-import org.checklist.comics.comicschecklist.receiver.BootReceiver;
+import org.checklist.comics.comicschecklist.notification.ComicReleaseSyncJob;
 import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
@@ -172,42 +168,13 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     boolean boolValue = (boolean) newValue;
-                    Context mContext = getActivity();
                     if (boolValue) {
                         CCLogger.d(TAG, "onCreate - Activate notification for favorite");
-                        // Activate notification for favorite
-                        AlarmManager alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-                        Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);
-                        PendingIntent alarmIntent = PendingIntent.getBroadcast(mContext, 0, mIntentReceiver, 0);
-
-                        // Specify a non-precise custom interval, in this case every days.
-                        alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, DateCreator.getAlarm().getTimeInMillis(),
-                                AlarmManager.INTERVAL_DAY, alarmIntent);
-
-                        // Enabling also receiver on boot
-                        ComponentName receiver = new ComponentName(mContext, BootReceiver.class);
-                        PackageManager pm = mContext.getPackageManager();
-
-                        pm.setComponentEnabledSetting(receiver,
-                                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                                PackageManager.DONT_KILL_APP);
+                        ComicReleaseSyncJob.scheduleJob();
                     } else {
                         CCLogger.d(TAG, "onCreate - Disable notification for favorite");
-                        // Disable notification for favorite
-                        AlarmManager alarmMgr = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-                        Intent mIntentReceiver = new Intent(mContext, AlarmReceiver.class);
-                        PendingIntent alarmIntent = PendingIntent.getBroadcast(mContext, 0, mIntentReceiver, 0);
-                        if (alarmMgr != null) {
-                            alarmMgr.cancel(alarmIntent);
-                        }
-
-                        // Disable also receiver on boot
-                        ComponentName receiver = new ComponentName(mContext, BootReceiver.class);
-                        PackageManager pm = mContext.getPackageManager();
-
-                        pm.setComponentEnabledSetting(receiver,
-                                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                                PackageManager.DONT_KILL_APP);
+                        JobManager mJobManager = JobManager.instance();
+                        mJobManager.cancelAll();
                     }
                     return true;
                 }
