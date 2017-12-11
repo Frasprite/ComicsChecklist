@@ -55,10 +55,10 @@ public class ComicDatabase {
             // Update database by adding new column
             database.execSQL("ALTER TABLE " + COMICS_TABLE + " ADD COLUMN " + COMICS_URL_KEY + " TEXT");
             // Populate new column
-            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.URLPANINI, Constants.Sections.getName(Constants.Sections.PANINI));
-            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.IMG_URL, Constants.Sections.getName(Constants.Sections.STAR));
-            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.MAIN_URL, Constants.Sections.getName(Constants.Sections.BONELLI));
-            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.RW_URL, Constants.Sections.getName(Constants.Sections.RW));
+            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.URL_PANINI, Constants.Sections.getName(Constants.Sections.PANINI));
+            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.URL_STAR, Constants.Sections.getName(Constants.Sections.STAR));
+            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.URL_BONELLI, Constants.Sections.getName(Constants.Sections.BONELLI));
+            updateRows(database, ComicDatabase.COMICS_URL_KEY, Constants.URL_RW, Constants.Sections.getName(Constants.Sections.RW));
         }
 
         // N.B.:

@@ -13,7 +13,10 @@ import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
-import org.checklist.comics.comicschecklist.parser.Parser;
+import org.checklist.comics.comicschecklist.parser.ParserBonelli;
+import org.checklist.comics.comicschecklist.parser.ParserPanini;
+import org.checklist.comics.comicschecklist.parser.ParserRW;
+import org.checklist.comics.comicschecklist.parser.ParserStar;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.util.CCLogger;
 import org.checklist.comics.comicschecklist.util.CCNotificationManager;
@@ -54,7 +57,6 @@ public class DownloadService extends IntentService {
     // Will be called asynchronously by Android
     @Override
     protected void onHandleIntent(Intent intent) {
-        Parser myParser = new Parser(getApplicationContext());
         boolean searchNecessary = false;
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
@@ -93,7 +95,7 @@ public class DownloadService extends IntentService {
                         searchNecessary = true;
                         String editorTitle = Constants.Sections.getTitle(currentSection);
                         publishResults(Constants.SearchResults.RESULT_START, editorTitle);
-                        searchComics(myParser, notificationPref, editorTitle, currentSection);
+                        searchComics(notificationPref, editorTitle, currentSection);
                     }
                 }
 
@@ -111,7 +113,7 @@ public class DownloadService extends IntentService {
                     searchNecessary = true;
                     String editorTitle = Constants.Sections.getTitle(editor);
                     publishResults(Constants.SearchResults.RESULT_START, editorTitle);
-                    searchComics(myParser, notificationPref, editorTitle, editor);
+                    searchComics(notificationPref, editorTitle, editor);
 
                     // Update last scan for editor on shared preference
                     String today = DateCreator.getTodayString();
@@ -163,12 +165,12 @@ public class DownloadService extends IntentService {
 
     /**
      * Start searching for specified comics editor.
-     * @param myParser the parser class which will search on the web
+     *
      * @param notificationPref boolean indicating if notification are desired
      * @param editorTitle editor personal text
      * @param editor editor to search
      */
-    private void searchComics(Parser myParser, boolean notificationPref, String editorTitle, Constants.Sections editor) {
+    private void searchComics(boolean notificationPref, String editorTitle, Constants.Sections editor) {
         if (notificationPref) {
             CCNotificationManager.createNotification(this, editorTitle + getResources().getString(R.string.search_started), true);
         }
@@ -176,16 +178,16 @@ public class DownloadService extends IntentService {
         // Select editor
         switch (editor) {
             case PANINI:
-                error = myParser.startParsePanini();
+                error = new ParserPanini(getApplicationContext()).startParsing();
                 break;
             case STAR:
-                error = myParser.startParseStarC();
+                error = new ParserStar(getApplicationContext()).startParsing();
                 break;
             case BONELLI:
-                error = myParser.startParseBonelli();
+                error = new ParserBonelli(getApplicationContext()).startParsing();
                 break;
             case RW:
-                error = myParser.startParseRW();
+                error = new ParserRW(getApplicationContext()).startParsing();
                 break;
         }
 

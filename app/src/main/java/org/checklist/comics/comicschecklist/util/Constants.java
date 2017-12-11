@@ -180,27 +180,9 @@ public class Constants {
     public static final String ACTION_ADD_COMIC = "org.checklist.comics.comicschecklist.ADD_COMIC";
     public static final String ACTION_SEARCH_STORE = "org.checklist.comics.comicschecklist.SEARCH_STORE";
 
-    /**
-     * Constants for parser class.
-     */
-    // Panini, Planet Manga & Marvel
-    public static final String URLPANINI = "http://www.paninicomics.it";
-    // RWEdizioni ex.: http://www.rwedizioni.it/news/uscite-9-gennaio-2016/
-    public static final String RW_URL = "http://www.rwedizioni.it";
-    public static final String FIRSTRW = "http://www.rwedizioni.it/news/uscite-del";
-    public static final String MIDDLERW = "-";
-    public static final String ENDRW = "/";
-    public static final String MEDIARW = "http://www.rwedizioni.it/media/";
-    // Star Comics
-    public static final String ROOT = "https://www.starcomics.com/UsciteMensili.aspx?AspxAutoDetectCookieSupport=1";
-    public static final String COMIC_ROOT = "https://www.starcomics.com/fumetto.aspx?Fumetto=";
-    public static final String IMG_URL = "https://www.starcomics.com";
-    // Bonelli
-    public static final String EDICOLA_INEDITI = "http://www.sergiobonelli.it/sezioni/1025/inediti1025";
-    public static final String EDICOLA_RISTAMPE = "http://www.sergiobonelli.it/sezioni/1016/ristampe1016";
-    public static final String EDICOLA_RACCOLTE = "http://www.sergiobonelli.it/sezioni/1017/raccolte1017";
-    public static final String PROSSIMAMENTE_INEDITI = "http://www.sergiobonelli.it/sezioni/1026/inediti1026";
-    public static final String PROSSIMAMENTE_RISTAMPE = "http://www.sergiobonelli.it/sezioni/1018/ristampe1018";
-    public static final String PROSSIMAMENTE_RACCOLTE = "http://www.sergiobonelli.it/sezioni/1019/raccolte1019";
-    public static final String MAIN_URL = "http://www.sergiobonelli.it/";
+    /* Constants for old database migration */
+    public static final String URL_PANINI = "http://www.paninicomics.it";
+    public static final String URL_RW = "http://www.rwedizioni.it";
+    public static final String URL_STAR = "https://www.starcomics.com";
+    public static final String URL_BONELLI = "http://www.sergiobonelli.it/";
 }
