@@ -20,7 +20,7 @@ public abstract class Parser {
      *
      * @param context the {@link Context} for saving data
      */
-    public Parser(Context context) {
+    Parser(Context context) {
         mContext = context;
     }
 

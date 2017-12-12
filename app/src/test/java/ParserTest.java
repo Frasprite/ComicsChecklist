@@ -1,6 +1,9 @@
 import android.content.Context;
 
-import org.checklist.comics.comicschecklist.parser.Parser;
+import org.checklist.comics.comicschecklist.parser.ParserBonelli;
+import org.checklist.comics.comicschecklist.parser.ParserPanini;
+import org.checklist.comics.comicschecklist.parser.ParserRW;
+import org.checklist.comics.comicschecklist.parser.ParserStar;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -13,33 +16,33 @@ import static org.junit.Assert.assertThat;
 public class ParserTest {
 
     @Mock
-    Context mMockContext;
+    private Context mMockContext;
 
     @Test
     public void startParsePaniniTest() {
-        Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParsePanini();
+        ParserPanini parser = new ParserPanini(mMockContext);
+        boolean result = parser.startParsing();
         assertThat(result, is(true));
     }
 
     @Test
     public void startParseRWTest() {
-        Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParseRW();
+        ParserRW parser = new ParserRW(mMockContext);
+        boolean result = parser.startParsing();
         assertThat(result, is(true));
     }
 
     @Test
     public void startParseBonelliTest() {
-        Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParseBonelli();
+        ParserBonelli parser = new ParserBonelli(mMockContext);
+        boolean result = parser.startParsing();
         assertThat(result, is(false));
     }
 
     @Test
     public void startParseStarTest() {
-        Parser parser = new Parser(mMockContext);
-        boolean result = parser.startParseStarC();
+        ParserStar parser = new ParserStar(mMockContext);
+        boolean result = parser.startParsing();
         assertThat(result, is(true));
     }
 }
