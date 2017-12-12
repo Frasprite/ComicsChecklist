@@ -34,8 +34,8 @@ public class ParserPanini extends Parser {
         CCLogger.i(TAG, "startParsePanini - Start searching for Panini comics");
         boolean parseError;
 
-        parseError = parseUrl(BASE_URL + "/calendario/uscite-questa-settimana/");
-        parseError = parseUrl(BASE_URL + "/calendario/uscite-prossime-settimane/");
+        parseError = parseUrl(BASE_URL + "/calendario/uscite-questa-settimana/") &&
+                     parseUrl(BASE_URL + "/calendario/uscite-prossime-settimane/");
 
         return parseError;
     }
