@@ -12,7 +12,7 @@ import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.WidgetSettings;
 import org.checklist.comics.comicschecklist.service.WidgetService;
-import org.checklist.comics.comicschecklist.util.CCLogger;
+import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 /**

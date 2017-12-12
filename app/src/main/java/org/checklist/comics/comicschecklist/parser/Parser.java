@@ -3,7 +3,7 @@ package org.checklist.comics.comicschecklist.parser;
 import android.content.Context;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
-import org.checklist.comics.comicschecklist.util.CCLogger;
+import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
 /**

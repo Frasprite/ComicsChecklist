@@ -1,5 +1,7 @@
 package org.checklist.comics.comicschecklist.util;
 
+import org.checklist.comics.comicschecklist.log.CCLogger;
+
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

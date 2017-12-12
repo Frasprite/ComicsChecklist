@@ -11,7 +11,7 @@ import android.text.TextUtils;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseHelper;
-import org.checklist.comics.comicschecklist.util.CCLogger;
+import org.checklist.comics.comicschecklist.log.CCLogger;
 
 import java.util.Arrays;
 import java.util.HashSet;

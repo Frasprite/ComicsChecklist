@@ -3,7 +3,7 @@ package org.checklist.comics.comicschecklist.database;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.checklist.comics.comicschecklist.util.CCLogger;
+import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 public class ComicDatabase {

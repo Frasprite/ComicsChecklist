@@ -18,7 +18,7 @@ import org.checklist.comics.comicschecklist.parser.ParserPanini;
 import org.checklist.comics.comicschecklist.parser.ParserRW;
 import org.checklist.comics.comicschecklist.parser.ParserStar;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.util.CCLogger;
+import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.CCNotificationManager;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;

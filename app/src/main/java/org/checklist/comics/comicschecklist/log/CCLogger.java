@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist.util;
+package org.checklist.comics.comicschecklist.log;
 
 import android.util.Log;
 

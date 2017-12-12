@@ -7,7 +7,7 @@ import android.database.Cursor;
 import android.net.Uri;
 
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.util.CCLogger;
+import org.checklist.comics.comicschecklist.log.CCLogger;
 
 import java.util.Date;
 

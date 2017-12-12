@@ -12,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 
 import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
+import org.checklist.comics.comicschecklist.log.CCLogger;
 
 /**
  * Class used to create and manage notifications.
