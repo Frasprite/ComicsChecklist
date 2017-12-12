@@ -19,9 +19,9 @@ public class ParserBonelli extends Parser {
     private static final String TAG = ParserBonelli.class.getSimpleName();
 
     private static final String BASE_URL = "http://www.sergiobonelli.it";
-    private static final String EDICOLA_INEDITI = BASE_URL + "/sezioni/1025/inediti1025";
-    private static final String EDICOLA_RISTAMPE = BASE_URL + "/sezioni/1016/ristampe1016";
-    private static final String EDICOLA_RACCOLTE = BASE_URL + "/sezioni/1017/raccolte1017";
+    private static final String EDICOLA_INEDITI = BASE_URL + "/sezioni/1025/inediti";
+    private static final String EDICOLA_RISTAMPE = BASE_URL + "/sezioni/1016/ristampe";
+    private static final String EDICOLA_RACCOLTE = BASE_URL + "/sezioni/1017/raccolte";
     private static final String PROSSIMAMENTE_INEDITI = BASE_URL + "/sezioni/1026/inediti1026";
     private static final String PROSSIMAMENTE_RISTAMPE = BASE_URL + "/sezioni/1018/ristampe1018";
     private static final String PROSSIMAMENTE_RACCOLTE = BASE_URL + "/sezioni/1019/raccolte1019";
@@ -120,10 +120,14 @@ public class ParserBonelli extends Parser {
                     myDate = DateCreator.elaborateDate(releaseDate);
                 }
 
+                CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + releaseDate);
+
                 coverUrl = searchCover(docMoreInfo);
                 description = searchDescription(docMoreInfo);
                 feature = searchFeature(docMoreInfo);
                 price = searchPrice(docMoreInfo);
+
+                CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
 
                 // Insert comic on database
                 ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.BONELLI.getName(), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
