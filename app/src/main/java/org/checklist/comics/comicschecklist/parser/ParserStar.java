@@ -119,14 +119,14 @@ public class ParserStar extends Parser {
                 myDate = DateCreator.elaborateDate(releaseDate);
             }
 
-            CCLogger.d(TAG, "parseUrl - Comic title : " + title + "\nRelease date : " + releaseDate);
+            CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + releaseDate);
 
             coverUrl = searchCover(content);
             description = searchDescription(content);
             feature = searchFeature(content);
             price = searchPrice(content);
 
-            CCLogger.d(TAG, "parseUrl - Cover url : + " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice " + price);
+            CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
 
             // Insert comic on database
             ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.getName(Constants.Sections.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
