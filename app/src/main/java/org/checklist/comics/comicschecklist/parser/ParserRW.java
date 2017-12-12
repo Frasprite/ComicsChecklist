@@ -109,14 +109,14 @@ public class ParserRW extends Parser {
                     continue;
                 }
 
-                CCLogger.d(TAG, "parseUrl - Comic title : " + title + "\nRelease date : " + mCurrentReleaseDate);
+                CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + mCurrentReleaseDate);
 
                 coverUrl = searchCover(checkForImg);
                 description = searchDescription(checkForImg);
                 feature = searchFeature(element);
                 price = searchPrice(element);
 
-                CCLogger.d(TAG, "parseUrl - Cover url : + " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice " + price);
+                CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
 
                 // Insert found comic on DB
                 ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.RW.getName(),
@@ -141,6 +141,7 @@ public class ParserRW extends Parser {
             String coverUrl = src.attr("src");
             if (coverUrl.startsWith(MEDIA_RW)) {
                 title = coverUrl.replace(MEDIA_RW, "").replace("_", " ").replace(".jpg", "");
+                title = title.substring(0, title.indexOf("-"));
                 // Title elaborated
                 CCLogger.v(TAG, "searchTitle - Title " + title);
             }
