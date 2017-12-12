@@ -34,7 +34,6 @@ public class ParserPanini extends Parser {
         CCLogger.i(TAG, "startParsePanini - Start searching for Panini comics");
         boolean parseError;
 
-        parseError = parseUrl(BASE_URL + "/calendario/uscite-scorsa-settimana/");
         parseError = parseUrl(BASE_URL + "/calendario/uscite-questa-settimana/");
         parseError = parseUrl(BASE_URL + "/calendario/uscite-prossime-settimane/");
 
@@ -99,7 +98,7 @@ public class ParserPanini extends Parser {
                     myDate = DateCreator.elaborateDate(releaseDate);
                 }
 
-                CCLogger.d(TAG, "parseUrl - Comic title : " + title + "\nRelease date : " + releaseDate);
+                CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + releaseDate);
 
                 String linkMoreInfo = element.getElementsByTag("a").attr("href");
                 Document docMoreInfo = searchMoreInfo(linkMoreInfo);
@@ -123,7 +122,7 @@ public class ParserPanini extends Parser {
                 feature = searchFeature(divEssential);
                 price = searchPrice(divEssential);
 
-                CCLogger.d(TAG, "parseUrl - Cover url : + " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice " + price);
+                CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
 
                 // Insert data on database
                 ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.PANINI.getName(), description, releaseDate,
