@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.log.CCLogger;
+import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 import org.jsoup.Jsoup;
@@ -49,6 +50,7 @@ public class ParserStar extends Parser {
         } catch (Exception e) {
             // Unable to find data for Star Comics
             CCLogger.w(TAG, "startParsing - Error while searching release from Star Comics site " + e.toString());
+            ParserLog.increaseWrongStarURL();
             return false;
         }
 
@@ -74,8 +76,11 @@ public class ParserStar extends Parser {
                     .openStream(), "UTF-8", url);
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - This url does not exists " + url + " " + e.toString());
+            ParserLog.increaseWrongStarURL();
             return true;
         }
+
+        ParserLog.increaseParsedStarURL();
 
         // Take every info about comic on element
         Element content;
@@ -83,6 +88,7 @@ public class ParserStar extends Parser {
             content = doc.getElementsByTag("article").first();
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - Can't take a list of elements " + url + " " + e.toString());
+            ParserLog.increaseWrongStarElements();
             return true;
         }
 
@@ -99,12 +105,14 @@ public class ParserStar extends Parser {
             title = searchTitle(content);
             if (title == null) {
                 CCLogger.w(TAG, "parseUrl - Title not found!");
+                ParserLog.increaseErrorOnParsingComic();
                 return true;
             }
 
             releaseDate = searchReleaseDate(content);
             if (releaseDate == null) {
                 CCLogger.w(TAG, "parseUrl - Release date not found!");
+                ParserLog.increaseErrorOnParsingComic();
                 return true;
             } else {
                 // Calculating date for SQL
@@ -124,6 +132,7 @@ public class ParserStar extends Parser {
             ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.getName(Constants.Sections.STAR), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrlStarC - Error while searching data for comic id " + e.toString() + "\n" + url);
+            ParserLog.increaseErrorOnParsingComic();
             return true;
         }
 

@@ -118,7 +118,7 @@ public class DateCreator {
     public static String getTargetReadableMonth(int days) {
         Calendar calendar = DateCreator.getTargetDay(days);
         int month = calendar.get(Calendar.MONTH);
-        String monthString = DateFormatSymbols.getInstance(Locale.ITALIAN).getMonths()[month];
+        String monthString = DateFormatSymbols.getInstance(Locale.ITALIAN).getMonths()[month].toLowerCase();
         CCLogger.d(TAG, "getCurrentReadableMonth - Month is " + monthString);
         return monthString;
     }
@@ -129,18 +129,6 @@ public class DateCreator {
      */
     public static int getCurrentYear() {
         Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        CCLogger.d(TAG, "getCurrentYear - day is " + year);
-        return year;
-    }
-
-    /**
-     * Return the current year in {@link Integer} format.
-     * @param days the days to add
-     * @return the current year
-     */
-    public static int getTargetYear(int days) {
-        Calendar calendar = DateCreator.getTargetDay(days);
         int year = calendar.get(Calendar.YEAR);
         CCLogger.d(TAG, "getCurrentYear - day is " + year);
         return year;
@@ -189,12 +177,15 @@ public class DateCreator {
 
     /**
      * Method which add given days to the current date.
-     * @param dayToSum the days to add
+     * @param daysToAdd the days to add
      * @return the calendar updated
      */
-    private static Calendar getTargetDay(int dayToSum) {
+    public static Calendar getTargetDay(int daysToAdd) {
+        Date date = new Date();
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, dayToSum);
+        calendar.setTime(date);
+        calendar.add(Calendar.DAY_OF_YEAR, daysToAdd);
+        CCLogger.v(TAG, "getTargetDay - Result " + calendar.toString());
         return calendar;
     }
 

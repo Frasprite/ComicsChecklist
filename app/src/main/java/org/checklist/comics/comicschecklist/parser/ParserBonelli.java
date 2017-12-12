@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.log.CCLogger;
+import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 import org.jsoup.Jsoup;
@@ -62,8 +63,11 @@ public class ParserBonelli extends Parser {
                     .get();
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - This url does not exists " + url + " " + e.toString());
+            ParserLog.increaseWrongBonelliURL();
             return true;
         }
+
+        ParserLog.increaseParsedBonelliURL();
 
         // Finding release date
         String releaseTag = doc.select("p.tag_2").html();
@@ -76,6 +80,7 @@ public class ParserBonelli extends Parser {
         if (spanRelease.size() != spanOther.size()) {
             CCLogger.w(TAG, "parseUrl - List of elements have different size!\n" +
                     "Total release " + spanRelease.size() + "\nTotal entries " + spanOther.size());
+            ParserLog.increaseWrongBonelliElements();
             return true;
         }
 
@@ -101,12 +106,14 @@ public class ParserBonelli extends Parser {
                 title = searchTitle(docMoreInfo);
                 if (title == null) {
                     CCLogger.w(TAG, "parseUrl - Title not found!");
+                    ParserLog.increaseErrorOnParsingComic();
                     continue;
                 }
 
                 releaseDate = searchReleaseDate(spanRelease.get(i));
                 if (releaseDate == null) {
                     CCLogger.w(TAG, "parseUrl - Release date not found!");
+                    ParserLog.increaseErrorOnParsingComic();
                     continue;
                 } else {
                     // Calculating date for SQL
@@ -122,6 +129,7 @@ public class ParserBonelli extends Parser {
                 ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.BONELLI.getName(), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
             } catch (Exception e) {
                 CCLogger.w(TAG, "parseUrl - Can't take more info from " + e.toString() + " comic not fetched", e);
+                ParserLog.increaseErrorOnParsingComic();
             }
         }
 

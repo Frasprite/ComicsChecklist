@@ -13,6 +13,7 @@ import org.checklist.comics.comicschecklist.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
+import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.parser.ParserBonelli;
 import org.checklist.comics.comicschecklist.parser.ParserPanini;
 import org.checklist.comics.comicschecklist.parser.ParserRW;
@@ -203,6 +204,8 @@ public class DownloadService extends IntentService {
                 CCNotificationManager.updateNotification(this, editorTitle + getResources().getString(R.string.search_editor_completed), true);
             }
         }
+
+        ParserLog.printReport();
     }
 
     /**

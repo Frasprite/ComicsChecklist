@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.log.CCLogger;
+import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 import org.jsoup.Jsoup;
@@ -11,6 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class ParserRW extends Parser {
@@ -18,7 +20,7 @@ public class ParserRW extends Parser {
     private static final String TAG = ParserRW.class.getSimpleName();
 
     private static final String BASE_URL = "http://www.rwedizioni.it";
-    private static final String FIRST_RW = BASE_URL + "/news/uscite-del";
+    private static final String FIRST_RW = BASE_URL + "/news/uscite";
     private static final String MIDDLE_RW = "-";
     private static final String END_RW = "/";
     private static final String MEDIA_RW = BASE_URL + "/media/";
@@ -42,12 +44,12 @@ public class ParserRW extends Parser {
         int dayToSearch = 5;
         for (int i = 1; i <= dayToSearch; i++) {
             CCLogger.d(TAG, "startParsing - Today is " + DateCreator.getTodayString() + " adding " + i + " day(s)");
-            mCurrentReleaseDate = DateCreator.getStringTargetDay(i);
+            mCurrentReleaseDate = searchReleaseDate(i);
+            int day = DateCreator.getTargetDay(i).get(Calendar.DAY_OF_MONTH);
 
-            // Example : http://www.rwedizioni.it/news/uscite-del-7-gennaio-2017/
-            String url = FIRST_RW + MIDDLE_RW + i + MIDDLE_RW +
-                    DateCreator.getTargetReadableMonth(i) + MIDDLE_RW +
-                    DateCreator.getTargetYear(i) + END_RW;
+            // Example : http://www.rwedizioni.it/news/uscite-2-dicembre/
+            String url = FIRST_RW + MIDDLE_RW + day + MIDDLE_RW +
+                    DateCreator.getTargetReadableMonth(i) + END_RW;
             parseError = parseUrl(url);
         }
 
@@ -72,8 +74,11 @@ public class ParserRW extends Parser {
                     .get();
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - Error while parsing URL " + url + " " + e.toString());
+            ParserLog.increaseWrongRWURL();
             return true;
         }
+
+        ParserLog.increaseParsedRWURL();
 
         // Take every potential comic as elements
         Elements pElements;
@@ -81,6 +86,7 @@ public class ParserRW extends Parser {
            pElements = doc.getElementById("content").select("p");
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - Can't take a list of elements " + url + " " + e.toString());
+            ParserLog.increaseWrongRWElements();
             return true;
         }
 
@@ -99,6 +105,7 @@ public class ParserRW extends Parser {
                 title = searchTitle(checkForImg);
                 if (title == null) {
                     CCLogger.w(TAG, "parseUrl - Title not found!");
+                    ParserLog.increaseErrorOnParsingComic();
                     continue;
                 }
 
@@ -117,6 +124,7 @@ public class ParserRW extends Parser {
                         "no", "no", url);
             } catch (Exception e) {
                 CCLogger.w(TAG, "parseUrl - Error while comic fetching " + element.toString() + " " + e.toString());
+                ParserLog.increaseErrorOnParsingComic();
             }
         }
 
@@ -143,7 +151,10 @@ public class ParserRW extends Parser {
 
     @Override
     public String searchReleaseDate(Object object) {
-        return null;
+        int daysToAdd = (Integer) object;
+        String releaseDate = DateCreator.getStringTargetDay(daysToAdd);
+        CCLogger.v(TAG, "searchReleaseDate - Computed release date " + releaseDate);
+        return releaseDate;
     }
 
     @Override

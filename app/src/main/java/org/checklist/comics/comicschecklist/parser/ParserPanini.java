@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.log.CCLogger;
+import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 import org.jsoup.Jsoup;
@@ -54,8 +55,11 @@ public class ParserPanini extends Parser {
                     .get();
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - This url does not exists " + url + " " + e.toString());
+            ParserLog.increaseWrongPaniniURL();
             return true;
         }
+
+        ParserLog.increaseParsedPaniniURL();
 
         Elements links;
         try {
@@ -66,6 +70,7 @@ public class ParserPanini extends Parser {
             CCLogger.d(TAG, "parseUrl - Total links : " + links.size());
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - Can't take a list of elements " + url + " " + e.toString());
+            ParserLog.increaseWrongPaniniElements();
             return true;
         }
 
@@ -80,12 +85,14 @@ public class ParserPanini extends Parser {
                 title = searchTitle(element);
                 if (title == null) {
                     CCLogger.w(TAG, "parseUrl - Title not found!");
+                    ParserLog.increaseErrorOnParsingComic();
                     continue;
                 }
 
                 releaseDate = searchReleaseDate(element);
                 if (releaseDate == null) {
                     CCLogger.w(TAG, "parseUrl - Release date not found!");
+                    ParserLog.increaseErrorOnParsingComic();
                     continue;
                 } else {
                     // Calculating date for SQL
@@ -123,6 +130,7 @@ public class ParserPanini extends Parser {
                         myDate, coverUrl, feature, price, "no", "no", linkMoreInfo);
             } catch (Exception e) {
                 CCLogger.w(TAG, "parseUrl - Error while comic fetching " + element.toString() + " " + e.toString());
+                ParserLog.increaseErrorOnParsingComic();
             }
         }
 
