@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist.util;
+package org.checklist.comics.comicschecklist.notification;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;

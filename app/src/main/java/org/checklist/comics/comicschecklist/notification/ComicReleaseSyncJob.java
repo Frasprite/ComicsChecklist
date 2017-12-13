@@ -11,7 +11,6 @@ import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.log.CCLogger;
-import org.checklist.comics.comicschecklist.util.CCNotificationManager;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
 import java.util.concurrent.TimeUnit;

@@ -42,6 +42,9 @@ import org.checklist.comics.comicschecklist.util.RecyclerViewEmptySupport;
  */
 public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    // TODO implement highlight item
+    // TODO implement on long click for context menu
+
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
     private RecyclerViewEmptySupport mRecyclerView;
