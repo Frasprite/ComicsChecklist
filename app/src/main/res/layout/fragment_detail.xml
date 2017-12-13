@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/cover_image_view"
@@ -12,40 +12,37 @@
         android:gravity="center"
         android:scaleType="centerCrop" />
 
-    <LinearLayout
-        android:id="@+id/comic_detail_main_layout"
+    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/transparent"
-        android:gravity="center|top"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="6dp"
+        app:contentPadding="4dp">
 
         <LinearLayout
-            android:id="@+id/title_box_layout"
+            android:id="@+id/comic_detail_main_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="10dp">
+            android:layout_height="match_parent"
+            android:gravity="center|top"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/title_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textStyle="bold"
                 android:ellipsize="end"
-                android:paddingLeft="6dp"
-                android:paddingRight="6dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/other_info_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+                android:gravity="center_horizontal"
+                android:paddingEnd="6dp"
+                android:paddingStart="6dp"
+                android:paddingTop="10dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -77,21 +74,21 @@
                 android:gravity="center_horizontal"
                 android:padding="10dp"
                 android:textStyle="bold" />
-        </LinearLayout>
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fadeScrollbars="false"
-            android:padding="10dp">
-
-            <TextView
-                android:id="@+id/description_text_view"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:cacheColorHint="#00000000"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
-        </ScrollView>
-    </LinearLayout>
+                android:layout_height="match_parent"
+                android:fadeScrollbars="false"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/description_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:cacheColorHint="#00000000"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </ScrollView>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
 
 </FrameLayout>
