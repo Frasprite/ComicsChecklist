@@ -2,7 +2,6 @@ package org.checklist.comics.comicschecklist;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
@@ -12,38 +11,46 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DividerItemDecoration;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.checklist.comics.comicschecklist.adapter.CustomCursorRecyclerViewAdapter;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.adapter.ComicAdapter;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.RecyclerViewEmptySupport;
 
-public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, RecyclerView.OnItemTouchListener {
-
-    // TODO highlight selected item (and save it on save instance state)
-    // http://stackoverflow.com/questions/27194044/how-to-properly-highlight-selected-item-on-recyclerview
-    // http://stackoverflow.com/questions/26682277/how-do-i-get-the-position-selected-in-a-recyclerview
+/**
+ * A fragment representing a list of Comics. This fragment
+ * also supports tablet devices by allowing list items to be given an
+ * 'activated' state upon selection. This helps indicate which item is
+ * currently being viewed in a {@link FragmentDetail}.
+ * <p>
+ */
+public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
+    private RecyclerViewEmptySupport mRecyclerView;
+    private ComicAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
     private Constants.Sections mEditor;
-    private CustomCursorRecyclerViewAdapter mAdapter;
-    private RecyclerView mRecyclerView;
-    private TextView mEmptyText;
+    private static final int DELETE_ID = Menu.FIRST + 1;
+    private static final int DELETE_ALL = Menu.FIRST + 2;
 
     /**
      * The fragment's current callback object, which is notified of list item
@@ -56,36 +63,20 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
      * implement. This mechanism allows activities to be notified of item
      * selections.
      */
-    public interface Callbacks {
+    interface Callbacks {
         /**
          * Callback for when an item has been selected.
          */
         void onItemSelected(long id);
-
-        /**
-         * Callback for when list is scrolled down / up.
-         */
-        void onHideFAB();
-
-        /**
-         * Callback for when list is scrolled stops.
-         */
-        void onShowFAB();
     }
 
     /**
-     * An implementation of the {@link FragmentRecycler.Callbacks} interface that does
+     * An implementation of the {@link Callbacks} interface that does
      * nothing. Used only when this fragment is not attached to an activity.
      */
-    private static final FragmentRecycler.Callbacks sComicCallbacks = new FragmentRecycler.Callbacks() {
+    private static final Callbacks sComicCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(long id) {}
-
-        @Override
-        public void onHideFAB() {}
-
-        @Override
-        public void onShowFAB() {}
     };
 
     /**
@@ -107,49 +98,49 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         // Find editor
         mEditor = (Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR);
         CCLogger.d(TAG, "onCreate - name " + mEditor);
-
-        fillData();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
         CCLogger.d(TAG, "onCreateView - start");
+        // Create the list fragment's content view by calling the super method
+        super.onCreateView(inflater, container, savedInstanceState);
+
         View view = inflater.inflate(R.layout.fragment_recycler_view, container, false);
 
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
-        mAdapter = new CustomCursorRecyclerViewAdapter(getActivity(), null);
+        mRecyclerView = view.findViewById(R.id.recyclerView);
 
-        mRecyclerView = view.findViewById(R.id.recycler_view);
+        // Use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setEmptyView(view.findViewById(R.id.empty_text_view));
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(),
-                mLayoutManager.getOrientation());
-        mRecyclerView.addItemDecoration(dividerItemDecoration);
+        getActivity().setTitle(Constants.Sections.getTitle(mEditor));
 
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState != RecyclerView.SCROLL_STATE_IDLE) {
-                    mCallbacks.onHideFAB();
-                } else {
-                    mCallbacks.onShowFAB();
-                }
-            }
+        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
+            CCLogger.v(TAG, "onCreateView - Created a Fragment - end");
+            return view;
+        } else {
+            // Now create a SwipeRefreshLayout to wrap the fragment's content view
+            mSwipeRefreshLayout = new ListFragmentSwipeRefreshLayout(container.getContext());
 
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
-        });
+            // Add the list fragment's content view to the SwipeRefreshLayout, making sure that it fills
+            // the SwipeRefreshLayout
+            mSwipeRefreshLayout.addView(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-        mRecyclerView.addOnItemTouchListener(this);
+            // Make sure that the SwipeRefreshLayout will fill the fragment
+            mSwipeRefreshLayout.setLayoutParams(
+                    new ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
 
-        getActivity().getSupportLoaderManager().restartLoader(0, null, this);
+            // Set color
+            mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent);
 
-        return view;
+            // Now return the SwipeRefreshLayout as this fragment's content view
+            CCLogger.v(TAG, "onCreateView - Created a SwipeRefreshLayout - end");
+            return mSwipeRefreshLayout;
+        }
     }
 
     @Override
@@ -157,159 +148,128 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         super.onViewCreated(view, savedInstanceState);
         CCLogger.d(TAG, "onViewCreated - start");
 
-        mEmptyText = view.findViewById(R.id.empty_view);
+        fillData();
+
+        TextView emptyText = view.findViewById(R.id.empty_text_view);
 
         if (mEditor.equals(Constants.Sections.FAVORITE)) {
-            mEmptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
-            mEmptyText.setText(getString(R.string.empty_favorite_list));
+            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
+            emptyText.setText(getString(R.string.empty_favorite_list));
         } else if (mEditor.equals(Constants.Sections.CART)) {
-            mEmptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
-            mEmptyText.setText(getString(R.string.empty_cart_list));
+            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
+            emptyText.setText(getString(R.string.empty_cart_list));
         } else {
-            mEmptyText.setText(getString(R.string.empty_editor_list));
+            emptyText.setText(getString(R.string.empty_editor_list));
         }
+
+        /*
+          Implement {@link SwipeRefreshLayout.OnRefreshListener}. When users do the "swipe to
+          refresh" gesture, SwipeRefreshLayout invokes
+          {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}. In
+          {@link SwipeRefreshLayout.OnRefreshListener#onRefresh onRefresh()}, call a method that
+          refreshes the content. Call the same method in response to the Refresh action from the
+          action bar.
+         */
+        setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                ActivityMain activityMain = (ActivityMain) getActivity();
+                activityMain.initiateRefresh(mEditor);
+            }
+        });
 
         CCLogger.v(TAG, "onViewCreated - end");
     }
 
     @Override
-    public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
-        // Case item is clicked
-        View childView = view.findChildViewUnder(e.getX(), e.getY());
-        if (childView != null && mGestureDetector.onTouchEvent(e)) {
-            long id = mAdapter.getItemId(view.getChildAdapterPosition(childView));
-            CCLogger.d(TAG, "onItemClick - item ID " + id);
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mCallbacks.onItemSelected(id);
-            return true;
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        CCLogger.v(TAG, "onAttach");
+        // Activities containing this fragment must implement its callbacks.
+        if (!(context instanceof Callbacks)) {
+            throw new IllegalStateException("Activity must implement fragment's callbacks.");
         }
-        return false;
+
+        mCallbacks = (Callbacks) context;
     }
 
     @Override
-    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-        // Not used
+    public void onDetach() {
+        super.onDetach();
+        CCLogger.v(TAG, "onDetach");
+        // Reset the active callbacks interface to the callback implementation.
+        mCallbacks = sComicCallbacks;
     }
 
     @Override
-    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-        // Not used
+    public void onActivityCreated(Bundle savedState) {
+        super.onActivityCreated(savedState);
+        CCLogger.v(TAG, "onActivityCreated");
+        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
+            registerForContextMenu(mRecyclerView);
+        }
     }
 
-    /**
-     * Using {@link GestureDetector} in order to detect if an item is clicked for a long time.
-     */
-    GestureDetector mGestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public boolean onSingleTapUp(MotionEvent e) {
-            return true;
-        }
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(0, DELETE_ID, 0, R.string.context_menu_delete_comic);
+        menu.add(0, DELETE_ALL, 1, R.string.context_menu_delete_all);
+    }
 
-        @Override
-        public void onLongPress(MotionEvent e) {
-            // Case item is long clicked
-            View child = mRecyclerView.findChildViewUnder(e.getX(), e.getY());
-            if (child != null && mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
-                long id = mAdapter.getItemId(mRecyclerView.getChildAdapterPosition(child));
-                CCLogger.d(TAG, "onLongItemClick - ID " + id);
-                launchActionDialog(id);
-            }
-        }
-    });
-
-    /**
-     * Used to launch a confirm dialog with some options.
-     * @param itemID the ID of item selected
-     */
-    private void launchActionDialog(final long itemID) {
-        // Prepare dialog
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppCompatAlertDialogStyle);
-
-        // Add decoration
-        builder.setTitle(R.string.dialog_context_action);
-        builder.setItems(R.array.dialog_available_actions, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case 0:
-                        // Delete entry from list
-                        deleteEntry(itemID);
-                        break;
-                    case 1:
-                        // Delete all entries from list
-                        deleteAllEntries();
-                        break;
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        ContentValues mUpdateValues;
+        switch (item.getItemId()) {
+            case DELETE_ID:
+                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                mUpdateValues = new ContentValues();
+                if (mEditor.equals(Constants.Sections.FAVORITE)) {
+                    mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
+                    CCLogger.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + info.id);
+                    // Defines selection criteria for the rows you want to update
+                    String whereClause = ComicDatabase.ID + "=?";
+                    String[] whereArgs = new String[]{String.valueOf(info.id)};
+                    int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
+                    CCLogger.v(TAG, "onContextItemSelected - favorite comic UPDATED " + rowUpdated);
+                } else if (mEditor.equals(Constants.Sections.CART)) {
+                    CCLogger.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + info.id);
+                    removeComicFromCart(info.id);
                 }
-            }
-        });
+                WidgetService.updateWidget(getActivity());
+                return true;
+            case DELETE_ALL:
+                mUpdateValues = new ContentValues();
+                int updateResult;
+                if (mEditor.equals(Constants.Sections.FAVORITE)) {
+                    // Update all favorite
+                    mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
+                    updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
+                    if (updateResult > 0) {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
+                        CCLogger.d(TAG, "onContextItemSelected - deleting all favorite comic");
+                    } else {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
+                        CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
+                    }
+                } else if (mEditor.equals(Constants.Sections.CART)) {
+                    // Remove comic from cart
+                    updateResult = removeAllComicFromCart();
+                    if (updateResult > 0) {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
+                        CCLogger.d(TAG, "onContextItemSelected - deleting " + updateResult + " from cart");
+                    } else {
+                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
+                        CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from cart");
+                    }
+                }
 
-        // Neutral button: propose next time
-        builder.setNeutralButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-            }
-        });
-
-        builder.create().show();
-    }
-
-    /**
-     * Method used to delete all entries from list.
-     */
-    private void deleteAllEntries() {
-        ContentValues mUpdateValues = new ContentValues();
-        int updateResult;
-        if (mEditor.equals(Constants.Sections.FAVORITE)) {
-            // Update all favorite
-            mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-            updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
-            if (updateResult > 0) {
-                Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
-                CCLogger.d(TAG, "onContextItemSelected - deleting all favorite comic");
-            } else {
-                Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
-                CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
-            }
-        } else if (mEditor.equals(Constants.Sections.CART)) {
-            // Remove comic from cart
-            updateResult = removeAllComicFromCart();
-            if (updateResult > 0) {
-                Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
-                CCLogger.d(TAG, "onContextItemSelected - deleting " + updateResult + " from cart");
-            } else {
-                Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
-                CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from cart");
-            }
+                WidgetService.updateWidget(getActivity());
+                return true;
         }
-
-        WidgetService.updateWidget(getActivity());
+        return super.onContextItemSelected(item);
     }
 
-    /**
-     * Method used to delete an entry from database.
-     * @param itemID the ID of item selected
-     */
-    private void deleteEntry(long itemID) {
-        ContentValues mUpdateValues = new ContentValues();
-        if (mEditor.equals(Constants.Sections.FAVORITE)) {
-            mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-            CCLogger.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + itemID);
-            // Defines selection criteria for the rows you want to update
-            String whereClause = ComicDatabase.ID + "=?";
-            String[] whereArgs = new String[]{String.valueOf(itemID)};
-            int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
-            CCLogger.v(TAG, "onContextItemSelected - favorite comic UPDATED " + rowUpdated);
-        } else if (mEditor.equals(Constants.Sections.CART)) {
-            CCLogger.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + itemID);
-            removeComicFromCart(itemID);
-        }
-        WidgetService.updateWidget(getActivity());
-    }
-
-    /**
-     * Method used to remove an entry from Cart database.
-     * @param comicId the ID of item selected
-     */
     private void removeComicFromCart(long comicId) {
         // Evaluate if comic was created by user or it is coming from network
         Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + comicId);
@@ -337,10 +297,6 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         }
     }
 
-    /**
-     * Method used to remove all entries from cart database.
-     * @return the number of comic removed
-     */
     private int removeAllComicFromCart() {
         // Update all comic on cart and delete those manually created
         int total = 0;
@@ -354,25 +310,116 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         return total;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        CCLogger.v(TAG, "onAttach");
-        // Activities containing this fragment must implement its callbacks.
-        if (!(context instanceof Callbacks)) {
-            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+    private ComicAdapter.ComicViewHolder.ViewHolderClicks mClickListener = new ComicAdapter.ComicViewHolder.ViewHolderClicks() {
+        @Override
+        public void itemClicked(View container, int position) {
+            CCLogger.d(TAG, "itemClicked - Clicked " + position);
+            // Notify the active callbacks interface (the activity, if the
+            // fragment is attached to one) that an item has been selected.
+            Cursor cursor = mAdapter.getCursor();
+            if (cursor != null) {
+                cursor.moveToPosition(position);
+                long id = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
+                mCallbacks.onItemSelected(id);
+            }
+        }
+    };
+
+    /**
+     * Method used to return current editor.
+     * @return the editor showed on UI.
+     */
+    public Constants.Sections getCurrentEditor() {
+        return mEditor;
+    }
+
+    /* ****************************************************************************************
+     * SwipeRefreshLayout methods
+     ******************************************************************************************/
+
+    /**
+     * Set the {@link android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener} to listen for
+     * initiated refreshes.
+     *
+     * @see android.support.v4.widget.SwipeRefreshLayout#setOnRefreshListener(android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener)
+     */
+    private void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
+        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(listener);
+        }
+    }
+
+    /**
+     * Returns whether the {@link android.support.v4.widget.SwipeRefreshLayout} is currently
+     * refreshing or not.
+     *
+     * @see android.support.v4.widget.SwipeRefreshLayout#isRefreshing()
+     */
+    public boolean isRefreshing() {
+        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
+        if (swipeRefreshLayout != null) {
+            return swipeRefreshLayout.isRefreshing();
+        } else {
+            CCLogger.v(TAG, "isRefreshing - Returning FALSE because swipe refresh layout is null");
+            return false;
+        }
+    }
+
+    /**
+     * Set whether the {@link android.support.v4.widget.SwipeRefreshLayout} should be displaying
+     * that it is refreshing or not.
+     *
+     * @see android.support.v4.widget.SwipeRefreshLayout#setRefreshing(boolean)
+     */
+    public void setRefreshing(boolean refreshing) {
+        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(refreshing);
+        }
+    }
+
+    /**
+     * @return the fragment's {@link android.support.v4.widget.SwipeRefreshLayout} widget.
+     */
+    public SwipeRefreshLayout getSwipeRefreshLayout() {
+        return mSwipeRefreshLayout;
+    }
+
+    /**
+     * Sub-class of {@link android.support.v4.widget.SwipeRefreshLayout} for use in this
+     * {@link android.support.v4.app.ListFragment}. The reason that this is needed is because
+     * {@link android.support.v4.widget.SwipeRefreshLayout} only supports a single child, which it
+     * expects to be the one which triggers refreshes. In our case the layout's child is the content
+     * view returned from
+     * {@link android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)}
+     * which is a {@link android.view.ViewGroup}.
+     *
+     * <p>To enable 'swipe-to-refresh' support via the {@link android.widget.ListView} we need to
+     * override the default behavior and properly signal when a gesture is possible. This is done by
+     * overriding {@link #canChildScrollUp()}.
+     */
+    private class ListFragmentSwipeRefreshLayout extends SwipeRefreshLayout {
+
+        public ListFragmentSwipeRefreshLayout(Context context) {
+            super(context);
         }
 
-        mCallbacks = (Callbacks) context;
+        /**
+         * As mentioned above, we need to override this method to properly signal when a
+         * 'swipe-to-refresh' is possible.
+         *
+         * @return true if the {@link android.widget.ListView} is visible and can scroll up.
+         */
+        @Override
+        public boolean canChildScrollUp() {
+            return mRecyclerView.getVisibility() == View.VISIBLE && mRecyclerView.canScrollVertically(-1);
+        }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        CCLogger.v(TAG, "onDetach");
-        // Reset the active callbacks interface to the callback implementation.
-        mCallbacks = sComicCallbacks;
-    }
+    /* ****************************************************************************************
+     * Data loader methods
+     ******************************************************************************************/
 
     /**
      * Method used to fill data on list.
@@ -381,16 +428,14 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         CCLogger.d(TAG, "fillData - start");
 
         getLoaderManager().initLoader(0, null, this);
-
-        CCLogger.d(TAG, "fillData - end");
+        // Specify an adapter (see also next example)
+        mAdapter = new ComicAdapter(getActivity(), null, mClickListener);
+        mRecyclerView.setAdapter(mAdapter);
+        CCLogger.v(TAG, "fillData - end");
     }
 
-    /* ****************************************************************************************
-     * LoaderManager methods
-     ******************************************************************************************/
-
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
@@ -428,21 +473,13 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAdapter.swapCursor(data);
-        if (data.getCount() == 0) {
-            mRecyclerView.setVisibility(View.GONE);
-            mEmptyText.setVisibility(View.VISIBLE);
-        } else {
-            mRecyclerView.setVisibility(View.VISIBLE);
-            mEmptyText.setVisibility(View.GONE);
-        }
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        mAdapter.swapCursor(cursor);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
         // Data is not available anymore, delete reference
         mAdapter.swapCursor(null);
     }
-
 }

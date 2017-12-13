@@ -54,12 +54,12 @@ import java.util.Set;
  * item details side-by-side using two vertical panes.
  * <p>
  * The activity makes heavy use of fragments. The list of items is a
- * {@link FragmentList} and the item details
+ * {@link FragmentRecycler} and the item details
  * (if present) is a {@link FragmentDetail}.
  * <p>
  * to listen for item selections.
  */
-public class ActivityMain extends AppCompatActivity implements FragmentList.Callbacks,
+public class ActivityMain extends AppCompatActivity implements FragmentRecycler.Callbacks,
                                                                 NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = ActivityMain.class.getSimpleName();
@@ -67,7 +67,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device
     private boolean mTwoPane;
 
-    private FragmentList mListFragment;
+    private FragmentRecycler mFragmentRecycler;
 
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -122,9 +122,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             }
 
             // Set search animation on UI
-            if (mListFragment != null) {
+            if (mFragmentRecycler != null) {
                 if (!shouldSetRefresh) {
-                    mListFragment.setRefreshing(false);
+                    mFragmentRecycler.setRefreshing(false);
                 }
             }
         }
@@ -163,8 +163,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             @Override
             public void onClick(View v) {
                 // Refresh data
-                if (mListFragment != null) {
-                    initiateRefresh(mListFragment.getCurrentEditor());
+                if (mFragmentRecycler != null) {
+                    initiateRefresh(mFragmentRecycler.getCurrentEditor());
                 }
             }
         });
@@ -402,9 +402,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         CCLogger.v(TAG, "onStart");
         if (mTwoPane) {
             // In two-pane mode, list items should be given the 'activated' state when touched
-            if (mListFragment != null) {
+            if (mFragmentRecycler != null) {
                 CCLogger.d(TAG, "onStart - two-pane mode, activate item on click");
-                mListFragment.setActivateOnItemClick(true);
+                //mFragmentRecycler.setActivateOnItemClick(true);
             }
         }
     }
@@ -452,9 +452,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         CCLogger.v(TAG, "onPause");
         unregisterReceiver(receiver);
         // Stop animation
-        if (mListFragment != null) {
-            if (mListFragment.isRefreshing()) {
-                mListFragment.setRefreshing(false);
+        if (mFragmentRecycler != null) {
+            if (mFragmentRecycler.isRefreshing()) {
+                mFragmentRecycler.setRefreshing(false);
             }
         }
     }
@@ -523,7 +523,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
     }
 
     /**
-     * Callback method from {@link FragmentList.Callbacks}
+     * Callback method from {@link FragmentRecycler.Callbacks}
      * indicating that the comic was selected.
      */
     @Override
@@ -593,9 +593,9 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
         startService(intent);
 
         // Update refresh spinner
-        if (mListFragment != null) {
-            if (mListFragment.isRefreshing()) {
-                mListFragment.setRefreshing(false);
+        if (mFragmentRecycler != null) {
+            if (mFragmentRecycler.isRefreshing()) {
+                mFragmentRecycler.setRefreshing(false);
             }
         }
     }
@@ -672,8 +672,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentList.Call
             case RW:
             case STAR:
                 // Update the main content by replacing fragments
-                mListFragment = FragmentList.newInstance(section);
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, mListFragment).commit();
+                mFragmentRecycler = FragmentRecycler.newInstance(section);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, mFragmentRecycler).commit();
                 break;
             case SETTINGS:
                 // Open settings
