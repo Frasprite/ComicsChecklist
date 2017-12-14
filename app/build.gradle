@@ -36,7 +36,7 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:26.1.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.github.apl-devs:appintro:v4.2.2'
-    compile 'org.jsoup:jsoup:1.11.2'
+    compile 'org.jsoup:jsoup:1.10.3'
     compile 'com.evernote:android-job:1.2.1'
     // Unit test stuff
     // JUnit 4 framework
