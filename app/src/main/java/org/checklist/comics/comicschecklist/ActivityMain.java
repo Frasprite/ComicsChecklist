@@ -485,6 +485,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
         // Hide detail buttons
         menu.findItem(R.id.search).setVisible(!drawerOpen);
         //menu.findItem(R.id.layout).setVisible(!drawerOpen);
+        menu.findItem(R.id.deleteAll).setVisible(!drawerOpen);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -493,8 +494,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
         // ActionBarDrawerToggle will take care of this.
-        /*switch (item.getItemId()) {
-            case R.id.layout:
+        switch (item.getItemId()) {
+            /*case R.id.layout:
                 FragmentRecycler.LayoutManagerType layoutManagerType = mFragmentRecycler.getCurrentLayoutManagerType();
                 switch (layoutManagerType) {
                     case GRID_LAYOUT_MANAGER:
@@ -508,8 +509,11 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
                         CCLogger.v(TAG, "onOptionsItemSelected - Change layout to grid");
                         break;
                 }
+                break;*/
+            case R.id.deleteAll:
+                mFragmentRecycler.deleteAllComic();
                 break;
-        }*/
+        }
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 

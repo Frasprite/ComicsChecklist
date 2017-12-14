@@ -12,4 +12,9 @@
         android:title="@string/menu_layout"
         android:icon="@drawable/ic_view_list"
         app:showAsAction="ifRoom" /> -->
+    <item
+        android:id="@+id/deleteAll"
+        android:title="@string/menu_delete_all"
+        android:icon="@drawable/ic_delete"
+        app:showAsAction="never" />
 </menu>

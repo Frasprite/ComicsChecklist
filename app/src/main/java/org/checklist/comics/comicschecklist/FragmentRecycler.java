@@ -15,13 +15,10 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.ContextMenu;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +41,6 @@ import org.checklist.comics.comicschecklist.util.RecyclerViewEmptySupport;
 public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     // TODO implement highlight item
-    // TODO implement on long click for context menu
 
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
@@ -63,8 +59,6 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
     private RecyclerView.LayoutManager mLayoutManager;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Constants.Sections mEditor;
-    private static final int DELETE_ID = Menu.FIRST + 1;
-    private static final int DELETE_ALL = Menu.FIRST + 2;
 
     /**
      * The fragment's current callback object, which is notified of list item
@@ -91,6 +85,44 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
     private static final Callbacks sComicCallbacks = new Callbacks() {
         @Override
         public void onItemSelected(long id) {}
+    };
+
+    private ItemTouchHelper.SimpleCallback sItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+            // Remove swiped item from list and notify the RecyclerView
+            int position = viewHolder.getAdapterPosition();
+            Cursor cursor = mAdapter.getCursor();
+            if (cursor != null) {
+                cursor.moveToPosition(position);
+                // Take comic ID
+                long comicID = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
+                CCLogger.v(TAG, "onSwiped - Deleting comic with ID " + comicID);
+                deleteComic(comicID);
+            } else {
+                CCLogger.w(TAG, "onSwiped - Cursor is null, can't delete item!");
+            }
+        }
+    };
+
+    private ComicAdapter.ComicViewHolder.ViewHolderClicks mClickListener = new ComicAdapter.ComicViewHolder.ViewHolderClicks() {
+        @Override
+        public void itemClicked(View container, int position) {
+            CCLogger.d(TAG, "itemClicked - Clicked " + position);
+            // Notify the active callbacks interface (the activity, if the
+            // fragment is attached to one) that an item has been selected.
+            Cursor cursor = mAdapter.getCursor();
+            if (cursor != null) {
+                cursor.moveToPosition(position);
+                long id = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
+                mCallbacks.onItemSelected(id);
+            }
+        }
     };
 
     /**
@@ -124,6 +156,12 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
 
         mRecyclerView = view.findViewById(R.id.recyclerView);
 
+        // Attach swipe to delete if we are in CART or FAVORITE section
+        if (mEditor.equals(Constants.Sections.CART) || mEditor.equals(Constants.Sections.FAVORITE)) {
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(sItemTouchCallback);
+            itemTouchHelper.attachToRecyclerView(mRecyclerView);
+        }
+
         // Use a linear layout manager
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -145,7 +183,7 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
             return view;
         } else {
             // Now create a SwipeRefreshLayout to wrap the fragment's content view
-            mSwipeRefreshLayout = new ListFragmentSwipeRefreshLayout(container.getContext());
+            mSwipeRefreshLayout = new FragmentRecyclerSwipeRefreshLayout(container.getContext());
 
             // Add the list fragment's content view to the SwipeRefreshLayout, making sure that it fills
             // the SwipeRefreshLayout
@@ -231,73 +269,63 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         mCallbacks = sComicCallbacks;
     }
 
-    @Override
-    public void onActivityCreated(Bundle savedState) {
-        super.onActivityCreated(savedState);
-        CCLogger.v(TAG, "onActivityCreated");
-        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
-            registerForContextMenu(mRecyclerView);
+    public void deleteComic(long itemID) {
+        ContentValues mUpdateValues = new ContentValues();
+        if (mEditor.equals(Constants.Sections.FAVORITE)) {
+            mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
+            CCLogger.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + itemID);
+            // Defines selection criteria for the rows you want to update
+            String whereClause = ComicDatabase.ID + "=?";
+            String[] whereArgs = new String[]{String.valueOf(itemID)};
+            int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
+            CCLogger.v(TAG, "onContextItemSelected - favorite comic UPDATED " + rowUpdated);
+        } else if (mEditor.equals(Constants.Sections.CART)) {
+            CCLogger.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + itemID);
+            removeComicFromCart(itemID);
         }
+
+        WidgetService.updateWidget(getActivity());
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, DELETE_ID, 0, R.string.context_menu_delete_comic);
-        menu.add(0, DELETE_ALL, 1, R.string.context_menu_delete_all);
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        ContentValues mUpdateValues;
-        switch (item.getItemId()) {
-            case DELETE_ID:
-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-                mUpdateValues = new ContentValues();
-                if (mEditor.equals(Constants.Sections.FAVORITE)) {
-                    mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-                    CCLogger.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + info.id);
-                    // Defines selection criteria for the rows you want to update
-                    String whereClause = ComicDatabase.ID + "=?";
-                    String[] whereArgs = new String[]{String.valueOf(info.id)};
-                    int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
-                    CCLogger.v(TAG, "onContextItemSelected - favorite comic UPDATED " + rowUpdated);
-                } else if (mEditor.equals(Constants.Sections.CART)) {
-                    CCLogger.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + info.id);
-                    removeComicFromCart(info.id);
+    public void deleteAllComic() {
+        ContentValues mUpdateValues = new ContentValues();
+        int updateResult;
+        switch (mEditor) {
+            case FAVORITE:
+                // Update all favorite
+                mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
+                updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
+                if (updateResult > 0) {
+                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
+                    CCLogger.d(TAG, "onContextItemSelected - deleting all favorite comic");
+                } else {
+                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
+                    CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
                 }
-                WidgetService.updateWidget(getActivity());
-                return true;
-            case DELETE_ALL:
-                mUpdateValues = new ContentValues();
-                int updateResult;
-                if (mEditor.equals(Constants.Sections.FAVORITE)) {
-                    // Update all favorite
-                    mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-                    updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
-                    if (updateResult > 0) {
-                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
-                        CCLogger.d(TAG, "onContextItemSelected - deleting all favorite comic");
-                    } else {
-                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
-                        CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
-                    }
-                } else if (mEditor.equals(Constants.Sections.CART)) {
-                    // Remove comic from cart
-                    updateResult = removeAllComicFromCart();
-                    if (updateResult > 0) {
-                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
-                        CCLogger.d(TAG, "onContextItemSelected - deleting " + updateResult + " from cart");
-                    } else {
-                        Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
-                        CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from cart");
-                    }
+                break;
+            case CART:
+                // Remove comic from cart
+                updateResult = removeAllComicFromCart();
+                if (updateResult > 0) {
+                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
+                    CCLogger.d(TAG, "onContextItemSelected - deleting " + updateResult + " from cart");
+                } else {
+                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
+                    CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from cart");
                 }
+                break;
+            default:
+                // Removing all comics of current editor
+                CCLogger.v(TAG, "deleteAllComic - Deleting all comics from this editor " + mEditor);
+                String selection = ComicDatabase.COMICS_EDITOR_KEY + " =? AND " +
+                        ComicDatabase.COMICS_CART_KEY + " =? AND " +
+                        ComicDatabase.COMICS_FAVORITE_KEY + " =?";
+                String[] selectionArgs = new String[]{mEditor.getName(), "no", "no"};
+                int result = ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, selection, selectionArgs);
+                CCLogger.d(TAG, "Deleted " + result + " entries of " + mEditor + " section");
+                break;
 
-                WidgetService.updateWidget(getActivity());
-                return true;
         }
-        return super.onContextItemSelected(item);
     }
 
     /**
@@ -380,21 +408,6 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         return total;
     }
 
-    private ComicAdapter.ComicViewHolder.ViewHolderClicks mClickListener = new ComicAdapter.ComicViewHolder.ViewHolderClicks() {
-        @Override
-        public void itemClicked(View container, int position) {
-            CCLogger.d(TAG, "itemClicked - Clicked " + position);
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            Cursor cursor = mAdapter.getCursor();
-            if (cursor != null) {
-                cursor.moveToPosition(position);
-                long id = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
-                mCallbacks.onItemSelected(id);
-            }
-        }
-    };
-
     /**
      * Method used to return current editor.
      * @return the editor showed on UI.
@@ -469,9 +482,9 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
      * override the default behavior and properly signal when a gesture is possible. This is done by
      * overriding {@link #canChildScrollUp()}.
      */
-    private class ListFragmentSwipeRefreshLayout extends SwipeRefreshLayout {
+    private class FragmentRecyclerSwipeRefreshLayout extends SwipeRefreshLayout {
 
-        public ListFragmentSwipeRefreshLayout(Context context) {
+        public FragmentRecyclerSwipeRefreshLayout(Context context) {
             super(context);
         }
 
