@@ -137,35 +137,28 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/dialog_jsoup_copyright" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/dialog_jsoup_license" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="@string/dialog_picasso_title_text"
+                android:text="@string/dialog_app_intro_title_text"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autoLink="web"
-                android:text="@string/dialog_picasso_link" />
+                android:text="@string/dialog_app_intro_link" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/dialog_picasso_copyright" />
+                android:layout_marginTop="10dp"
+                android:text="@string/dialog_android_job_title_text"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/dialog_picasso_license" />
+                android:autoLink="web"
+                android:text="@string/dialog_android_job_link" />
 
         </LinearLayout>
 
