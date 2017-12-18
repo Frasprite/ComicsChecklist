@@ -40,8 +40,6 @@ import org.checklist.comics.comicschecklist.util.RecyclerViewEmptySupport;
  */
 public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    // TODO implement highlight item
-
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
     private static final String KEY_LAYOUT_MANAGER = "layoutManager";
