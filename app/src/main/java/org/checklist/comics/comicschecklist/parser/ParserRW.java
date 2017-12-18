@@ -42,7 +42,7 @@ public class ParserRW extends Parser {
         boolean parseError = false;
 
         int dayToSearch = 5;
-        for (int i = 1; i <= dayToSearch; i++) {
+        for (int i = -3; i <= dayToSearch; i++) {
             CCLogger.d(TAG, "startParsing - Today is " + DateCreator.getTodayString() + " adding " + i + " day(s)");
             mCurrentReleaseDate = searchReleaseDate(i);
             int day = DateCreator.getTargetDay(i).get(Calendar.DAY_OF_MONTH);
