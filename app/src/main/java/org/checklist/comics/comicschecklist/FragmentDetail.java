@@ -14,11 +14,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.squareup.picasso.Picasso;
 
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
@@ -110,15 +107,7 @@ public class FragmentDetail extends Fragment {
             ((TextView) rootView.findViewById(R.id.description_text_view)).setText(mComicDescription);
             ((TextView) rootView.findViewById(R.id.feature_text_view)).setText(mComicFeature);
             ((TextView) rootView.findViewById(R.id.price_text_view)).setText(mComicPrice);
-            ImageView coverView = rootView.findViewById(R.id.cover_image_view);
-            Picasso.with(getActivity())
-                    .load(R.drawable.comic_placeholder)
-                    .placeholder(R.drawable.comic_placeholder)
-                    .error(R.drawable.comic_placeholder)
-                    .resize(720, 960)
-                    //.fit()
-                    .centerCrop()
-                    .into(coverView);
+            //ImageView coverView = rootView.findViewById(R.id.cover_image_view);
         }
 
         if (!mActivityDetailLaunched) {
