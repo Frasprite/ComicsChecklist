@@ -227,7 +227,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
         String version = "";
         try {
             pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version = pInfo.versionName;
+            version = "v" + pInfo.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             CCLogger.w(TAG, "Can't find app version!", e);
         }
