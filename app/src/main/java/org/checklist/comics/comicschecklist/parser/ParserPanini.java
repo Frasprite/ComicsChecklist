@@ -31,11 +31,23 @@ public class ParserPanini extends Parser {
      */
     @Override
     public boolean startParsing() {
-        CCLogger.i(TAG, "startParsePanini - Start searching for Panini comics");
+        CCLogger.i(TAG, "startParsing - Start searching for Panini comics");
         boolean parseError;
 
-        parseError = parseUrl(BASE_URL + "/calendario/uscite-questa-settimana/") &&
-                     parseUrl(BASE_URL + "/calendario/uscite-prossime-settimane/");
+        parseError = parseUrl(BASE_URL + "/calendario/uscite-questa-settimana/");
+        CCLogger.v(TAG, "startParsing - Result on this week is " + parseError);
+        parseError = parseUrl(BASE_URL + "/calendario/uscite-prossime-settimane/");
+        CCLogger.v(TAG, "startParsing - Result on next week is " + parseError);
+        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/9l.html");
+        CCLogger.v(TAG, "startParsing - Result on 9L is" + parseError);
+        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/cmc-d.html");
+        CCLogger.v(TAG, "startParsing - Result on Panini Disney is " + parseError);
+        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/manga.html");
+        CCLogger.v(TAG, "startParsing - Result on Planet Manga is " + parseError);
+        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/cmc-m.html");
+        CCLogger.v(TAG, "startParsing - Result on Marvel is " + parseError);
+        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/comics.html");
+        CCLogger.v(TAG, "startParsing - Result on Panini Comics is " + parseError);
 
         return parseError;
     }
