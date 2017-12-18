@@ -39,9 +39,18 @@ public class ParserBonelli extends Parser {
         CCLogger.i(TAG, "startParsing - Start searching Bonelli comics");
         boolean parseError;
 
-        parseError = parseUrl(EDICOLA_INEDITI) && parseUrl(EDICOLA_RISTAMPE) &&
-                parseUrl(EDICOLA_RACCOLTE) && parseUrl(PROSSIMAMENTE_INEDITI) &&
-                parseUrl(PROSSIMAMENTE_RISTAMPE) && parseUrl(PROSSIMAMENTE_RACCOLTE);
+        parseError = parseUrl(EDICOLA_INEDITI);
+        CCLogger.v(TAG, "startParsing - Edicola inediti results " + parseError);
+        parseError = parseUrl(EDICOLA_RISTAMPE);
+        CCLogger.v(TAG, "startParsing - Edicola ristampe results " + parseError);
+        parseError = parseUrl(EDICOLA_RACCOLTE);
+        CCLogger.v(TAG, "startParsing - Edicola raccolte results " + parseError);
+        parseError = parseUrl(PROSSIMAMENTE_INEDITI);
+        CCLogger.v(TAG, "startParsing - Prossimamente inediti results " + parseError);
+        parseError = parseUrl(PROSSIMAMENTE_RISTAMPE);
+        CCLogger.v(TAG, "startParsing - Prossimamente ristampe results " + parseError);
+        parseError = parseUrl(PROSSIMAMENTE_RACCOLTE);
+        CCLogger.v(TAG, "startParsing - Prossimamente raccolte results " + parseError);
 
         return parseError;
     }
