@@ -30,7 +30,7 @@ public class CCNotificationManager {
      * @param context the {@link Context} to use for creating the channel
      */
     private static void createNotificationChannel(Context context) {
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
             int importance = NotificationManager.IMPORTANCE_LOW;
