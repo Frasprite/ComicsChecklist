@@ -8,9 +8,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.widget.RemoteViews;
 
-import org.checklist.comics.comicschecklist.ActivityMain;
+import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.WidgetSettings;
+import org.checklist.comics.comicschecklist.ui.WidgetSettings;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;

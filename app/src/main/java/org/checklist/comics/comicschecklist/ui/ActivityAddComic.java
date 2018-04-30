@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist;
+package org.checklist.comics.comicschecklist.ui;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -18,6 +18,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.DatePicker;
 
+import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;

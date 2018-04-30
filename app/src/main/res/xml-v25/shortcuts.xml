@@ -9,7 +9,7 @@
         <intent
             android:action="org.checklist.comics.comicschecklist.ADD_COMIC"
             android:targetPackage="org.checklist.comics.comicschecklist"
-            android:targetClass="org.checklist.comics.comicschecklist.ActivityMain" />
+            android:targetClass="org.checklist.comics.comicschecklist.ui.ActivityMain" />
     </shortcut>
 
     <shortcut
@@ -21,6 +21,6 @@
         <intent
             android:action="org.checklist.comics.comicschecklist.SEARCH_STORE"
             android:targetPackage="org.checklist.comics.comicschecklist"
-            android:targetClass="org.checklist.comics.comicschecklist.ActivityMain" />
+            android:targetClass="org.checklist.comics.comicschecklist.ui.ActivityMain" />
     </shortcut>
 </shortcuts>

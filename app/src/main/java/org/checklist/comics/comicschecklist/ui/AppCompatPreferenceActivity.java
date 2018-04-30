@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist;
+package org.checklist.comics.comicschecklist.ui;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

@@ -9,7 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 
-import org.checklist.comics.comicschecklist.ActivityMain;
+import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;

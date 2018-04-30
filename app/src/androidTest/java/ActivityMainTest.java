@@ -1,7 +1,7 @@
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import org.checklist.comics.comicschecklist.ActivityMain;
+import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.junit.Rule;
 import org.junit.Test;

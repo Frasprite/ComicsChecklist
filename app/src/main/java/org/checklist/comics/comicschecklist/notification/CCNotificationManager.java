@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 
-import org.checklist.comics.comicschecklist.ActivityMain;
+import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 

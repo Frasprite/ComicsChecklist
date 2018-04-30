@@ -20,7 +20,7 @@
         tools:replace="android:supportsRtl">
 
         <activity
-            android:name=".ActivityMain"
+            android:name=".ui.ActivityMain"
             android:label="@string/app_name"
             android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
@@ -44,21 +44,21 @@
         </activity>
 
         <activity
-            android:name=".ActivityGuide"
+            android:name=".ui.ActivityGuide"
             android:label="@string/activity_title_guide" />
 
         <activity
-            android:name=".ActivityDetail"
+            android:name=".ui.ActivityDetail"
             android:label="@string/activity_title_comic_detail"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".ActivityAddComic"
+            android:name=".ui.ActivityAddComic"
             android:label="@string/activity_title_add_comic"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".ActivitySettings"
+            android:name=".ui.ActivitySettings"
             android:label="@string/activity_help_settings" />
 
         <!-- Service which launch search & download data -->
@@ -91,7 +91,7 @@
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <activity
-            android:name=".WidgetSettings"
+            android:name=".ui.WidgetSettings"
             android:excludeFromRecents="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />

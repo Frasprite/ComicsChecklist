@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist;
+package org.checklist.comics.comicschecklist.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +9,8 @@ import android.support.v7.app.ActionBar;
 import com.github.paolorotolo.appintro.AppIntro;
 import com.github.paolorotolo.appintro.AppIntroFragment;
 import com.github.paolorotolo.appintro.model.SliderPage;
+
+import org.checklist.comics.comicschecklist.R;
 
 /**
  * Activity used to show to user a guide about application.

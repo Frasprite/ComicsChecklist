@@ -4,19 +4,19 @@
 
     <header
         android:id="@+id/notification"
-        android:fragment="org.checklist.comics.comicschecklist.ActivitySettings$NotificationPreferenceFragment"
+        android:fragment="org.checklist.comics.comicschecklist.ui.ActivitySettings$NotificationPreferenceFragment"
         android:icon="@drawable/ic_notifications"
         android:title="@string/pref_header_notifications" />
 
     <header
         android:id="@+id/data_sync"
-        android:fragment="org.checklist.comics.comicschecklist.ActivitySettings$DataSyncPreferenceFragment"
+        android:fragment="org.checklist.comics.comicschecklist.ui.ActivitySettings$DataSyncPreferenceFragment"
         android:icon="@drawable/ic_cached"
         android:title="@string/pref_header_data_sync" />
 
     <header
         android:id="@+id/data_filter"
-        android:fragment="org.checklist.comics.comicschecklist.ActivitySettings$DataFilterPreferenceFragment"
+        android:fragment="org.checklist.comics.comicschecklist.ui.ActivitySettings$DataFilterPreferenceFragment"
         android:icon="@drawable/ic_filter"
         android:title="@string/pref_header_data_filter" />
 

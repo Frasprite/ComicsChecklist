@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist;
+package org.checklist.comics.comicschecklist.ui;
 
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;

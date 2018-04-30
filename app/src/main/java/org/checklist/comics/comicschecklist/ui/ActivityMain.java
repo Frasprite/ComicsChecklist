@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist;
+package org.checklist.comics.comicschecklist.ui;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
@@ -33,6 +33,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;

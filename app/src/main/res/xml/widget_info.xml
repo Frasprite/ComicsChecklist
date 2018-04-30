@@ -1,5 +1,5 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:configure="org.checklist.comics.comicschecklist.WidgetSettings"
+    android:configure="org.checklist.comics.comicschecklist.ui.WidgetSettings"
     android:minWidth="250dp"
     android:minHeight="110dp"
     android:minResizeWidth="250dp"
@@ -11,4 +11,4 @@
     <!--86400000 = 1 day
         x for cell (x * 70) - 30
         ((Number of columns / rows) * 74) - 2
-        android:configure="org.checklist.comics.comicschecklist.WidgetSettings"-->
+        android:configure="org.checklist.comics.comicschecklist.ui.WidgetSettings"-->

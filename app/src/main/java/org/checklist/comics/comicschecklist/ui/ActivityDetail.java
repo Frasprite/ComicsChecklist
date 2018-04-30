@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist;
+package org.checklist.comics.comicschecklist.ui;
 
 import android.content.Intent;
 import android.os.Build;
@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
+import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 /**
