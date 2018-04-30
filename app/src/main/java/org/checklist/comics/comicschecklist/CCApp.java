@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.evernote.android.job.JobManager;
 
+import org.checklist.comics.comicschecklist.database.AppDatabase;
 import org.checklist.comics.comicschecklist.notification.ComicReleaseJobCreator;
 
 /**
@@ -17,4 +18,11 @@ public class CCApp extends Application {
         JobManager.create(this).addJobCreator(new ComicReleaseJobCreator());
     }
 
+    public AppDatabase getDatabase() {
+        return AppDatabase.getInstance(this);
+    }
+
+    public DataRepository getRepository() {
+        return DataRepository.getInstance(getDatabase());
+    }
 }
