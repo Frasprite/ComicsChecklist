@@ -3,3 +3,11 @@
 /.idea/workspace.xml
 /.idea/libraries
 /build
+*.iml
+.DS_Store
+/captures
+.externalNativeBuild
+.idea/caches/
+.idea/inspectionProfiles/
+app/libs/
+app/release/
