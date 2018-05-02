@@ -9,6 +9,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
 
+import org.checklist.comics.comicschecklist.database.AppDatabase;
 import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
@@ -142,6 +143,13 @@ public class DownloadService extends IntentService {
                         CCNotificationManager.deleteNotification(this);
                         // Favorite data may have changed, update widget as well
                         WidgetService.updateWidget(this);
+                    }
+
+                    boolean createDatabase = intent.getBooleanExtra(Constants.CREATE_DATABASE, false);
+                    if (createDatabase) {
+                        // Notify that the database was created and it's ready to be used
+                        AppDatabase database = AppDatabase.getInstance(this.getApplicationContext());
+                        database.setDatabaseCreated();
                     }
                 }
             }

@@ -153,6 +153,7 @@ public class Constants {
 
     /* Service & Notification */
     public static final String MANUAL_SEARCH = "manual_search";
+    public static final String CREATE_DATABASE = "create_database";
 
     public enum SearchResults {
         RESULT_START,
