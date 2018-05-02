@@ -5,14 +5,14 @@ import android.arch.persistence.room.PrimaryKey;
 
 import org.checklist.comics.comicschecklist.model.Comic;
 
+import java.util.Date;
+
 @Entity(tableName = "comics")
 public class ComicEntity implements Comic {
 
-    @PrimaryKey
-    private int id;
+    @PrimaryKey(autoGenerate = true)
     private String name;
-    private String release;
-    private int releaseDate;
+    private Date releaseDate;
     private String description;
     private String price;
     private String feature;
@@ -22,13 +22,11 @@ public class ComicEntity implements Comic {
     private boolean isOnCart;
     private String URL;
 
-    public ComicEntity(int id, String name, String release, int releaseDate,
+    public ComicEntity(String name, Date releaseDate,
                        String description, String price, String feature,
                        String cover, String editor, boolean isFavorite,
                        boolean isOnCart, String URL) {
-        this.id = id;
         this.name = name;
-        this.release = release;
         this.releaseDate = releaseDate;
         this.description = description;
         this.price = price;
@@ -41,9 +39,7 @@ public class ComicEntity implements Comic {
     }
 
     public ComicEntity(Comic comic) {
-        this.id = comic.getId();
         this.name = comic.getName();
-        this.release = comic.getRelease();
         this.releaseDate = comic.getReleaseDate();
         this.description = comic.getDescription();
         this.price = comic.getPrice();
@@ -56,22 +52,12 @@ public class ComicEntity implements Comic {
     }
 
     @Override
-    public int getId() {
-        return id;
-    }
-
-    @Override
     public String getName() {
         return name;
     }
 
     @Override
-    public String getRelease() {
-        return release;
-    }
-
-    @Override
-    public int getReleaseDate() {
+    public Date getReleaseDate() {
         return releaseDate;
     }
 

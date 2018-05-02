@@ -6,17 +6,22 @@ import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
+import org.checklist.comics.comicschecklist.database.converter.DateConverter;
 import org.checklist.comics.comicschecklist.database.dao.ComicDao;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
+import org.checklist.comics.comicschecklist.service.DownloadService;
+import org.checklist.comics.comicschecklist.util.Constants;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Database(entities = {ComicEntity.class}, version = 1)
+@TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase sInstance;
@@ -47,13 +52,10 @@ public abstract class AppDatabase extends RoomDatabase {
                     public void onCreate(@NonNull SupportSQLiteDatabase db) {
                         super.onCreate(db);
 
-                        // Populate database when it is created
-                        AppDatabase database = AppDatabase.getInstance(appContext);
-                        List<ComicEntity> comics = new ArrayList<>();
-
-                        insertData(database, comics);
-                        // notify that the database was created and it's ready to be used
-                        database.setDatabaseCreated();
+                        // Populate database when it is created, using an Intent service
+                        Intent intent = new Intent(appContext, DownloadService.class);
+                        intent.putExtra(Constants.CREATE_DATABASE, true);
+                        appContext.startService(intent);
                     }
                 }).build();
     }
@@ -67,17 +69,12 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     }
 
-    private void setDatabaseCreated(){
+    public void setDatabaseCreated(){
         mIsDatabaseCreated.postValue(true);
     }
 
-    private static void insertData(final AppDatabase database, final List<ComicEntity> comics) {
-        database.runInTransaction(new Runnable() {
-            @Override
-            public void run() {
-                database.comicDao().insertAll(comics);
-            }
-        });
+    public static void insertData(final AppDatabase database, final List<ComicEntity> comics) {
+        database.runInTransaction(() -> database.comicDao().insertAll(comics));
     }
 
     public LiveData<Boolean> getDatabaseCreated() {

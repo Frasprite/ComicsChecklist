@@ -1,10 +1,10 @@
 package org.checklist.comics.comicschecklist.model;
 
+import java.util.Date;
+
 public interface Comic {
-    int getId();
     String getName();
-    String getRelease();
-    int getReleaseDate();
+    Date getReleaseDate();
     String getDescription();
     String getPrice();
     String getFeature();
