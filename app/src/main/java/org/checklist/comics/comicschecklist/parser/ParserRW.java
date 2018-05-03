@@ -144,7 +144,10 @@ public class ParserRW extends Parser {
             String coverUrl = src.attr("src");
             if (coverUrl.startsWith(MEDIA_RW)) {
                 title = coverUrl.replace(MEDIA_RW, "").replace("_", " ").replace(".jpg", "");
-                title = title.substring(0, title.indexOf("-"));
+                if (title.contains("-")) {
+                    title = title.substring(0, title.indexOf("-"));
+                }
+
                 // Title elaborated
                 CCLogger.v(TAG, "searchTitle - Title " + title);
             }

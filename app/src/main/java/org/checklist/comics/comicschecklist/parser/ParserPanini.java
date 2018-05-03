@@ -213,6 +213,10 @@ public class ParserPanini extends Parser {
     public String searchFeature(Object object) {
         Document div = (Document) object;
         Element featureElement = div.select("div.box-additional-info").first();
+        if (featureElement == null) {
+            return "N.D.";
+        }
+
         Elements features = featureElement.getElementsByClass("product");
         StringBuilder feature = new StringBuilder();
         for (Element element : features) {
