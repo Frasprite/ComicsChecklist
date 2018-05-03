@@ -2,7 +2,8 @@ package org.checklist.comics.comicschecklist.parser;
 
 import android.content.Context;
 
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
+import org.checklist.comics.comicschecklist.database.AppDatabase;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -12,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class ParserBonelli extends Parser {
@@ -96,6 +98,8 @@ public class ParserBonelli extends Parser {
         // Init optional data
         String description, price, feature, coverUrl, moreInfoUrl;
 
+        ArrayList<ComicEntity> comicsList = new ArrayList<>();
+
         for (int i = 0; i < spanRelease.size(); i++) {
             try {
                 moreInfoUrl = BASE_URL + "/" + spanOther.get(i).select("a").first().attr("href");
@@ -135,13 +139,20 @@ public class ParserBonelli extends Parser {
 
                 CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
 
-                // Insert comic on database
-                ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.BONELLI.getName(), description, releaseDate, myDate, coverUrl, feature, price, "no", "no", url);
+                // Insert found comic on list
+                ComicEntity comic = new ComicEntity(title.toUpperCase(), myDate, description,
+                        price, feature, coverUrl, Constants.Sections.BONELLI.getName(), false, false, url);
+
+                comicsList.add(comic);
             } catch (Exception e) {
                 CCLogger.w(TAG, "parseUrl - Can't take more info from " + e.toString() + " comic not fetched", e);
                 ParserLog.increaseErrorOnParsingComic();
             }
         }
+
+        // Get reference to database and insert data
+        AppDatabase database = AppDatabase.getInstance(mContext.getApplicationContext());
+        AppDatabase.insertData(database, comicsList);
 
         return false;
     }

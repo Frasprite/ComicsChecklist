@@ -2,7 +2,8 @@ package org.checklist.comics.comicschecklist.parser;
 
 import android.content.Context;
 
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
+import org.checklist.comics.comicschecklist.database.AppDatabase;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -12,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.StringTokenizer;
 
@@ -73,58 +75,54 @@ public class ParserPanini extends Parser {
         ParserLog.increaseParsedPaniniURL();
 
         Elements links;
-        try {
-            // Select only a part of document
-            Element content = doc.getElementById("products-list");
+        // Select only a part of document
+        Element content = doc.getElementById("products-list");
+        if (content != null) {
             links = content.getElementsByAttributeValueContaining("class", "row list-group-item");
             // Prompt number of comics found on document
             CCLogger.d(TAG, "parseUrl - Total links : " + links.size());
-        } catch (Exception e) {
-            CCLogger.w(TAG, "parseUrl - Can't take a list of elements " + url + " " + e.toString());
+        } else {
+            CCLogger.w(TAG, "parseUrl - Can't take a list of elements, because content 'products-list' return NULL\n" + doc.toString());
             ParserLog.increaseWrongPaniniElements();
             return true;
         }
 
         // Init mandatory data
-        String title, releaseDate;
-        Date myDate;
+        String title;
+        Date releaseDate;
         // Init optional data
         String description, price, feature, coverUrl;
 
+        ArrayList<ComicEntity> comicsList = new ArrayList<>();
+
         for (Element element : links) {
-            try {
-                title = searchTitle(element);
-                if (title == null) {
-                    CCLogger.w(TAG, "parseUrl - Title not found!");
-                    ParserLog.increaseErrorOnParsingComic();
-                    continue;
-                }
+            title = searchTitle(element);
+            if (title == null) {
+                CCLogger.w(TAG, "parseUrl - Title not found!");
+                ParserLog.increaseErrorOnParsingComic();
+                continue;
+            }
 
-                releaseDate = searchReleaseDate(element);
-                if (releaseDate == null) {
-                    CCLogger.w(TAG, "parseUrl - Release date not found!");
-                    ParserLog.increaseErrorOnParsingComic();
-                    continue;
-                } else {
-                    // Calculating date for SQL
-                    myDate = DateCreator.elaborateDate(releaseDate);
-                }
+            String rawReleaseDate = searchReleaseDate(element);
+            if (rawReleaseDate == null) {
+                CCLogger.w(TAG, "parseUrl - Release date not found!");
+                ParserLog.increaseErrorOnParsingComic();
+                continue;
+            } else {
+                // Calculating date
+                releaseDate = DateCreator.elaborateDate(rawReleaseDate);
+            }
 
-                CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + releaseDate);
+            CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + releaseDate);
 
-                String linkMoreInfo = element.getElementsByTag("a").attr("href");
-                Document docMoreInfo = searchMoreInfo(linkMoreInfo);
-                if (docMoreInfo == null) {
-                    coverUrl = "";
-                    description = "N.D.";
-                    feature = "N.D.";
-                    price = "N.D.";
-                    // Insert only mandatory info on database
-                    ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.PANINI.getName(), description, releaseDate,
-                            myDate, coverUrl, feature, price, "no", "no", linkMoreInfo);
-                    continue;
-                }
-
+            String linkMoreInfo = element.getElementsByTag("a").attr("href");
+            Document docMoreInfo = searchMoreInfo(linkMoreInfo);
+            if (docMoreInfo == null) {
+                coverUrl = "";
+                description = "N.D.";
+                feature = "N.D.";
+                price = "N.D.";
+            } else {
                 // Getting only essential info for comic
                 String docPath = docMoreInfo.select("div.product-essential").html();
                 Document divEssential = Jsoup.parse(docPath);
@@ -135,15 +133,17 @@ public class ParserPanini extends Parser {
                 price = searchPrice(divEssential);
 
                 CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
-
-                // Insert data on database
-                ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.PANINI.getName(), description, releaseDate,
-                        myDate, coverUrl, feature, price, "no", "no", linkMoreInfo);
-            } catch (Exception e) {
-                CCLogger.w(TAG, "parseUrl - Error while comic fetching " + element.toString() + " " + e.toString());
-                ParserLog.increaseErrorOnParsingComic();
             }
+
+            ComicEntity comic = new ComicEntity(title.toUpperCase(), releaseDate, description,
+                    price, feature, coverUrl, Constants.Sections.PANINI.getName(), false, false, linkMoreInfo);
+
+            comicsList.add(comic);
         }
+
+        // Get reference to database and insert data
+        AppDatabase database = AppDatabase.getInstance(mContext.getApplicationContext());
+        AppDatabase.insertData(database, comicsList);
 
         return false;
     }
@@ -165,8 +165,14 @@ public class ParserPanini extends Parser {
     public String searchReleaseDate(Object object) {
         Element link = (Element) object;
         String rawReleaseDate = link.getElementsByTag("p").text();
+        rawReleaseDate = rawReleaseDate.replace("Data d'uscita:", "").trim();
 
-        return rawReleaseDate.replace("Data d'uscita:", "").trim();
+        if (rawReleaseDate.isEmpty()) {
+            return null;
+        } else {
+            return rawReleaseDate;
+        }
+
     }
 
     @Override

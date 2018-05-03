@@ -2,7 +2,8 @@ package org.checklist.comics.comicschecklist.parser;
 
 import android.content.Context;
 
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
+import org.checklist.comics.comicschecklist.database.AppDatabase;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -12,6 +13,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -81,11 +83,9 @@ public class ParserRW extends Parser {
         ParserLog.increaseParsedRWURL();
 
         // Take every potential comic as elements
-        Elements pElements;
-        try {
-           pElements = doc.getElementById("content").select("p");
-        } catch (Exception e) {
-            CCLogger.w(TAG, "parseUrl - Can't take a list of elements " + url + " " + e.toString());
+        Element content = doc.getElementById("content");
+        if (content == null) {
+            CCLogger.w(TAG, "parseUrl - Can't take a list of elements " + url + " because content is NULL!");
             ParserLog.increaseWrongRWElements();
             return true;
         }
@@ -96,37 +96,40 @@ public class ParserRW extends Parser {
         // Init optional data
         String description, coverUrl, feature, price;
 
+        ArrayList<ComicEntity> comicsList = new ArrayList<>();
+
         // Parse comic data
+        Elements pElements = content.select("p");
         for (Element element : pElements) {
-            try {
-                Elements checkForImg = element.getElementsByTag("img");
-                CCLogger.v(TAG, "parseUrl - Start inspecting element:\n" + element.toString());
+            Elements checkForImg = element.getElementsByTag("img");
+            CCLogger.v(TAG, "parseUrl - Start inspecting element:\n" + element.toString());
 
-                title = searchTitle(checkForImg);
-                if (title == null) {
-                    CCLogger.w(TAG, "parseUrl - Title not found!");
-                    ParserLog.increaseErrorOnParsingComic();
-                    continue;
-                }
-
-                CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + mCurrentReleaseDate);
-
-                coverUrl = searchCover(checkForImg);
-                description = searchDescription(checkForImg);
-                feature = searchFeature(element);
-                price = searchPrice(element);
-
-                CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
-
-                // Insert found comic on DB
-                ComicDatabaseManager.insert(mContext, title.toUpperCase(), Constants.Sections.RW.getName(),
-                        description, mCurrentReleaseDate, myDate, coverUrl, feature, price,
-                        "no", "no", url);
-            } catch (Exception e) {
-                CCLogger.w(TAG, "parseUrl - Error while comic fetching " + element.toString() + " " + e.toString());
+            title = searchTitle(checkForImg);
+            if (title == null) {
+                CCLogger.w(TAG, "parseUrl - Title not found!");
                 ParserLog.increaseErrorOnParsingComic();
+                continue;
             }
+
+            CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + mCurrentReleaseDate);
+
+            coverUrl = searchCover(checkForImg);
+            description = searchDescription(checkForImg);
+            feature = searchFeature(element);
+            price = searchPrice(element);
+
+            CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
+
+            // Insert found comic on list
+            ComicEntity comic = new ComicEntity(title.toUpperCase(), myDate, description,
+                    price, feature, coverUrl, Constants.Sections.RW.getName(), false, false, url);
+
+            comicsList.add(comic);
         }
+
+        // Get reference to database and insert data
+        AppDatabase database = AppDatabase.getInstance(mContext.getApplicationContext());
+        AppDatabase.insertData(database, comicsList);
 
         return false;
     }
