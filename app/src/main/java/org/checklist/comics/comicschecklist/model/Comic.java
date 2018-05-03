@@ -3,6 +3,7 @@ package org.checklist.comics.comicschecklist.model;
 import java.util.Date;
 
 public interface Comic {
+    int getId();
     String getName();
     Date getReleaseDate();
     String getDescription();

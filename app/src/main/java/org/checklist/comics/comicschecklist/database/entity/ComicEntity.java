@@ -11,6 +11,7 @@ import java.util.Date;
 public class ComicEntity implements Comic {
 
     @PrimaryKey(autoGenerate = true)
+    private int id;
     private String name;
     private Date releaseDate;
     private String description;
@@ -49,6 +50,15 @@ public class ComicEntity implements Comic {
         this.isFavorite = comic.isFavorite();
         this.isOnCart = comic.isOnCart();
         this.URL = comic.getURL();
+    }
+
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
