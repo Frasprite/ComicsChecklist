@@ -1,18 +1,16 @@
 package org.checklist.comics.comicschecklist.ui;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -23,14 +21,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.adapter.ComicAdapter;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
+import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBinding;
+import org.checklist.comics.comicschecklist.model.Comic;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.RecyclerViewEmptySupport;
+import org.checklist.comics.comicschecklist.viewmodel.ComicListViewModel;
+
+import java.util.List;
 
 /**
  * A fragment representing a list of Comics. This fragment
@@ -39,52 +41,14 @@ import org.checklist.comics.comicschecklist.util.RecyclerViewEmptySupport;
  * currently being viewed in a {@link FragmentDetail}.
  * <p>
  */
-public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FragmentRecycler extends Fragment {
 
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
-    private static final String KEY_LAYOUT_MANAGER = "layoutManager";
-    private static final int SPAN_COUNT = 2;
-
-    public enum LayoutManagerType {
-        GRID_LAYOUT_MANAGER,
-        LINEAR_LAYOUT_MANAGER
-    }
-
-    protected LayoutManagerType mCurrentLayoutManagerType;
-
-    private RecyclerViewEmptySupport mRecyclerView;
-    private ComicAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private ComicAdapter mComicAdapter;
+    private FragmentRecyclerViewBinding mBinding;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private Constants.Sections mEditor;
-
-    /**
-     * The fragment's current callback object, which is notified of list item
-     * clicks.
-     */
-    private Callbacks mCallbacks = sComicCallbacks;
-
-    /**
-     * A callback interface that all activities containing this fragment must
-     * implement. This mechanism allows activities to be notified of item
-     * selections.
-     */
-    interface Callbacks {
-        /**
-         * Callback for when an item has been selected.
-         */
-        void onItemSelected(long id);
-    }
-
-    /**
-     * An implementation of the {@link Callbacks} interface that does
-     * nothing. Used only when this fragment is not attached to an activity.
-     */
-    private static final Callbacks sComicCallbacks = new Callbacks() {
-        @Override
-        public void onItemSelected(long id) {}
-    };
 
     private ItemTouchHelper.SimpleCallback sItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
         @Override
@@ -95,7 +59,7 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
             // Remove swiped item from list and notify the RecyclerView
-            int position = viewHolder.getAdapterPosition();
+            /*int position = viewHolder.getAdapterPosition();
             Cursor cursor = mAdapter.getCursor();
             if (cursor != null) {
                 cursor.moveToPosition(position);
@@ -105,22 +69,7 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
                 deleteComic(comicID);
             } else {
                 CCLogger.w(TAG, "onSwiped - Cursor is null, can't delete item!");
-            }
-        }
-    };
-
-    private ComicAdapter.ComicViewHolder.ViewHolderClicks mClickListener = new ComicAdapter.ComicViewHolder.ViewHolderClicks() {
-        @Override
-        public void itemClicked(View container, int position) {
-            CCLogger.d(TAG, "itemClicked - Clicked " + position);
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            Cursor cursor = mAdapter.getCursor();
-            if (cursor != null) {
-                cursor.moveToPosition(position);
-                long id = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
-                mCallbacks.onItemSelected(id);
-            }
+            }*/
         }
     };
 
@@ -151,64 +100,41 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         // Create the list fragment's content view by calling the super method
         super.onCreateView(inflater, container, savedInstanceState);
 
-        View view = inflater.inflate(R.layout.fragment_recycler_view, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_recycler_view, container, false);
 
-        mRecyclerView = view.findViewById(R.id.recyclerView);
+        mComicAdapter = new ComicAdapter(mComicClickCallback);
+        mBinding.recyclerView.setAdapter(mComicAdapter);
 
-        // Attach swipe to delete if we are in CART or FAVORITE section
+        RecyclerView recyclerView = mBinding.getRoot().findViewById(R.id.recycler_view);
+        mSwipeRefreshLayout = mBinding.getRoot().findViewById(R.id.swipe_refresh_layout);
+
+        // Attach swipe to delete (right / left) if we are in CART or FAVORITE section
         if (mEditor.equals(Constants.Sections.CART) || mEditor.equals(Constants.Sections.FAVORITE)) {
             ItemTouchHelper itemTouchHelper = new ItemTouchHelper(sItemTouchCallback);
-            itemTouchHelper.attachToRecyclerView(mRecyclerView);
+            itemTouchHelper.attachToRecyclerView(recyclerView);
         }
 
-        // Use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setEmptyView(view.findViewById(R.id.empty_text_view));
-
-        mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-
-        if (savedInstanceState != null) {
-            // Restore saved layout manager type.
-            mCurrentLayoutManagerType = (LayoutManagerType) savedInstanceState
-                    .getSerializable(KEY_LAYOUT_MANAGER);
-        }
-        setRecyclerViewLayoutManager(mCurrentLayoutManagerType);
-
+        // Set title into toolbar
         getActivity().setTitle(Constants.Sections.getTitle(mEditor));
 
+        // Enable swipe to refresh if we are on other categories
         if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
-            CCLogger.v(TAG, "onCreateView - Created a Fragment - end");
-            return view;
-        } else {
-            // Now create a SwipeRefreshLayout to wrap the fragment's content view
-            mSwipeRefreshLayout = new FragmentRecyclerSwipeRefreshLayout(container.getContext());
-
-            // Add the list fragment's content view to the SwipeRefreshLayout, making sure that it fills
-            // the SwipeRefreshLayout
-            mSwipeRefreshLayout.addView(view, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-            // Make sure that the SwipeRefreshLayout will fill the fragment
-            mSwipeRefreshLayout.setLayoutParams(
-                    new ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT));
-
-            // Set color
-            mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent);
-
-            // Now return the SwipeRefreshLayout as this fragment's content view
-            CCLogger.v(TAG, "onCreateView - Created a SwipeRefreshLayout - end");
-            return mSwipeRefreshLayout;
+            CCLogger.v(TAG, "onCreateView - Locking swipe to refresh");
+            mSwipeRefreshLayout.setEnabled(false);
         }
+
+        // Set color of progress view
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent);
+
+        setRecyclerViewLayoutManager(recyclerView);
+
+        return mBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         CCLogger.d(TAG, "onViewCreated - start");
-
-        fillData();
 
         TextView emptyText = view.findViewById(R.id.empty_text_view);
 
@@ -242,31 +168,66 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save currently selected layout manager.
-        savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
-        super.onSaveInstanceState(savedInstanceState);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        final ComicListViewModel viewModel =
+                ViewModelProviders.of(this).get(ComicListViewModel.class);
+
+        subscribeUi(viewModel);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        CCLogger.v(TAG, "onAttach");
-        // Activities containing this fragment must implement its callbacks.
-        if (!(context instanceof Callbacks)) {
-            throw new IllegalStateException("Activity must implement fragment's callbacks.");
+    /**
+     * Set the layout type of {@link RecyclerView}.
+     * @param recyclerView the current recycler view where to set layout
+     */
+    private void setRecyclerViewLayoutManager(RecyclerView recyclerView) {
+        int scrollPosition = 0;
+
+        // If a layout manager has already been set, get current scroll position.
+        if (recyclerView.getLayoutManager() != null) {
+            scrollPosition = ((LinearLayoutManager) recyclerView.getLayoutManager())
+                    .findFirstCompletelyVisibleItemPosition();
         }
 
-        mCallbacks = (Callbacks) context;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.scrollToPosition(scrollPosition);
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        CCLogger.v(TAG, "onDetach");
-        // Reset the active callbacks interface to the callback implementation.
-        mCallbacks = sComicCallbacks;
+    /**
+     * Method which observe the status of database and update UI when data is available.
+     * @param viewModel the view model which store and manage the data to show
+     */
+    private void subscribeUi(ComicListViewModel viewModel) {
+        // Update the list when the data changes
+        viewModel.filterByEditor(mEditor.getName());
+        viewModel.getComics().observe(this, new Observer<List<ComicEntity>>() {
+            @Override
+            public void onChanged(@Nullable List<ComicEntity> myComics) {
+                if (myComics != null) {
+                    if (myComics.size() == 0) {
+                        mBinding.setIsLoading(true);
+                    } else {
+                        mBinding.setIsLoading(false);
+                    }
+                    mComicAdapter.setComicList(myComics);
+                } else {
+                    mBinding.setIsLoading(true);
+                }
+                // Espresso does not know how to wait for data binding's loop so we execute changes
+                // sync.
+                mBinding.executePendingBindings();
+            }
+        });
     }
+
+    private final ComicClickCallback mComicClickCallback = new ComicClickCallback() {
+        @Override
+        public void onClick(Comic comic) {
+            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                ((ActivityMain) getActivity()).launchDetailView(comic);
+            }
+        }
+    };
 
     public void deleteComic(long itemID) {
         ContentValues mUpdateValues = new ContentValues();
@@ -325,46 +286,6 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
                 break;
 
         }
-    }
-
-    /**
-     * Method which return the current layout of list.
-     * @return the {@link LayoutManagerType}
-     */
-    public LayoutManagerType getCurrentLayoutManagerType() {
-        return mCurrentLayoutManagerType;
-    }
-
-    /**
-     * Set RecyclerView's LayoutManager to the one given.
-     *
-     * @param layoutManagerType Type of layout manager to switch to.
-     */
-    public void setRecyclerViewLayoutManager(LayoutManagerType layoutManagerType) {
-        int scrollPosition = 0;
-
-        // If a layout manager has already been set, get current scroll position.
-        if (mRecyclerView.getLayoutManager() != null) {
-            scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager())
-                    .findFirstCompletelyVisibleItemPosition();
-        }
-
-        switch (layoutManagerType) {
-            case GRID_LAYOUT_MANAGER:
-                mLayoutManager = new GridLayoutManager(getActivity(), SPAN_COUNT);
-                mCurrentLayoutManagerType = LayoutManagerType.GRID_LAYOUT_MANAGER;
-                break;
-            case LINEAR_LAYOUT_MANAGER:
-                mLayoutManager = new LinearLayoutManager(getActivity());
-                mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-                break;
-            default:
-                mLayoutManager = new LinearLayoutManager(getActivity());
-                mCurrentLayoutManagerType = LayoutManagerType.LINEAR_LAYOUT_MANAGER;
-        }
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.scrollToPosition(scrollPosition);
     }
 
     private void removeComicFromCart(long comicId) {
@@ -468,56 +389,7 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         return mSwipeRefreshLayout;
     }
 
-    /**
-     * Sub-class of {@link android.support.v4.widget.SwipeRefreshLayout} for use in this
-     * {@link android.support.v4.app.ListFragment}. The reason that this is needed is because
-     * {@link android.support.v4.widget.SwipeRefreshLayout} only supports a single child, which it
-     * expects to be the one which triggers refreshes. In our case the layout's child is the content
-     * view returned from
-     * {@link android.support.v4.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)}
-     * which is a {@link android.view.ViewGroup}.
-     *
-     * <p>To enable 'swipe-to-refresh' support via the {@link android.widget.ListView} we need to
-     * override the default behavior and properly signal when a gesture is possible. This is done by
-     * overriding {@link #canChildScrollUp()}.
-     */
-    private class FragmentRecyclerSwipeRefreshLayout extends SwipeRefreshLayout {
-
-        public FragmentRecyclerSwipeRefreshLayout(Context context) {
-            super(context);
-        }
-
-        /**
-         * As mentioned above, we need to override this method to properly signal when a
-         * 'swipe-to-refresh' is possible.
-         *
-         * @return true if the {@link android.widget.ListView} is visible and can scroll up.
-         */
-        @Override
-        public boolean canChildScrollUp() {
-            return mRecyclerView.getVisibility() == View.VISIBLE && mRecyclerView.canScrollVertically(-1);
-        }
-    }
-
-    /* ****************************************************************************************
-     * Data loader methods
-     ******************************************************************************************/
-
-    /**
-     * Method used to fill data on list.
-     */
-    private void fillData() {
-        CCLogger.d(TAG, "fillData - start");
-
-        getLoaderManager().initLoader(0, null, this);
-        // Specify an adapter (see also next example)
-        mAdapter = new ComicAdapter(getActivity(), null, mClickListener);
-        mRecyclerView.setAdapter(mAdapter);
-        CCLogger.v(TAG, "fillData - end");
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+    /*public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
@@ -552,16 +424,5 @@ public class FragmentRecycler extends Fragment implements LoaderManager.LoaderCa
         }
 
         return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, whereClause, whereArgs, sortOrder);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mAdapter.swapCursor(cursor);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        // Data is not available anymore, delete reference
-        mAdapter.swapCursor(null);
-    }
+    }*/
 }

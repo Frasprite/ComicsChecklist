@@ -36,6 +36,7 @@ import android.widget.Toast;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
+import org.checklist.comics.comicschecklist.model.Comic;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
@@ -60,8 +61,7 @@ import java.util.Set;
  * <p>
  * to listen for item selections.
  */
-public class ActivityMain extends AppCompatActivity implements FragmentRecycler.Callbacks,
-                                                                NavigationView.OnNavigationItemSelectedListener {
+public class ActivityMain extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = ActivityMain.class.getSimpleName();
 
@@ -293,7 +293,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_COMIC_WIDGET)) {
             int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
             CCLogger.d(TAG, "handleIntent - launching detail for comic ID " + comicId);
-            launchDetailView(comicId);
+            // TODO implement this
+            //launchDetailView(comicId);
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_WIDGET_ADD)) {
             // Open add comic activity
             CCLogger.d(TAG, "handleIntent - starting add activity");
@@ -377,7 +378,8 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
                         CCLogger.d(TAG, "onClick (dialog) - ID " + comicID + " from position " + which);
 
                         if (comicID != 0) {
-                            launchDetailView(comicID);
+                            // TODO change this for launching comics or modify list
+                            //launchDetailView(comicID);
                         } else {
                             Toast.makeText(ActivityMain.this, getResources().getText(R.string.search_error), Toast.LENGTH_SHORT).show();
                         }
@@ -546,16 +548,6 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
     }
 
     /**
-     * Callback method from {@link FragmentRecycler.Callbacks}
-     * indicating that the comic was selected.
-     */
-    @Override
-    public void onItemSelected(long id) {
-        CCLogger.d(TAG, "Launching detail for comic with ID " + id);
-        launchDetailView(id);
-    }
-
-    /**
      * By abstracting the refresh process to a single method, the app allows both the
      * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
      * @param mEditor the editor picked by user
@@ -625,23 +617,17 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
 
     /**
      * This method launch detail view in a Fragment or on a new Activity.
-     * @param id the comic id
+     * @param comic the comic to show on details UI
      */
-    private void launchDetailView(long id) {
-        // Load only a part of selected id
-        Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + id);
-        String[] projection = {ComicDatabase.COMICS_EDITOR_KEY};
-        Cursor mCursor = ComicDatabaseManager.query(this, uri, projection, null, null, null);
-        mCursor.moveToFirst();
-        String rawEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
-        mCursor.close();
-        CCLogger.d(TAG, "launchDetailView - comic ID is " + id + " editor is " + rawEditor);
+    public void launchDetailView(Comic comic) {
+        String rawEditor = comic.getEditor();
+        CCLogger.d(TAG, "launchDetailView - comic editor is " + rawEditor);
         Constants.Sections editor = Constants.Sections.getEditorFromName(rawEditor);
         switch (editor) {
             case CART:
                 // Show note
                 Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
-                addComicIntent.putExtra(Constants.ARG_COMIC_ID, id);
+                addComicIntent.putExtra(Constants.ARG_COMIC_ID, comic.getId());
                 startActivity(addComicIntent);
                 break;
             default:
@@ -651,7 +637,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
                     // In two-pane mode, show the detail view in this activity by adding
                     // or replacing the detail fragment using a fragment transaction
                     Bundle arguments = new Bundle();
-                    arguments.putLong(Constants.ARG_COMIC_ID, id);
+                    arguments.putLong(Constants.ARG_COMIC_ID, comic.getId());
                     FragmentDetail mDetailFragment = new FragmentDetail();
                     mDetailFragment.setArguments(arguments);
                     getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
@@ -660,7 +646,7 @@ public class ActivityMain extends AppCompatActivity implements FragmentRecycler.
                     // In single-pane mode, simply start the detail activity
                     // for the selected item ID
                     Intent detailIntent = new Intent(this, ActivityDetail.class);
-                    detailIntent.putExtra(Constants.ARG_COMIC_ID, id);
+                    detailIntent.putExtra(Constants.ARG_COMIC_ID, comic.getId());
 
                     ActivityOptions options = ActivityOptions.makeCustomAnimation(
                             this,

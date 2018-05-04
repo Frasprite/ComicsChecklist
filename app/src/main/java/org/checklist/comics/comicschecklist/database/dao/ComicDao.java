@@ -13,8 +13,8 @@ import java.util.List;
 @Dao
 public interface ComicDao {
 
-    @Query("SELECT * FROM comics")
-    LiveData<List<ComicEntity>> loadAllComics();
+    @Query("SELECT * FROM comics WHERE editor LIKE :editorName")
+    LiveData<List<ComicEntity>> loadComicsByEditor(String editorName);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<ComicEntity> comics);

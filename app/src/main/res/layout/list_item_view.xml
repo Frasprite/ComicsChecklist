@@ -1,41 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground"
-    app:cardCornerRadius="4dp"
-    app:cardElevation="6dp"
-    app:contentPadding="4dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
+    <data>
+
+        <variable
+            name="comic"
+            type="org.checklist.comics.comicschecklist.model.Comic" />
+
+        <variable
+            name="callback"
+            type="org.checklist.comics.comicschecklist.ui.ComicClickCallback" />
+    </data>
+
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="?android:attr/listPreferredItemHeight"
-        android:mode="twoLine"
-        android:paddingBottom="2dip"
-        android:paddingTop="2dip">
+        android:layout_margin="5dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:onClick="@{() ->  callback.onClick(comic)}"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="6dp"
+        app:contentPadding="4dp">
 
-        <TextView
-            android:id="@+id/comic_name_view"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="?android:attr/listPreferredItemPaddingStart"
-            android:layout_marginTop="6dip"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead" />
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:mode="twoLine"
+            android:paddingBottom="2dip"
+            android:paddingTop="2dip">
 
-        <TextView
-            android:id="@+id/comic_release_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/comic_name_view"
-            android:layout_alignStart="@+id/comic_name_view"
-            android:layout_below="@+id/comic_name_view"
-            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+            <TextView
+                android:id="@+id/comic_name_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="?android:attr/listPreferredItemPaddingStart"
+                android:layout_marginTop="6dip"
+                android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+                android:text="@{comic.name}" />
 
-    </RelativeLayout>
-</android.support.v7.widget.CardView>
+            <TextView
+                android:id="@+id/comic_release_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/comic_name_view"
+                android:layout_alignStart="@+id/comic_name_view"
+                android:layout_below="@+id/comic_name_view"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:text="@{@string/format(comic.releaseDate)}" />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+</layout>

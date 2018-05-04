@@ -5,6 +5,7 @@ import android.arch.lifecycle.MediatorLiveData;
 
 import org.checklist.comics.comicschecklist.database.AppDatabase;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
+import org.checklist.comics.comicschecklist.util.Constants;
 
 import java.util.List;
 
@@ -22,10 +23,10 @@ public class DataRepository {
         mDatabase = database;
         mObservableComics = new MediatorLiveData<>();
 
-        mObservableComics.addSource(mDatabase.comicDao().loadAllComics(),
-                productEntities -> {
+        mObservableComics.addSource(mDatabase.comicDao().loadComicsByEditor(Constants.Sections.FAVORITE.getName()),
+                comicEntities -> {
                     if (mDatabase.getDatabaseCreated().getValue() != null) {
-                        mObservableComics.postValue(productEntities);
+                        mObservableComics.postValue(comicEntities);
                     }
                 });
     }
@@ -42,10 +43,23 @@ public class DataRepository {
     }
 
     /**
-     * Get the list of products from the database and get notified when the data changes.
+     * Get the list of all comics from the database and get notified when the data changes.
      */
     public LiveData<List<ComicEntity>> getComics() {
         return mObservableComics;
+    }
+
+    /**
+     * Get a list of comics with given editor.
+     * @param editorName one of editor listed on {@link org.checklist.comics.comicschecklist.util.Constants.Sections} raw name
+     */
+    public void filterComics(String editorName) {
+        mObservableComics.addSource(mDatabase.comicDao().loadComicsByEditor(editorName),
+                comicEntities -> {
+                    if (mDatabase.getDatabaseCreated().getValue() != null) {
+                        mObservableComics.postValue(comicEntities);
+                    }
+                });
     }
 
     public LiveData<ComicEntity> loadComic(final int productId) {

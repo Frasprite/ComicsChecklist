@@ -237,6 +237,8 @@
     <string name="calendar_release">Disponibile da oggi in edicola/libreria.</string>
     <string name="calendar_error">Spiacente, non \è possibile inserire l\'evento nel calendario.</string>
 
+    <string name="format">%1$td/%1$tm/%1$tY</string>
+
     <!-- Activity add comic -->
     <string name="text_preview_title"><b>Nome fumetto</b></string>
     <string name="text_preview_other">Altre info, es.: editore, numeri mancanti</string>
