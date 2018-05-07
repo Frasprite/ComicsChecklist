@@ -14,7 +14,7 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 
 public class ComicViewModel extends AndroidViewModel {
 
-    private final LiveData<ComicEntity> mObersavableComic;
+    private final LiveData<ComicEntity> mObservableComic;
 
     public ObservableField<ComicEntity> comic = new ObservableField<>();
 
@@ -24,11 +24,11 @@ public class ComicViewModel extends AndroidViewModel {
         super(application);
         mComicId = comicId;
 
-        mObersavableComic = repository.loadComic(mComicId);
+        mObservableComic = repository.loadComic(mComicId);
     }
 
-    public LiveData<ComicEntity> getObersavableComic() {
-        return mObersavableComic;
+    public LiveData<ComicEntity> getObservableComic() {
+        return mObservableComic;
     }
 
     public void setComic(ComicEntity comic) {
@@ -39,27 +39,27 @@ public class ComicViewModel extends AndroidViewModel {
      * A creator is used to inject the comic ID into the ViewModel.
      * <p>
      * This creator is to showcase how to inject dependencies into ViewModels. It's not
-     * actually necessary in this case, as the product ID can be passed in a public method.
+     * actually necessary in this case, as the comic ID can be passed in a public method.
      */
     public static class Factory extends ViewModelProvider.NewInstanceFactory {
 
         @NonNull
         private final Application mApplication;
 
-        private final int mProductId;
+        private final int mComicId;
 
         private final DataRepository mRepository;
 
-        public Factory(@NonNull Application application, int productId) {
+        public Factory(@NonNull Application application, int comicId) {
             mApplication = application;
-            mProductId = productId;
+            mComicId = comicId;
             mRepository = ((CCApp) application).getRepository();
         }
 
         @Override
         public <T extends ViewModel> T create(Class<T> modelClass) {
             //noinspection unchecked
-            return (T) new ComicViewModel(mApplication, mRepository, mProductId);
+            return (T) new ComicViewModel(mApplication, mRepository, mComicId);
         }
     }
 }

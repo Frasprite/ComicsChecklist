@@ -1,94 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/cover_image_view"
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="comicViewModel"
+            type="org.checklist.comics.comicschecklist.viewmodel.ComicViewModel" />
+    </data>
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/description_background"
-        android:gravity="center"
-        android:scaleType="centerCrop" />
+        android:layout_height="match_parent">
 
-    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        app:cardCornerRadius="4dp"
-        app:cardElevation="6dp"
-        app:contentPadding="4dp">
-
-        <LinearLayout
-            android:id="@+id/comic_detail_main_layout"
+        <ImageView
+            android:id="@+id/cover_image_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center|top"
-            android:orientation="vertical">
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/description_background"
+            android:gravity="center"
+            android:scaleType="centerCrop" />
 
-            <TextView
-                android:id="@+id/title_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:paddingEnd="6dp"
-                android:paddingStart="6dp"
-                android:paddingTop="10dp"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textStyle="bold" />
+        <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            app:cardCornerRadius="4dp"
+            app:cardElevation="6dp"
+            app:contentPadding="4dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/release_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/price_text_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/feature_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal"
-                android:padding="10dp"
-                android:textStyle="bold" />
-
-            <ScrollView
+                android:id="@+id/comic_detail_main_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fadeScrollbars="false"
-                android:padding="10dp">
+                android:gravity="center|top"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/description_text_view"
+                    android:id="@+id/title_text_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:ellipsize="end"
+                    android:gravity="center_horizontal"
+                    android:paddingEnd="6dp"
+                    android:paddingStart="6dp"
+                    android:paddingTop="10dp"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textStyle="bold"
+                    android:text="@{comicViewModel.comic.name}"/>
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:cacheColorHint="#00000000"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-            </ScrollView>
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
+                    android:orientation="horizontal">
 
-</FrameLayout>
+                    <TextView
+                        android:id="@+id/release_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:textStyle="bold"
+                        android:text="@{@string/format(comicViewModel.comic.releaseDate)}" />
+
+                    <TextView
+                        android:id="@+id/price_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:textStyle="bold"
+                        android:text="@{comicViewModel.comic.price}"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/feature_text_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:padding="10dp"
+                    android:textStyle="bold"
+                    android:text="@{comicViewModel.comic.feature}"/>
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fadeScrollbars="false"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/description_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:cacheColorHint="#00000000"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="@{comicViewModel.comic.description}" />
+                </ScrollView>
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+    </FrameLayout>
+</layout>

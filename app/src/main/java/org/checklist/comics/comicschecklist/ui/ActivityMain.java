@@ -621,13 +621,14 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
      */
     public void launchDetailView(Comic comic) {
         String rawEditor = comic.getEditor();
-        CCLogger.d(TAG, "launchDetailView - comic editor is " + rawEditor);
+        int comicId = comic.getId();
+        CCLogger.d(TAG, "launchDetailView - Comic ID is " + comicId + " editor is " + rawEditor);
         Constants.Sections editor = Constants.Sections.getEditorFromName(rawEditor);
         switch (editor) {
             case CART:
                 // Show note
                 Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
-                addComicIntent.putExtra(Constants.ARG_COMIC_ID, comic.getId());
+                addComicIntent.putExtra(Constants.ARG_COMIC_ID, comicId);
                 startActivity(addComicIntent);
                 break;
             default:
@@ -637,7 +638,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
                     // In two-pane mode, show the detail view in this activity by adding
                     // or replacing the detail fragment using a fragment transaction
                     Bundle arguments = new Bundle();
-                    arguments.putLong(Constants.ARG_COMIC_ID, comic.getId());
+                    arguments.putInt(Constants.ARG_COMIC_ID, comicId);
                     FragmentDetail mDetailFragment = new FragmentDetail();
                     mDetailFragment.setArguments(arguments);
                     getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
@@ -646,7 +647,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
                     // In single-pane mode, simply start the detail activity
                     // for the selected item ID
                     Intent detailIntent = new Intent(this, ActivityDetail.class);
-                    detailIntent.putExtra(Constants.ARG_COMIC_ID, comic.getId());
+                    detailIntent.putExtra(Constants.ARG_COMIC_ID, comicId);
 
                     ActivityOptions options = ActivityOptions.makeCustomAnimation(
                             this,

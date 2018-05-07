@@ -1,11 +1,12 @@
 package org.checklist.comics.comicschecklist.ui;
 
-import android.content.ContentValues;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -14,17 +15,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.databinding.FragmentDetailBinding;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.DateCreator;
+import org.checklist.comics.comicschecklist.viewmodel.ComicViewModel;
 
 /**
  * A fragment representing a single Comic detail screen.
@@ -36,22 +34,13 @@ public class FragmentDetail extends Fragment {
 
     private static final String TAG = FragmentDetail.class.getSimpleName();
 
-    /**
-     * The fragment arguments representing the item ID that this fragment represents.
-     */
-    public static final String ARG_ACTIVITY_LAUNCHED = "activity_launched";
-
     // The comic content this fragment is presenting.
-    private String mComicName;
-    private String mComicRelease;
-    private String mFavorite;
-    private String mCart;
-    private String mComicEditor;
-    private String mComicURL;
-    private long mComicId = -1;
-    private boolean mActivityDetailLaunched = false;
+    private boolean mIsAFavoriteComic;
+    private boolean mIsComicOnCart;
 
     private Menu mMenu;
+
+    private FragmentDetailBinding mBinding;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -60,66 +49,30 @@ public class FragmentDetail extends Fragment {
     public FragmentDetail() {}
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        CCLogger.d(TAG, "onCreate - start");
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate this data binding layout
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail, container, false);
 
-        if (getArguments().containsKey(Constants.ARG_COMIC_ID)) {
-            // Load comic content specified by the fragment arguments from ComicContentProvider.
-            // For better performance, use a Loader to load content from a content provider.
-            mComicId = getArguments().getLong(Constants.ARG_COMIC_ID);
-            mActivityDetailLaunched = getArguments().getBoolean(ARG_ACTIVITY_LAUNCHED);
-            CCLogger.i(TAG, "onCreate - comic with ID " + mComicId + " / fragment launched by ActivityDetail " + mActivityDetailLaunched);
-        }
-
-        setHasOptionsMenu(mActivityDetailLaunched);
-        CCLogger.v(TAG, "onCreate - end");
+        return mBinding.getRoot();
     }
 
+    // TODO create bottom menu for other options and move URL into card
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        CCLogger.d(TAG, "onCreateView - start");
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-
-        // Show the comic contents
-        if (mComicId > -1) {
-            Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + mComicId);
-            String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY,
-                    ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
-                    ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY, ComicDatabase.COMICS_EDITOR_KEY,
-                    ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY, ComicDatabase.COMICS_URL_KEY};
-            Cursor mCursor = ComicDatabaseManager.query(getActivity(), uri, projection, null, null, null);
-            mCursor.moveToFirst();
-            mComicName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
-            mComicRelease = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY));
-            String mComicDescription = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY));
-            String mComicPrice = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY));
-            String mComicFeature = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY));
-            mFavorite = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_FAVORITE_KEY));
-            mCart = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY));
-            mComicEditor = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
-            mComicURL = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_URL_KEY));
-            //String mComicCover = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY));
-            mCursor.close();
-            // Populating view
-            TextView titleTextView = (rootView.findViewById(R.id.title_text_view));
-            titleTextView.setText(mComicName);
-            ((TextView) rootView.findViewById(R.id.release_text_view)).setText(mComicRelease);
-            ((TextView) rootView.findViewById(R.id.description_text_view)).setText(mComicDescription);
-            ((TextView) rootView.findViewById(R.id.feature_text_view)).setText(mComicFeature);
-            ((TextView) rootView.findViewById(R.id.price_text_view)).setText(mComicPrice);
-            //ImageView coverView = rootView.findViewById(R.id.cover_image_view);
-        }
-
-        if (!mActivityDetailLaunched) {
-            CCLogger.d(TAG, "onCreateView - Inflating detail toolbar");
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        if (getActivity() instanceof ActivityMain) {
+            CCLogger.d(TAG, "onCreateOptionsMenu - Inflating detail menu on main toolbar");
+            inflater.inflate(R.menu.menu_detail, menu);
+            mMenu = menu;
+            updateMenuItems(mIsAFavoriteComic, mIsComicOnCart);
+        } else {
+            CCLogger.d(TAG, "onCreateOptionsMenu - Fragment is launched from ActivityDetail, creating menu");
             // Create detail toolbar
             Toolbar toolbarDetail = getActivity().findViewById(R.id.toolbarDetail);
             // Inflate a menu to be displayed in the toolbar
             if (toolbarDetail != null) {
                 toolbarDetail.inflateMenu(R.menu.menu_detail);
                 mMenu = toolbarDetail.getMenu();
-                updateMenuItems(mFavorite, mCart);
+                updateMenuItems(mIsAFavoriteComic, mIsComicOnCart);
 
                 toolbarDetail.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
                     @Override
@@ -129,19 +82,6 @@ public class FragmentDetail extends Fragment {
                 });
             }
         }
-
-        CCLogger.v(TAG, "onCreateView - end");
-        return rootView;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        if (mActivityDetailLaunched) {
-            // Fragment is launched from ActivityDetail, inflate own menu
-            inflater.inflate(R.menu.menu_detail, menu);
-            mMenu = menu;
-            updateMenuItems(mFavorite, mCart);
-        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -150,8 +90,34 @@ public class FragmentDetail extends Fragment {
         return manageItemSelected(item);
     }
 
-    private void updateMenuItems(String favoriteFlag, String cartFlag) {
-        if (favoriteFlag.equalsIgnoreCase("no")) {
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        int comicId = getArguments().getInt(Constants.ARG_COMIC_ID);
+        CCLogger.i(TAG, "onCreate - comic with ID " + comicId);
+
+        ComicViewModel.Factory factory = new ComicViewModel.Factory(getActivity().getApplication(), comicId);
+
+        final ComicViewModel model = ViewModelProviders.of(this, factory)
+                .get(ComicViewModel.class);
+
+        mBinding.setComicViewModel(model);
+
+        subscribeToModel(model);
+    }
+
+    /**
+     * Method which observe the item data.
+     * @param model the view model which store and manage the data to show
+     */
+    private void subscribeToModel(final ComicViewModel model) {
+        model.getObservableComic().observe(this, comicEntity -> model.setComic(comicEntity));
+    }
+
+    // TODO fix multiple menu entries
+    private void updateMenuItems(Boolean favoriteFlag, Boolean cartFlag) {
+        if (favoriteFlag) {
             // Comic can be added to favorite
             mMenu.getItem(2).setVisible(true);
             mMenu.getItem(3).setVisible(false);
@@ -161,7 +127,7 @@ public class FragmentDetail extends Fragment {
             mMenu.getItem(3).setVisible(true);
         }
 
-        if (cartFlag.equalsIgnoreCase("no")) {
+        if (cartFlag) {
             // Comic can be added to cart
             mMenu.getItem(4).setVisible(true);
             mMenu.getItem(5).setVisible(false);
@@ -171,16 +137,16 @@ public class FragmentDetail extends Fragment {
             mMenu.getItem(5).setVisible(true);
         }
 
-        if (Constants.Sections.getEditorFromName(mComicEditor) == Constants.Sections.CART) {
+        // TODO implement feature
+        /*String rawEditor = mBinding.getComicViewModel().getObservableComic().getValue().getEditor();
+        if (Constants.Sections.getEditorFromName(rawEditor) == Constants.Sections.CART) {
             mMenu.getItem(1).setVisible(false);
         } else {
             mMenu.getItem(1).setVisible(true);
-        }
+        }*/
     }
 
     private boolean manageItemSelected(MenuItem item) {
-        String mSelectionClause;
-        String[] mSelectionArgs;
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.calendar:
@@ -189,11 +155,12 @@ public class FragmentDetail extends Fragment {
                     // ACTION_INSERT does not work on all phones; use Intent.ACTION_EDIT in this case
                     Intent intent = new Intent(Intent.ACTION_INSERT);
                     intent.setType("vnd.android.cursor.item/event");
-                    intent.putExtra(CalendarContract.Events.TITLE, mComicName);
+                    intent.putExtra(CalendarContract.Events.TITLE,
+                            mBinding.getComicViewModel().getObservableComic().getValue().getName());
                     intent.putExtra(CalendarContract.Events.DESCRIPTION, getString(R.string.calendar_release));
 
                     // Setting dates
-                    long timeInMillis = DateCreator.getTimeInMillis(mComicRelease);
+                    long timeInMillis = mBinding.getComicViewModel().getObservableComic().getValue().getReleaseDate().getTime();
                     intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, timeInMillis);
                     intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, timeInMillis);
 
@@ -209,86 +176,64 @@ public class FragmentDetail extends Fragment {
                 }
                 return true;
             case R.id.comicSite:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mComicURL));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                        mBinding.getComicViewModel().getObservableComic().getValue().getURL()
+                ));
                 startActivity(browserIntent);
                 return true;
             case R.id.favorite:
-                if (mFavorite.equalsIgnoreCase("no")) {
+                if (!mIsAFavoriteComic) {
                     CCLogger.i(TAG, "manageItemSelected - Add comic to favorite");
                     // Add comic to favorite
-                    ContentValues mUpdateValues = new ContentValues();
-                    mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "yes");
-                    mFavorite = "yes";
-                    // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.ID +  "=?";
-                    mSelectionArgs = new String[]{String.valueOf(mComicId)};
-                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO implement feature
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
                 } else {
                     CCLogger.v(TAG, "manageItemSelected - Comic already on favorite");
                 }
 
-                updateMenuItems(mFavorite, mCart);
+                updateMenuItems(mIsAFavoriteComic, mIsComicOnCart);
 
                 WidgetService.updateWidget(getActivity());
                 return true;
             case R.id.remove_favorite:
-                if (mFavorite.equalsIgnoreCase("yes")) {
+                if (mIsAFavoriteComic) {
                     CCLogger.i(TAG, "manageItemSelected - Delete from favorite");
                     // Delete from favorite
-                    ContentValues mUpdateValues = new ContentValues();
-                    mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-                    mFavorite = "no";
-                    // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.ID +  "=?";
-                    mSelectionArgs = new String[]{String.valueOf(mComicId)};
-                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO implement feature
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
                 } else {
                     CCLogger.v(TAG, "manageItemSelected - Comic already deleted from favorite");
                 }
 
-                updateMenuItems(mFavorite, mCart);
+                updateMenuItems(mIsAFavoriteComic, mIsComicOnCart);
 
                 WidgetService.updateWidget(getActivity());
                 return true;
             case R.id.buy:
-                if (mCart.equalsIgnoreCase("no")) {
+                if (!mIsComicOnCart) {
                     CCLogger.i(TAG, "manageItemSelected - Update entry on comic database: add to cart");
                     // Update entry on comic database
-                    ContentValues mUpdateValues = new ContentValues();
-                    mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "yes");
-                    mCart = "yes";
-                    // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.ID +  "=?";
-                    mSelectionArgs = new String[]{String.valueOf(mComicId)};
-                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO implement feature
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
                 } else {
                     CCLogger.v(TAG, "manageItemSelected - Comic already on cart");
                 }
 
-                updateMenuItems(mFavorite, mCart);
+                updateMenuItems(mIsAFavoriteComic, mIsComicOnCart);
 
                 WidgetService.updateWidget(getActivity());
                 return true;
             case R.id.remove_buy:
-                if (mCart.equalsIgnoreCase("yes")) {
+                if (mIsComicOnCart) {
                     CCLogger.i(TAG, "manageItemSelected - Update entry on comic database: remove from cart");
                     // Update entry on comic database
-                    ContentValues mUpdateValues = new ContentValues();
-                    mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
-                    mCart = "no";
-                    // Defines selection criteria for the rows you want to update
-                    mSelectionClause = ComicDatabase.ID +  "=?";
-                    mSelectionArgs = new String[]{String.valueOf(mComicId)};
-                    ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
+                    // TODO implement feature
                     Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
                 } else {
                     CCLogger.v(TAG, "manageItemSelected - Comic already removed from cart");
                 }
 
-                updateMenuItems(mFavorite, mCart);
+                updateMenuItems(mIsAFavoriteComic, mIsComicOnCart);
 
                 WidgetService.updateWidget(getActivity());
                 return true;
