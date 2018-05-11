@@ -4,17 +4,23 @@ import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -27,6 +33,7 @@ import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBind
 import org.checklist.comics.comicschecklist.model.Comic;
 import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -41,7 +48,7 @@ import java.util.List;
  * currently being viewed in a {@link FragmentDetail}.
  * <p>
  */
-public class FragmentRecycler extends Fragment {
+public class FragmentRecycler extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
@@ -102,9 +109,14 @@ public class FragmentRecycler extends Fragment {
 
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_recycler_view, container, false);
 
+        // Init adapter
         mComicAdapter = new ComicAdapter(mComicClickCallback);
         mBinding.recyclerView.setAdapter(mComicAdapter);
 
+        // Attach listener to navigation bottom
+        mBinding.bottomNavigation.setOnNavigationItemSelectedListener(this);
+
+        // Init swipe refresh layout
         RecyclerView recyclerView = mBinding.getRoot().findViewById(R.id.recycler_view);
         mSwipeRefreshLayout = mBinding.getRoot().findViewById(R.id.swipe_refresh_layout);
 
@@ -159,8 +171,7 @@ public class FragmentRecycler extends Fragment {
         setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                ActivityMain activityMain = (ActivityMain) getActivity();
-                activityMain.initiateRefresh(mEditor);
+                initiateRefresh(mEditor);
             }
         });
 
@@ -174,6 +185,28 @@ public class FragmentRecycler extends Fragment {
                 ViewModelProviders.of(this).get(ComicListViewModel.class);
 
         subscribeUi(viewModel);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        ActivityMain activityMain = (ActivityMain) getActivity();
+        switch (item.getItemId()) {
+            case R.id.searchStore:
+                // This method can be called from shortcut (Android 7.1 and above)
+                activityMain.searchStore();
+                break;
+            case R.id.addComic:
+                // This method can be called from shortcut (Android 7.1 and above)
+                activityMain.addComic();
+                break;
+            case R.id.refresh:
+                initiateRefresh(mEditor);
+                break;
+            case R.id.deleteAll:
+                deleteAllComic();
+                break;
+        }
+        return true;
     }
 
     /**
@@ -247,7 +280,73 @@ public class FragmentRecycler extends Fragment {
         WidgetService.updateWidget(getActivity());
     }
 
-    public void deleteAllComic() {
+    /**
+     * By abstracting the refresh process to a single method, the app allows both the
+     * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
+     * @param mEditor the editor picked by user
+     */
+    private void initiateRefresh(Constants.Sections mEditor) {
+        CCLogger.i(TAG, "initiateRefresh - start for editor " + mEditor);
+
+        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.dialog_pick_editor_title)
+                    .setItems(R.array.pref_available_editors, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // The 'which' argument contains the index position of the selected item
+                            CCLogger.v(TAG, "onClick - Selected position " + which);
+                            Constants.Sections pickedEditor = null;
+                            switch (which) {
+                                case 0:
+                                    pickedEditor = Constants.Sections.PANINI;
+                                    break;
+                                case 1:
+                                    pickedEditor = Constants.Sections.STAR;
+                                    break;
+                                case 2:
+                                    pickedEditor = Constants.Sections.BONELLI;
+                                    break;
+                                case 3:
+                                    pickedEditor = Constants.Sections.RW;
+                                    break;
+                            }
+
+                            if (pickedEditor != null) {
+                                startRefresh(pickedEditor);
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+            builder.setNegativeButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
+        } else {
+            startRefresh(mEditor);
+        }
+    }
+
+    /**
+     * Method used to start refresh.
+     * @param editor the editor picked by user
+     */
+    private void startRefresh(Constants.Sections editor) {
+        // Execute the background task, used on DownloadService to load the data
+        Intent intent = new Intent(getActivity(), DownloadService.class);
+        intent.putExtra(Constants.ARG_EDITOR, editor);
+        intent.putExtra(Constants.MANUAL_SEARCH, true);
+        getActivity().startService(intent);
+
+        // Update refresh spinner
+        if (isRefreshing()) {
+            setRefreshing(false);
+        }
+    }
+
+    private void deleteAllComic() {
         ContentValues mUpdateValues = new ContentValues();
         int updateResult;
         switch (mEditor) {
@@ -328,14 +427,6 @@ public class FragmentRecycler extends Fragment {
         return total;
     }
 
-    /**
-     * Method used to return current editor.
-     * @return the editor showed on UI.
-     */
-    public Constants.Sections getCurrentEditor() {
-        return mEditor;
-    }
-
     /* ****************************************************************************************
      * SwipeRefreshLayout methods
      ******************************************************************************************/
@@ -388,41 +479,4 @@ public class FragmentRecycler extends Fragment {
     public SwipeRefreshLayout getSwipeRefreshLayout() {
         return mSwipeRefreshLayout;
     }
-
-    /*public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        // Order list by DESC or ASC
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
-        // Quick fix on migration (1.3 --> 1.4)
-        if (rawSortOrder.equalsIgnoreCase("ASC") || rawSortOrder.equalsIgnoreCase("DESC")) {
-            rawSortOrder = "1";
-        }
-        String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
-        CCLogger.d(TAG, "onCreateLoader - creating loader ordered with " + sortOrder);
-        String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY};
-        String whereClause;
-        String[] whereArgs;
-        switch (mEditor) {
-            case CART:
-                CCLogger.d(TAG, "onCreateLoader - Loading CART content");
-                // Load comic with special editor name and buy flag to true
-                whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? OR " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
-                whereArgs = new String[]{Constants.Sections.getName(mEditor), "yes"};
-                break;
-            case FAVORITE:
-                CCLogger.d(TAG, "onCreateLoader - Loading FAVORITE content");
-                // Load only comic with positive favorite flag
-                whereClause = ComicDatabase.COMICS_FAVORITE_KEY + "=?";
-                whereArgs = new String[]{"yes"};
-                break;
-            default:
-                CCLogger.d(TAG, "onCreateLoader - Loading " + mEditor + " content");
-                // Do a simple load from editor name
-                whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-                whereArgs = new String[]{Constants.Sections.getName(mEditor)};
-                break;
-        }
-
-        return new CursorLoader(getActivity(), ComicContentProvider.CONTENT_URI, projection, whereClause, whereArgs, sortOrder);
-    }*/
 }

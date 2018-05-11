@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/searchStore"
+        android:enabled="true"
+        android:icon="@drawable/ic_store"
+        android:title="@string/activity_bottom_text_store"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/addComic"
+        android:enabled="true"
+        android:icon="@drawable/ic_add"
+        android:title="@string/activity_bottom_text_add"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/refresh"
+        android:enabled="true"
+        android:icon="@drawable/ic_cached"
+        android:title="@string/activity_bottom_text_refresh"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/deleteAll"
+        android:title="@string/menu_delete_all"
+        android:icon="@drawable/ic_delete"
+        app:showAsAction="ifRoom" />
+</menu>

@@ -144,32 +144,6 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        findViewById(R.id.layout_add_comic).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Open add comic activity
-                addComic();
-            }
-        });
-
-        findViewById(R.id.layout_search_store).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Search store on Maps
-                searchStore();
-            }
-        });
-
-        findViewById(R.id.layout_refresh).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Refresh data
-                if (mFragmentRecycler != null) {
-                    initiateRefresh(mFragmentRecycler.getCurrentEditor());
-                }
-            }
-        });
-
         // The detail container view will be present only in the
         // large-screen layouts (res/values-large-land and
         // res/values-sw600dp-land). If this view is present, then the
@@ -311,7 +285,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
     /**
      * Method used to call new UI for add comic note.
      */
-    private void addComic() {
+    public void addComic() {
         // Open add comic activity
         Intent addComicIntent = new Intent(ActivityMain.this, ActivityAddComic.class);
         startActivity(addComicIntent);
@@ -320,7 +294,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
     /**
      * Method used to launch Google maps for searching nearby store.
      */
-    private void searchStore() {
+    public void searchStore() {
         // Search for comics shops nearby
         Uri gmmIntentUri = Uri.parse("geo:0,0?q=fumetteria");
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
@@ -332,6 +306,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
      * Method used to do a search and show founded data in a dialog.
      * @param query the text to search on database
      */
+    // TODO this must be updated
     private void doMySearch(String query) {
         CCLogger.d(TAG, "doMySearch - start searching " + query);
 
@@ -406,6 +381,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         if (mTwoPane) {
             // In two-pane mode, list items should be given the 'activated' state when touched
             if (mFragmentRecycler != null) {
+                // TODO highlight item
                 CCLogger.d(TAG, "onStart - two-pane mode, activate item on click");
                 //mFragmentRecycler.setActivateOnItemClick(true);
             }
@@ -464,7 +440,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_main_top, menu);
         if (!mDrawerLayout.isDrawerOpen(mNavigationView)) {
             // Get the SearchView and set the searchable configuration
             SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -487,36 +463,12 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         boolean drawerOpen = mDrawerLayout.isDrawerOpen(mNavigationView);
         // Hide detail buttons
         menu.findItem(R.id.search).setVisible(!drawerOpen);
-        //menu.findItem(R.id.layout).setVisible(!drawerOpen);
-        menu.findItem(R.id.deleteAll).setVisible(!drawerOpen);
 
         return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
-        // ActionBarDrawerToggle will take care of this.
-        switch (item.getItemId()) {
-            /*case R.id.layout:
-                FragmentRecycler.LayoutManagerType layoutManagerType = mFragmentRecycler.getCurrentLayoutManagerType();
-                switch (layoutManagerType) {
-                    case GRID_LAYOUT_MANAGER:
-                        mFragmentRecycler.setRecyclerViewLayoutManager(FragmentRecycler.LayoutManagerType.LINEAR_LAYOUT_MANAGER);
-                        item.setIcon(R.drawable.ic_view_grid);
-                        CCLogger.v(TAG, "onOptionsItemSelected - Change layout to linear");
-                        break;
-                    case LINEAR_LAYOUT_MANAGER:
-                        mFragmentRecycler.setRecyclerViewLayoutManager(FragmentRecycler.LayoutManagerType.GRID_LAYOUT_MANAGER);
-                        item.setIcon(R.drawable.ic_view_list);
-                        CCLogger.v(TAG, "onOptionsItemSelected - Change layout to grid");
-                        break;
-                }
-                break;*/
-            case R.id.deleteAll:
-                mFragmentRecycler.deleteAllComic();
-                break;
-        }
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
@@ -545,74 +497,6 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggles
         mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    /**
-     * By abstracting the refresh process to a single method, the app allows both the
-     * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
-     * @param mEditor the editor picked by user
-     */
-    protected void initiateRefresh(Constants.Sections mEditor) {
-        CCLogger.i(TAG, "initiateRefresh - start for editor " + mEditor);
-
-        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(R.string.dialog_pick_editor_title)
-                    .setItems(R.array.pref_available_editors, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // The 'which' argument contains the index position of the selected item
-                            CCLogger.v(TAG, "onClick - Selected position " + which);
-                            Constants.Sections pickedEditor = null;
-                            switch (which) {
-                                case 0:
-                                    pickedEditor = Constants.Sections.PANINI;
-                                    break;
-                                case 1:
-                                    pickedEditor = Constants.Sections.STAR;
-                                    break;
-                                case 2:
-                                    pickedEditor = Constants.Sections.BONELLI;
-                                    break;
-                                case 3:
-                                    pickedEditor = Constants.Sections.RW;
-                                    break;
-                            }
-
-                            if (pickedEditor != null) {
-                                startRefresh(pickedEditor);
-                                dialog.dismiss();
-                            }
-                        }
-                    });
-            builder.setNegativeButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            builder.create().show();
-        } else {
-            startRefresh(mEditor);
-        }
-    }
-
-    /**
-     * Method used to start refresh.
-     * @param editor the editor picked by user
-     */
-    private void startRefresh(Constants.Sections editor) {
-        // Execute the background task, used on DownloadService to load the data
-        Intent intent = new Intent(this, DownloadService.class);
-        intent.putExtra(Constants.ARG_EDITOR, editor);
-        intent.putExtra(Constants.MANUAL_SEARCH, true);
-        startService(intent);
-
-        // Update refresh spinner
-        if (mFragmentRecycler != null) {
-            if (mFragmentRecycler.isRefreshing()) {
-                mFragmentRecycler.setRefreshing(false);
-            }
-        }
     }
 
     /**
