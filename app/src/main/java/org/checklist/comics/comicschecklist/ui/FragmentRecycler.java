@@ -113,6 +113,8 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         mComicAdapter = new ComicAdapter(mComicClickCallback);
         mBinding.recyclerView.setAdapter(mComicAdapter);
 
+        // TODO last item on list is behind bottom view, must fix
+        // TODO bottom view should take all width on tablet
         // Attach listener to navigation bottom
         mBinding.bottomNavigation.setOnNavigationItemSelectedListener(this);
 

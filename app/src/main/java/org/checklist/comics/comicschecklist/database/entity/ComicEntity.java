@@ -10,6 +10,7 @@ import java.util.Date;
 @Entity(tableName = "comics")
 public class ComicEntity implements Comic {
 
+    // TODO resolve double entries
     @PrimaryKey(autoGenerate = true)
     private int id;
     private String name;
