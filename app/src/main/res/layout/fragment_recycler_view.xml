@@ -16,7 +16,8 @@
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bottom_navigation">
 
             <RelativeLayout
                 android:id="@+id/activity_main"
@@ -50,6 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:background="@color/primary"
             app:itemBackground="@color/primary"
             app:itemIconTint="@drawable/selector"
             app:itemTextColor="@drawable/selector"
