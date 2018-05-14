@@ -1,19 +1,23 @@
 package org.checklist.comics.comicschecklist.database.entity;
 
+import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
 import org.checklist.comics.comicschecklist.model.Comic;
 
 import java.util.Date;
 
-@Entity(tableName = "comics")
+@Entity(tableName = "comics", indices = {@Index(value = {"comic_name", "release_date"},
+        unique = true)})
 public class ComicEntity implements Comic {
 
-    // TODO resolve double entries
     @PrimaryKey(autoGenerate = true)
     private int id;
+    @ColumnInfo(name = "comic_name")
     private String name;
+    @ColumnInfo(name = "release_date")
     private Date releaseDate;
     private String description;
     private String price;
