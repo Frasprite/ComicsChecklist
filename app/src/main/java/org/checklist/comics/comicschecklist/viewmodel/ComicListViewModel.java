@@ -42,4 +42,9 @@ public class ComicListViewModel extends AndroidViewModel {
         ((CCApp) getApplication()).getRepository().filterComics(editorName);
         mComics = ((CCApp) getApplication()).getRepository().getComics();
     }
+
+    public void filterComicsContainingText(String editorName, String text) {
+        ((CCApp) getApplication()).getRepository().filterComics(editorName, text);
+        mComics = ((CCApp) getApplication()).getRepository().getComics();
+    }
 }

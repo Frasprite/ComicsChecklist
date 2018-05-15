@@ -184,7 +184,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         final ComicListViewModel viewModel =
                 ViewModelProviders.of(this).get(ComicListViewModel.class);
 
-        subscribeUi(viewModel);
+        subscribeUi(viewModel, null);
     }
 
     @Override
@@ -227,18 +227,26 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
     }
 
     /**
-     * Method which observe the status of database and update UI when data is available.
+     * Method which observe the status of database and update UI when data is available.<br>
+     * If {@param text} is not null, the list will be filtered based on editor and part of text specified.
      * @param viewModel the view model which store and manage the data to show
+     * @param text the part of text to search on database
      */
-    private void subscribeUi(ComicListViewModel viewModel) {
+    private void subscribeUi(ComicListViewModel viewModel, String text) {
         // Update the list when the data changes
-        viewModel.filterByEditor(mEditor.getName());
+        if (text == null) {
+            viewModel.filterByEditor(mEditor.getName());
+        } else {
+            viewModel.filterComicsContainingText(mEditor.getName(), text);
+        }
         viewModel.getComics().observe(this, new Observer<List<ComicEntity>>() {
             @Override
             public void onChanged(@Nullable List<ComicEntity> myComics) {
                 if (myComics != null) {
                     if (myComics.size() == 0) {
                         mBinding.setIsLoading(true);
+                        // TODO set a message indicating that there is no result from search if text != null
+                        //getResources().getText(R.string.search_no_result);
                     } else {
                         mBinding.setIsLoading(false);
                     }
@@ -251,6 +259,13 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
                 mBinding.executePendingBindings();
             }
         });
+    }
+
+    public void updateList(String newText) {
+        final ComicListViewModel viewModel =
+                ViewModelProviders.of(this).get(ComicListViewModel.class);
+
+        subscribeUi(viewModel, newText);
     }
 
     private final ComicClickCallback mComicClickCallback = new ComicClickCallback() {

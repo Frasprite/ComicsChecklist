@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -34,10 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.model.Comic;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.log.CCLogger;
@@ -61,7 +57,7 @@ import java.util.Set;
  * <p>
  * to listen for item selections.
  */
-public class ActivityMain extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class ActivityMain extends AppCompatActivity implements SearchView.OnQueryTextListener, NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = ActivityMain.class.getSimpleName();
 
@@ -252,12 +248,23 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
         handleIntent(intent);
     }
 
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        doMySearch(newText);
+        return true;
+    }
+
     /**
      * Method used to handle the intent received from search.
      * @param intent the intent passed through search
      */
     private void handleIntent(Intent intent) {
-        // Special processing of the incoming intent only occurs if the if the action specified
+        // Special processing of the incoming intent only occurs if the action specified
         // by the intent is ACTION_SEARCH.
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             // Handles a search query
@@ -306,69 +313,13 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
      * Method used to do a search and show founded data in a dialog.
      * @param query the text to search on database
      */
-    // TODO this must be updated
     private void doMySearch(String query) {
         CCLogger.d(TAG, "doMySearch - start searching " + query);
 
-        // Load order for list
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
-        String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
-        CCLogger.d(TAG, "doMySearch - ordering by " + sortOrder);
-
-        // Query database
-        final Cursor cursor = ComicDatabaseManager.query(this,
-                                                   ComicContentProvider.CONTENT_URI,
-                                                   new String[] {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY},
-                                                   ComicDatabase.COMICS_NAME_KEY + " LIKE ?",
-                                                   new String[] {"%" + query + "%"},
-                                                   sortOrder);
-
-        if (cursor != null && cursor.getCount() == 0) {
-            CCLogger.d(TAG, "doMySearch - no data found!");
-            // There are no results
-            cursor.close();
-            Toast.makeText(this, getResources().getText(R.string.search_no_result), Toast.LENGTH_SHORT).show();
-        } else if (cursor != null && cursor.getCount() > 0) {
-            CCLogger.d(TAG, "doMySearch - found data: " + cursor.getCount());
-            // There are multiple results which fit the given query, so show this on dialog
-
-            // Open a dialog with a list of results
-            final AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
-
-            // Set negative button
-            builder.setNegativeButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int id) {
-                    // Simply dismiss dialog
-                    dialog.dismiss();
-                }
-            });
-
-            builder.setCursor(cursor, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    // The 'which' argument contains the index position of the selected item);
-                    if (cursor.moveToPosition(which)) {
-                        long comicID = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
-                        CCLogger.d(TAG, "onClick (dialog) - ID " + comicID + " from position " + which);
-
-                        if (comicID != 0) {
-                            // TODO change this for launching comics or modify list
-                            //launchDetailView(comicID);
-                        } else {
-                            Toast.makeText(ActivityMain.this, getResources().getText(R.string.search_error), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                }
-            }, ComicDatabase.COMICS_NAME_KEY);
-
-            // Return dialog
-            builder.setTitle(R.string.search_result)
-                    .create()
-                    .show();
+        // Filtering data based on editor and newText
+        if (mFragmentRecycler != null) {
+            mFragmentRecycler.updateList(query);
         }
-
-        CCLogger.v(TAG, "doMySearch - end searching " + query);
     }
 
     /**
@@ -450,6 +401,7 @@ public class ActivityMain extends AppCompatActivity implements NavigationView.On
                 // Assumes current activity is the searchable activity
                 searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
                 searchView.setIconifiedByDefault(false); // Do not iconify the widget; expand it by default
+                searchView.setOnQueryTextListener(this);
             }
 
             return true;

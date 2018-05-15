@@ -62,6 +62,25 @@ public class DataRepository {
                 });
     }
 
+    /**
+     * Return a list of comics with given editor and containing specific character.
+     * @param editorName one of editor listed on {@link org.checklist.comics.comicschecklist.util.Constants.Sections} raw name
+     * @param textToSearch the text to search on DB
+     */
+    public void filterComics(String editorName, String textToSearch) {
+        mObservableComics.addSource(mDatabase.comicDao().loadComicsContainingText(editorName, textToSearch),
+                comicEntities -> {
+                    if (mDatabase.getDatabaseCreated().getValue() != null) {
+                        mObservableComics.postValue(comicEntities);
+                    }
+                });
+    }
+
+    /**
+     * Get specific comic by given ID.
+     * @param productId the comic ID
+     * @return the {@link ComicEntity} representing the comic itself
+     */
     public LiveData<ComicEntity> loadComic(final int productId) {
         return mDatabase.comicDao().loadComic(productId);
     }
