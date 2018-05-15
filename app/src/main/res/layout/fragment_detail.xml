@@ -138,7 +138,7 @@
                         android:gravity="center_horizontal"
                         android:padding="10dp"
                         android:contentDescription="@string/menu_favorites"
-                        android:src="@{comicViewModel.comic.isFavorite ? @drawable/ic_star_border : @drawable/ic_grade}"/>
+                        android:src="@{comicViewModel.comic.isFavorite ? @drawable/ic_remove_favorite : @drawable/ic_add_favorite}"/>
 
                     <ImageButton
                         android:id="@+id/buy"
@@ -148,7 +148,7 @@
                         android:gravity="center_horizontal"
                         android:padding="10dp"
                         android:contentDescription="@string/menu_wishlist"
-                        android:src="@{comicViewModel.comic.isFavorite ? @drawable/ic_remove_shopping_cart : @drawable/ic_cart}" />
+                        android:src="@{comicViewModel.comic.isFavorite ? @drawable/ic_remove_from_cart : @drawable/ic_add_to_cart}" />
 
                 </LinearLayout>
             </LinearLayout>
