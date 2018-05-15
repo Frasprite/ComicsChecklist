@@ -101,8 +101,6 @@
     <string name="search_hint">Cerca un fumetto</string>
     <string name="search_title">Cerca</string>
     <string name="search_description">Inserisci il nome del fumetto che cerchi.</string>
-    <string name="search_error">Impossibile reperire ulteriori dettagli sul fumetto.</string>
-    <string name="search_no_result">Non ci sono fumetti che contengono il testo inserito.</string>
 
     <!-- Strings related to Settings -->
     <!-- String set for Data & Sync -->
@@ -221,7 +219,7 @@
     <string name="empty_list">La lista è vuota!</string>
     <string name="empty_favorite_list">La lista dei preferiti non è ancora stata creata!\nCerca le tue collane preferite tra gli editori disponibili dal menu laterale.</string>
     <string name="empty_cart_list">Nessun fumetto da comprare!\nPuoi crera una nota cliccando sul tasto <b>aggiungi</b>.</string>
-    <string name="empty_editor_list">La lista per questo editore è vuota! Effettua una ricerca rapida facendo uno <i>swipe</i> verso il basso.</string>
+    <string name="empty_editor_list">La lista per questo editore è vuota!\nPuoi effettuare una ricerca in rete con uno <i>swipe</i> verso il basso.</string>
 
     <string name="search_started">: ricerca in corso&#8230;</string>
     <string name="search_completed">Ricerca terminata.</string>

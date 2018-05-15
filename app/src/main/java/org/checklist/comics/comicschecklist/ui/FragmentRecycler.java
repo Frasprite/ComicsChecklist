@@ -245,8 +245,6 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
                 if (myComics != null) {
                     if (myComics.size() == 0) {
                         mBinding.setIsLoading(true);
-                        // TODO set a message indicating that there is no result from search if text != null
-                        //getResources().getText(R.string.search_no_result);
                     } else {
                         mBinding.setIsLoading(false);
                     }
