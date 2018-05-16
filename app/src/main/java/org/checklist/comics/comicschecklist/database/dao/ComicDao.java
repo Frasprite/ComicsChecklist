@@ -27,4 +27,7 @@ public interface ComicDao {
 
     @Query("SELECT * FROM comics WHERE id = :id")
     ComicEntity loadComicSync(int id);
+
+    @Query("SELECT * FROM comics WHERE editor LIKE :editorName")
+    List<ComicEntity> loadComicsByEditorSync(String editorName);
 }

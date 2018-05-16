@@ -5,16 +5,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -47,13 +45,13 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     private static final String TAG = ComicsRemoteViewsFactory.class.getSimpleName();
 
-    private int mCount = 0;
     private final List<WidgetItem> mWidgetItems = new ArrayList<>();
     private final Context mContext;
     private final int mAppWidgetId;
     private final String mEditor, mTitle;
-    private Cursor mCursor;
 
+    // TODO Widget content is empty at creation, but if screen is rotated it will appear
+    // TODO when app is updated, widget content disappear
     ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {
         mContext = applicationContext;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);
@@ -71,76 +69,54 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     }
 
     private void populateWidget() {
-        mCount = 0;
         mWidgetItems.clear();
+
         // Order list by DESC or ASC
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String whereClause;
-        String[] whereArgs;
         String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
         String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
         CCLogger.d(TAG, "populateWidget - ordering by " + sortOrder);
 
         CCLogger.d(TAG, "populateWidget - editor founded, query database " + mEditor);
-        Uri uri = ComicContentProvider.CONTENT_URI;
-        String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY, ComicDatabase.COMICS_DATE_KEY,
-                ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY,
-                ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY, ComicDatabase.COMICS_URL_KEY};
-
         // Load data based on selected editor
         Constants.Sections editor = Constants.Sections.getEditorFromName(mEditor);
-        CCLogger.v(TAG, "populateWidget - preparing entry for widget, mEditor is " + mEditor + " found editor is " + editor);
-        switch (editor) {
-            case CART:
-                // Load comic with special editor name and buy flag to true
-                whereClause = ComicDatabase.COMICS_EDITOR_KEY + " LIKE ? OR " + ComicDatabase.COMICS_CART_KEY + " LIKE ?";
-                whereArgs = new String[]{mEditor, "yes"};
-                break;
-            case FAVORITE:
-                // Load only comic with positive favorite flag
-                whereClause = ComicDatabase.COMICS_FAVORITE_KEY + "=?";
-                whereArgs = new String[]{"yes"};
-                break;
-            default:
-                // Do a simple load from editor name
-                whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-                whereArgs = new String[]{mEditor};
-                break;
-        }
-        mCursor = ComicDatabaseManager.query(mContext, uri, projection, whereClause, whereArgs, sortOrder);
 
-        int mID;
-        String mName;
-        String mRelease;
-        if (mCursor != null) {
-            CCLogger.d(TAG, "populateWidget - cursor has data: " + mCursor.getCount());
-            for (int i = 0; i < mCursor.getCount(); i++) {
-                mCursor.moveToNext();
-                mID = mCursor.getInt(mCursor.getColumnIndex(ComicDatabase.ID));
-                mName = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY));
-                mRelease = mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY));
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                List<ComicEntity> list = ((CCApp) mContext).getDatabase().comicDao().loadComicsByEditorSync(mEditor);
+                CCLogger.d(TAG, "populateWidget - List : " + list);
 
-                mWidgetItems.add(new WidgetItem(mID, mName, mRelease));
-                mCount = mCount + 1;
+                int mID;
+                String mName;
+                String mRelease;
+                if (list != null) {
+                    CCLogger.d(TAG, "populateWidget - List has data : " + list.size());
+                    for (ComicEntity comicEntity : list) {
+                        mID = comicEntity.getId();
+                        mName = comicEntity.getName();
+                        mRelease = mContext.getString(R.string.format, comicEntity.getReleaseDate().getTime());
+
+                        mWidgetItems.add(new WidgetItem(mID, mName, mRelease));
+                    }
+                }
             }
-
-            mCursor.close();
-        }
+        });
     }
 
     @Override
     public void onDataSetChanged() {
-        populateWidget();
+        CCLogger.v(TAG, "onDataSetChanged");
     }
 
     @Override
     public void onDestroy() {
-        mCursor.close();
+        CCLogger.v(TAG, "onDestroy");
     }
 
     @Override
     public int getCount() {
-        return mCount;
+        return mWidgetItems.size();
     }
 
     @Override

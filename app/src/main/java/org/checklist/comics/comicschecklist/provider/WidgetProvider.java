@@ -28,14 +28,18 @@ public class WidgetProvider extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
         }
+
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
     }
 
     @Override
     public void onDeleted(Context context, int[] appWidgetIds) {
-        // When the user deletes the widget, delete the preference associated with it.
+        // When the user deletes the widget, delete the preference associated with it
         for (int appWidgetId : appWidgetIds) {
             WidgetSettings.deleteTitlePref(context, appWidgetId);
         }
+
+        super.onDeleted(context, appWidgetIds);
     }
 
     @Override
@@ -95,6 +99,7 @@ public class WidgetProvider extends AppWidgetProvider {
         PendingIntent actionOpenAppPendingIntent = PendingIntent.getActivity(context, 0, openAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.widgetTextView, actionOpenAppPendingIntent);
 
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.list);
         appWidgetManager.updateAppWidget(appWidgetId, views);
     }
 }
