@@ -35,6 +35,10 @@ public class ComicViewModel extends AndroidViewModel {
         this.comic.set(comic);
     }
 
+    public void updateComic(ComicEntity comicEntity) {
+        ((CCApp) getApplication()).getRepository().updateComic(comicEntity);
+    }
+
     /**
      * A creator is used to inject the comic ID into the ViewModel.
      * <p>

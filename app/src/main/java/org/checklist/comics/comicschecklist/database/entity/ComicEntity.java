@@ -115,4 +115,12 @@ public class ComicEntity implements Comic {
     public String getURL() {
         return URL;
     }
+
+    public void setFavorite(boolean favorite) {
+        this.isFavorite = favorite;
+    }
+
+    public void setToCart(boolean favorite) {
+        this.isOnCart = favorite;
+    }
 }

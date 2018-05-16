@@ -84,4 +84,8 @@ public class DataRepository {
     public LiveData<ComicEntity> loadComic(final int productId) {
         return mDatabase.comicDao().loadComic(productId);
     }
+
+    public void updateComic(ComicEntity comicEntity) {
+        mDatabase.comicDao().update(comicEntity);
+    }
 }

@@ -148,7 +148,7 @@
                         android:gravity="center_horizontal"
                         android:padding="10dp"
                         android:contentDescription="@string/menu_wishlist"
-                        android:src="@{comicViewModel.comic.isFavorite ? @drawable/ic_remove_from_cart : @drawable/ic_add_to_cart}" />
+                        android:src="@{comicViewModel.comic.isOnCart ? @drawable/ic_remove_from_cart : @drawable/ic_add_to_cart}" />
 
                 </LinearLayout>
             </LinearLayout>

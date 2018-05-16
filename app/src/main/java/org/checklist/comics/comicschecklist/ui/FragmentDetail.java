@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.R;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.databinding.FragmentDetailBinding;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
@@ -129,61 +131,54 @@ public class FragmentDetail extends Fragment implements View.OnClickListener {
 
     private void manageFavorite() {
         boolean isAFavoriteComic = mBinding.getComicViewModel().comic.get().isFavorite();
-        boolean isComicOnCart = mBinding.getComicViewModel().comic.get().isOnCart();
 
         if (!isAFavoriteComic) {
             CCLogger.i(TAG, "manageFavorite - Add comic to favorite");
             isAFavoriteComic = true;
             // Add comic to favorite
-            // TODO implement feature
             Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_favorite), Toast.LENGTH_SHORT).show();
         } else {
             CCLogger.i(TAG, "manageFavorite - Delete from favorite");
             isAFavoriteComic = false;
             // Delete from favorite
-            // TODO implement feature
             Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
         }
 
-        updateItems(isAFavoriteComic, isComicOnCart);
+        ComicEntity comicEntity = mBinding.getComicViewModel().comic.get();
+        comicEntity.setFavorite(isAFavoriteComic);
 
-        WidgetService.updateWidget(getActivity());
+        updateData(comicEntity);
     }
 
     private void manageWishlist() {
-        boolean isAFavoriteComic = mBinding.getComicViewModel().comic.get().isFavorite();
         boolean isComicOnCart = mBinding.getComicViewModel().comic.get().isOnCart();
 
         if (!isComicOnCart) {
             CCLogger.i(TAG, "manageWishlist - Update entry on comic database: add to cart");
             isComicOnCart = true;
             // Update entry on comic database
-            // TODO implement feature
             Toast.makeText(getActivity(), getResources().getString(R.string.comic_added_cart), Toast.LENGTH_SHORT).show();
         } else {
             CCLogger.i(TAG, "manageWishlist - Update entry on comic database: remove from cart");
             isComicOnCart = false;
             // Update entry on comic database
-            // TODO implement feature
             Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
         }
 
-        updateItems(isAFavoriteComic, isComicOnCart);
+        ComicEntity comicEntity = mBinding.getComicViewModel().comic.get();
+        comicEntity.setToCart(isComicOnCart);
 
-        WidgetService.updateWidget(getActivity());
+        updateData(comicEntity);
     }
 
-    private void updateItems(Boolean favoriteFlag, Boolean cartFlag) {
-        if (favoriteFlag) {
-            mBinding.favorite.setImageResource(R.drawable.ic_remove_favorite);
-        } else {
-            mBinding.favorite.setImageResource(R.drawable.ic_add_favorite);
-        }
+    private void updateData(ComicEntity comicEntity) {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                mBinding.getComicViewModel().updateComic(comicEntity);
+            }
+        });
 
-        if (cartFlag) {
-            mBinding.buy.setImageResource(R.drawable.ic_remove_from_cart);
-        } else {
-            mBinding.buy.setImageResource(R.drawable.ic_add_to_cart);
-        }
+        WidgetService.updateWidget(getActivity());
     }
 }
