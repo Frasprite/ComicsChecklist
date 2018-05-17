@@ -66,7 +66,7 @@ public class ActivityDetail extends AppCompatActivity {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity using a fragment transaction.
             Bundle arguments = new Bundle();
-            arguments.putLong(Constants.ARG_COMIC_ID, getIntent().getLongExtra(Constants.ARG_COMIC_ID, 0));
+            arguments.putInt(Constants.ARG_COMIC_ID, getIntent().getIntExtra(Constants.ARG_COMIC_ID, -1));
             FragmentDetail fragment = new FragmentDetail();
             fragment.setArguments(arguments);
             getSupportFragmentManager().beginTransaction().add(R.id.comic_detail_container, fragment).commit();

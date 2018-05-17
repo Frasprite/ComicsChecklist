@@ -57,7 +57,7 @@ public class FragmentDetail extends Fragment implements View.OnClickListener {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        int comicId = getArguments().getInt(Constants.ARG_COMIC_ID);
+        int comicId = getArguments().getInt(Constants.ARG_COMIC_ID, -1);
         CCLogger.i(TAG, "onCreate - comic with ID " + comicId);
 
         ComicViewModel.Factory factory = new ComicViewModel.Factory(getActivity().getApplication(), comicId);

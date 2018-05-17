@@ -60,7 +60,7 @@ public class FragmentAddComic extends Fragment {
 
         if (getArguments().containsKey(Constants.ARG_COMIC_ID)) {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
-            mComicId = getArguments().getLong(Constants.ARG_COMIC_ID, -1);
+            mComicId = getArguments().getInt(Constants.ARG_COMIC_ID, -1);
             CCLogger.d(TAG, "onActivityCreated - mComicId (initiated from ARGUMENTS) = " + mComicId);
         }
 

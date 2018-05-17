@@ -13,6 +13,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
@@ -32,7 +33,9 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.model.Comic;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
@@ -274,8 +277,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_COMIC_WIDGET)) {
             int comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0);
             CCLogger.d(TAG, "handleIntent - launching detail for comic ID " + comicId);
-            // TODO implement this
-            //launchDetailView(comicId);
+            loadComicWithID(comicId);
         } else if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION_WIDGET_ADD)) {
             // Open add comic activity
             CCLogger.d(TAG, "handleIntent - starting add activity");
@@ -287,6 +289,21 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             // Intent is coming from shortcut, so search nearby store
             searchStore();
         }
+    }
+
+    /**
+     * Method which do a sync search on database for a comic with given Id.
+     * @param comicId the comic ID
+     */
+    private void loadComicWithID(int comicId) {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                ComicEntity comicEntity = ((CCApp) getApplicationContext()).getDatabase().comicDao().loadComicSync(comicId);
+                CCLogger.d(TAG, "loadComicWithID - Comic : " + comicEntity);
+                launchDetailView(comicEntity);
+            }
+        });
     }
 
     /**
