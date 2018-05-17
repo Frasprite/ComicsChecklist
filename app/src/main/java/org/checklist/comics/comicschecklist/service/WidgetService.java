@@ -4,9 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -71,15 +69,9 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
     private void populateWidget() {
         mWidgetItems.clear();
 
-        // Order list by DESC or ASC
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String rawSortOrder = sharedPref.getString(Constants.PREF_LIST_ORDER, String.valueOf(Constants.Filters.getCode(Constants.Filters.DATE_ASC)));
-        String sortOrder = Constants.Filters.getSortOrder(Integer.valueOf(rawSortOrder));
-        CCLogger.d(TAG, "populateWidget - ordering by " + sortOrder);
-
-        CCLogger.d(TAG, "populateWidget - editor founded, query database " + mEditor);
         // Load data based on selected editor
         Constants.Sections editor = Constants.Sections.getEditorFromName(mEditor);
+        CCLogger.d(TAG, "populateWidget - Raw editor " + mEditor + " gives " + editor);
 
         AsyncTask.execute(new Runnable() {
             @Override

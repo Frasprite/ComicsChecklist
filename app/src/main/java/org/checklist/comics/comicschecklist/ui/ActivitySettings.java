@@ -274,7 +274,6 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference(Constants.PREF_LIST_ORDER));
             MultiSelectListPreference multiSelectListPreference = (MultiSelectListPreference) findPreference(Constants.PREF_AVAILABLE_EDITORS);
             multiSelectListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override

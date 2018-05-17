@@ -15,18 +15,6 @@
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
          dismiss it. -->
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
-    <ListPreference
-        android:key="data_order"
-        android:title="@string/pref_title_data_order"
-        android:entries="@array/pref_data_order_titles"
-        android:entryValues="@array/pref_data_order_values"
-        android:defaultValue="1"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null" />
-
-    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
-         dismiss it. -->
-    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
     <Preference
         android:key="delete_content"
         android:title="@string/pref_title_delete_content"

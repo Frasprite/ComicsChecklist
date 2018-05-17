@@ -2,8 +2,6 @@ package org.checklist.comics.comicschecklist.util;
 
 import android.util.SparseArray;
 
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
-
 import java.util.HashMap;
 
 /**
@@ -28,39 +26,6 @@ public class Constants {
     static final String PREF_DATE_FIRST_LAUNCH = "date_first_launch";
     final static int DAYS_UNTIL_PROMPT = 7;
     final static int LAUNCHES_UNTIL_PROMPT = 7;
-
-    /* Enum of filters for list */
-    public enum Filters {
-        DATE_ASC (1, ComicDatabase.COMICS_DATE_KEY + " ASC"),
-        DATE_DESC(2, ComicDatabase.COMICS_DATE_KEY + " DESC"),
-        NAME_ASC (3, ComicDatabase.COMICS_NAME_KEY + " ASC"),
-        NAME_DESC(4, ComicDatabase.COMICS_NAME_KEY + " DESC");
-
-        private static final SparseArray<Filters> map;
-
-        static {
-            map = new SparseArray<>();
-            for (Filters filter : Filters.values()) {
-                map.put(filter.code, filter);
-            }
-        }
-
-        private final int code;
-        private final String sortOrder;
-
-        Filters(int code, String sortOrder) {
-            this.code = code;
-            this.sortOrder = sortOrder;
-        }
-
-        public static int getCode(Filters filter) {
-            return filter.code;
-        }
-
-        public static String getSortOrder(int rawSortOrder) {
-            return map.get(rawSortOrder).sortOrder;
-        }
-    }
 
     /* Enum of sections available on menu */
     public enum Sections {
@@ -140,7 +105,6 @@ public class Constants {
     /* Data sync preferences */
     public static final String PREF_SYNC_FREQUENCY = "sync_frequency";
     public static final String PREF_DELETE_FREQUENCY = "delete_frequency";
-    public static final String PREF_LIST_ORDER = "data_order";
     public static final String PREF_AVAILABLE_EDITORS = "available_editors";
     public static final String PREF_DELETE_CONTENT = "delete_content";
     public static final String PREF_LAST_SYNC = "last_sync";
