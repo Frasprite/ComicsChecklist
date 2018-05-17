@@ -88,4 +88,22 @@ public class DataRepository {
     public void updateComic(ComicEntity comicEntity) {
         mDatabase.comicDao().update(comicEntity);
     }
+
+    public void getFavoriteComics() {
+        mObservableComics.addSource(mDatabase.comicDao().loadFavoriteComics(),
+                comicEntities -> {
+                    if (mDatabase.getDatabaseCreated().getValue() != null) {
+                        mObservableComics.postValue(comicEntities);
+                    }
+                });
+    }
+
+    public void getWishlistComics() {
+        mObservableComics.addSource(mDatabase.comicDao().loadWishlistComics(),
+                comicEntities -> {
+                    if (mDatabase.getDatabaseCreated().getValue() != null) {
+                        mObservableComics.postValue(comicEntities);
+                    }
+                });
+    }
 }

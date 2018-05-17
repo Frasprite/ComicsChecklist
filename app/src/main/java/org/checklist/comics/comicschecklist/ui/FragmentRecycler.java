@@ -24,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
@@ -66,17 +65,18 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
             // TODO Remove swiped item from list and notify the RecyclerView
-            /*int position = viewHolder.getAdapterPosition();
-            Cursor cursor = mAdapter.getCursor();
-            if (cursor != null) {
-                cursor.moveToPosition(position);
-                // Take comic ID
-                long comicID = cursor.getLong(cursor.getColumnIndex(ComicDatabase.ID));
-                CCLogger.v(TAG, "onSwiped - Deleting comic with ID " + comicID);
-                deleteComic(comicID);
-            } else {
-                CCLogger.w(TAG, "onSwiped - Cursor is null, can't delete item!");
-            }*/
+            int position = viewHolder.getAdapterPosition();
+            Comic comic = mComicAdapter.mComicList.get(position);
+            CCLogger.v(TAG, "onSwiped - Comic ID " + comic.getId());
+        }
+    };
+
+    private final ComicClickCallback mComicClickCallback = new ComicClickCallback() {
+        @Override
+        public void onClick(Comic comic) {
+            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                ((ActivityMain) getActivity()).launchDetailView(comic);
+            }
         }
     };
 
@@ -233,7 +233,17 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
     private void subscribeUi(ComicListViewModel viewModel, String text) {
         // Update the list when the data changes
         if (text == null) {
-            viewModel.filterByEditor(mEditor.getName());
+            switch (mEditor) {
+                case FAVORITE:
+                    viewModel.getFavoriteComics();
+                    break;
+                case CART:
+                    viewModel.getWishlistComics();
+                    break;
+                default:
+                    viewModel.filterByEditor(mEditor.getName());
+                    break;
+            }
         } else {
             viewModel.filterComicsContainingText(mEditor.getName(), text);
         }
@@ -264,16 +274,8 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         subscribeUi(viewModel, newText);
     }
 
-    private final ComicClickCallback mComicClickCallback = new ComicClickCallback() {
-        @Override
-        public void onClick(Comic comic) {
-            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-                ((ActivityMain) getActivity()).launchDetailView(comic);
-            }
-        }
-    };
-
     public void deleteComic(long itemID) {
+        // TODO implement this for favorite or cart comic
         ContentValues mUpdateValues = new ContentValues();
         if (mEditor.equals(Constants.Sections.FAVORITE)) {
             mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
@@ -290,6 +292,37 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
 
         WidgetService.updateWidget(getActivity());
     }
+
+    private void removeComicFromCart(long comicId) {
+        // Evaluate if comic was created by user or it is coming from network
+        Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + comicId);
+        String[] projection = {ComicDatabase.COMICS_EDITOR_KEY};
+        Cursor cursor = ComicDatabaseManager.query(getActivity(), uri, projection, null, null, null);
+        cursor.moveToFirst();
+        String rawEditor = cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
+        Constants.Sections editor = Constants.Sections.getEditorFromName(rawEditor);
+        CCLogger.d(TAG, "removeComicFromCart - rawEditor " + rawEditor + " editor " + editor + " for comicId " + comicId);
+        cursor.close();
+        // Defines selection criteria for the rows you want to update / remove
+        String whereClause = ComicDatabase.ID + "=?";
+        String[] whereArgs = new String[]{String.valueOf(comicId)};
+        switch (editor) {
+            case CART:
+                int rowRemoved = ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, whereClause, whereArgs);
+                CCLogger.v(TAG, "removeComicFromCart - row REMOVED " + rowRemoved);
+                break;
+            default:
+                ContentValues mUpdateValues = new ContentValues();
+                mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
+                int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
+                CCLogger.v(TAG, "removeComicFromCart - row UPDATED " + rowUpdated);
+                break;
+        }
+    }
+
+    /* ****************************************************************************************
+     * SwipeRefreshLayout methods
+     ******************************************************************************************/
 
     /**
      * By abstracting the refresh process to a single method, the app allows both the
@@ -356,50 +389,6 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
             setRefreshing(false);
         }
     }
-
-    private void removeComicFromCart(long comicId) {
-        // Evaluate if comic was created by user or it is coming from network
-        Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + comicId);
-        String[] projection = {ComicDatabase.COMICS_EDITOR_KEY};
-        Cursor cursor = ComicDatabaseManager.query(getActivity(), uri, projection, null, null, null);
-        cursor.moveToFirst();
-        String rawEditor = cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
-        Constants.Sections editor = Constants.Sections.getEditorFromName(rawEditor);
-        CCLogger.d(TAG, "removeComicFromCart - rawEditor " + rawEditor + " editor " + editor + " for comicId " + comicId);
-        cursor.close();
-        // Defines selection criteria for the rows you want to update / remove
-        String whereClause = ComicDatabase.ID + "=?";
-        String[] whereArgs = new String[]{String.valueOf(comicId)};
-        switch (editor) {
-            case CART:
-                int rowRemoved = ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, whereClause, whereArgs);
-                CCLogger.v(TAG, "removeComicFromCart - row REMOVED " + rowRemoved);
-                break;
-            default:
-                ContentValues mUpdateValues = new ContentValues();
-                mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
-                int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
-                CCLogger.v(TAG, "removeComicFromCart - row UPDATED " + rowUpdated);
-                break;
-        }
-    }
-
-    private int removeAllComicFromCart() {
-        // Update all comic on cart and delete those manually created
-        int total = 0;
-        ContentValues mUpdateValues = new ContentValues();
-        mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
-        total = total + ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
-        // Defines selection criteria for the rows you want to update / remove
-        String whereClause = ComicDatabase.COMICS_EDITOR_KEY + "=?";
-        String[] whereArgs = new String[]{String.valueOf(Constants.Sections.getName(Constants.Sections.CART))};
-        total = total + ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, whereClause, whereArgs);
-        return total;
-    }
-
-    /* ****************************************************************************************
-     * SwipeRefreshLayout methods
-     ******************************************************************************************/
 
     /**
      * Set the {@link android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener} to listen for

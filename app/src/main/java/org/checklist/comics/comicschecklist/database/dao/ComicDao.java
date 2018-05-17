@@ -17,10 +17,17 @@ public interface ComicDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<ComicEntity> comics);
 
-    @Query("SELECT * FROM comics WHERE editor LIKE :editorName")
+    // Room maps boolean 'true' to 1 and 'false' to 0.
+    @Query("SELECT * FROM comics WHERE isFavorite = 1 ORDER BY release_date")
+    LiveData<List<ComicEntity>> loadFavoriteComics();
+
+    @Query("SELECT * FROM comics WHERE isOnCart = 1 ORDER BY release_date")
+    LiveData<List<ComicEntity>> loadWishlistComics();
+
+    @Query("SELECT * FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     LiveData<List<ComicEntity>> loadComicsByEditor(String editorName);
 
-    @Query("SELECT * FROM comics WHERE editor LIKE :editorName AND comic_name LIKE '%' || :character || '%'")
+    @Query("SELECT * FROM comics WHERE editor LIKE :editorName AND comic_name LIKE '%' || :character || '%' ORDER BY release_date")
     LiveData<List<ComicEntity>> loadComicsContainingText(String editorName, String character);
 
     @Query("SELECT * FROM comics WHERE id = :id")
@@ -29,7 +36,7 @@ public interface ComicDao {
     @Query("SELECT * FROM comics WHERE id = :id")
     ComicEntity loadComicSync(int id);
 
-    @Query("SELECT * FROM comics WHERE editor LIKE :editorName")
+    @Query("SELECT * FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     List<ComicEntity> loadComicsByEditorSync(String editorName);
 
     @Update

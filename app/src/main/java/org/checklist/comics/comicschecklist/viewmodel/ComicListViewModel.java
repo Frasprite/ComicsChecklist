@@ -38,6 +38,16 @@ public class ComicListViewModel extends AndroidViewModel {
         return mObservableComics;
     }
 
+    public void getFavoriteComics() {
+        ((CCApp) getApplication()).getRepository().getFavoriteComics();
+        mComics = ((CCApp) getApplication()).getRepository().getComics();
+    }
+
+    public void getWishlistComics() {
+        ((CCApp) getApplication()).getRepository().getWishlistComics();
+        mComics = ((CCApp) getApplication()).getRepository().getComics();
+    }
+
     public void filterByEditor(String editorName) {
         ((CCApp) getApplication()).getRepository().filterComics(editorName);
         mComics = ((CCApp) getApplication()).getRepository().getComics();
