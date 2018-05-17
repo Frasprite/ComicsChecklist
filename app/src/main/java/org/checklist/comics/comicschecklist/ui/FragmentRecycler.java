@@ -3,12 +3,10 @@ package org.checklist.comics.comicschecklist.ui;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -25,13 +23,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBinding;
 import org.checklist.comics.comicschecklist.model.Comic;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
@@ -64,10 +60,11 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-            // TODO Remove swiped item from list and notify the RecyclerView
+            // Remove swiped item from list
             int position = viewHolder.getAdapterPosition();
             Comic comic = mComicAdapter.mComicList.get(position);
             CCLogger.v(TAG, "onSwiped - Comic ID " + comic.getId());
+            updateComic(comic);
         }
     };
 
@@ -267,6 +264,10 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         });
     }
 
+    /**
+     * Method used to update the list after user gave an input on search view.
+     * @param newText the text to use for filter data
+     */
     public void updateList(String newText) {
         final ComicListViewModel viewModel =
                 ViewModelProviders.of(this).get(ComicListViewModel.class);
@@ -274,50 +275,78 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         subscribeUi(viewModel, newText);
     }
 
-    public void deleteComic(long itemID) {
-        // TODO implement this for favorite or cart comic
-        ContentValues mUpdateValues = new ContentValues();
+    /**
+     * Update a changes of favorite or wished comic on database.
+     * @param comic the entry to update on database
+     */
+    public void updateComic(Comic comic) {
         if (mEditor.equals(Constants.Sections.FAVORITE)) {
-            mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-            CCLogger.d(TAG, "onContextItemSelected - preparing for removing favorite comic with ID " + itemID);
-            // Defines selection criteria for the rows you want to update
-            String whereClause = ComicDatabase.ID + "=?";
-            String[] whereArgs = new String[]{String.valueOf(itemID)};
-            int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
-            CCLogger.v(TAG, "onContextItemSelected - favorite comic UPDATED " + rowUpdated);
+            CCLogger.d(TAG, "deleteComic - Removing favorite comic with ID " + comic.getId());
+            // Remove comic from favorite
+            ComicEntity comicEntity = (ComicEntity) comic;
+            comicEntity.setFavorite(!comicEntity.isFavorite());
+            updateData(comicEntity);
         } else if (mEditor.equals(Constants.Sections.CART)) {
-            CCLogger.d(TAG, "onContextItemSelected - preparing for removing comic in cart with ID " + itemID);
-            removeComicFromCart(itemID);
+            CCLogger.d(TAG, "onContextItemSelected - Removing comic in cart with ID " + comic.getId());
+            // Remove comic from cart
+            removeComicFromCart(comic);
         }
 
         WidgetService.updateWidget(getActivity());
     }
 
-    private void removeComicFromCart(long comicId) {
+    /**
+     * Method used to handle update operation on comic which is on cart list.<br>
+     * If the comic was created by user, it will be deleted; otherwise it is just updated.
+     * @param comic the comic to update or remove
+     */
+    private void removeComicFromCart(Comic comic) {
         // Evaluate if comic was created by user or it is coming from network
-        Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + comicId);
-        String[] projection = {ComicDatabase.COMICS_EDITOR_KEY};
-        Cursor cursor = ComicDatabaseManager.query(getActivity(), uri, projection, null, null, null);
-        cursor.moveToFirst();
-        String rawEditor = cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY));
-        Constants.Sections editor = Constants.Sections.getEditorFromName(rawEditor);
-        CCLogger.d(TAG, "removeComicFromCart - rawEditor " + rawEditor + " editor " + editor + " for comicId " + comicId);
-        cursor.close();
-        // Defines selection criteria for the rows you want to update / remove
-        String whereClause = ComicDatabase.ID + "=?";
-        String[] whereArgs = new String[]{String.valueOf(comicId)};
+        ComicEntity comicEntity = (ComicEntity) comic;
+        Constants.Sections editor = Constants.Sections.getEditorFromName(comicEntity.getEditor());
         switch (editor) {
             case CART:
-                int rowRemoved = ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, whereClause, whereArgs);
-                CCLogger.v(TAG, "removeComicFromCart - row REMOVED " + rowRemoved);
+                // Simply delete comic because was created by user
+                deleteData(comicEntity);
+                CCLogger.v(TAG, "removeComicFromCart - Comic deleted!");
                 break;
             default:
-                ContentValues mUpdateValues = new ContentValues();
-                mUpdateValues.put(ComicDatabase.COMICS_CART_KEY, "no");
-                int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, whereClause, whereArgs);
-                CCLogger.v(TAG, "removeComicFromCart - row UPDATED " + rowUpdated);
+                // Update comic because it is created from web data
+                comicEntity.setToCart(!comicEntity.isOnCart());
+                updateData(comicEntity);
+                CCLogger.v(TAG, "removeComicFromCart - Comic updated!");
                 break;
         }
+    }
+
+    /**
+     * Updating data of comic.
+     * @param comicEntity the comic to update
+     */
+    private void updateData(ComicEntity comicEntity) {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                ((CCApp) getActivity().getApplication()).getRepository().updateComic(comicEntity);
+            }
+        });
+
+        WidgetService.updateWidget(getActivity());
+    }
+
+    /**
+     * Completely delete the comic from database.
+     * @param comicEntity the comic to delete
+     */
+    private void deleteData(ComicEntity comicEntity) {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                ((CCApp) getActivity().getApplication()).getRepository().deleteComic(comicEntity);
+            }
+        });
+
+        WidgetService.updateWidget(getActivity());
     }
 
     /* ****************************************************************************************

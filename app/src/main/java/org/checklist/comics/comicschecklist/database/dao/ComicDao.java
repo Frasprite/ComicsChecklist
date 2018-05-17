@@ -2,6 +2,7 @@ package org.checklist.comics.comicschecklist.database.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
@@ -16,6 +17,9 @@ public interface ComicDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<ComicEntity> comics);
+
+    @Delete
+    int deleteComic(ComicEntity comic);
 
     // Room maps boolean 'true' to 1 and 'false' to 0.
     @Query("SELECT * FROM comics WHERE isFavorite = 1 ORDER BY release_date")

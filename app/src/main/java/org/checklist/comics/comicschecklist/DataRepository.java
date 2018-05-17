@@ -89,6 +89,10 @@ public class DataRepository {
         mDatabase.comicDao().update(comicEntity);
     }
 
+    public void deleteComic(ComicEntity comicEntity) {
+        mDatabase.comicDao().deleteComic(comicEntity);
+    }
+
     public void getFavoriteComics() {
         mObservableComics.addSource(mDatabase.comicDao().loadFavoriteComics(),
                 comicEntities -> {
