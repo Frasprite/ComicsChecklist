@@ -65,7 +65,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-            // Remove swiped item from list and notify the RecyclerView
+            // TODO Remove swiped item from list and notify the RecyclerView
             /*int position = viewHolder.getAdapterPosition();
             Cursor cursor = mAdapter.getCursor();
             if (cursor != null) {
@@ -110,6 +110,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_recycler_view, container, false);
 
         // Init adapter
+        // TODO add Paging from architecture, because content will be updated each time an item changes
         mComicAdapter = new ComicAdapter(mComicClickCallback);
         mBinding.recyclerView.setAdapter(mComicAdapter);
 

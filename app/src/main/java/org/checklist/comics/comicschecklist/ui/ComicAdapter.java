@@ -99,13 +99,4 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ComicViewHol
             this.binding = binding;
         }
     }
-
-    /*private void setAnimation(View viewToAnimate, int position) {
-        // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > mLastPosition) {
-            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.fade_in);
-            viewToAnimate.startAnimation(animation);
-            mLastPosition = position;
-        }
-    }*/
 }
