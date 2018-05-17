@@ -19,9 +19,4 @@
         android:icon="@drawable/ic_cached"
         android:title="@string/activity_bottom_text_refresh"
         app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/deleteAll"
-        android:title="@string/menu_delete_all"
-        android:icon="@drawable/ic_delete"
-        app:showAsAction="ifRoom" />
 </menu>

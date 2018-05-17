@@ -203,9 +203,6 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
             case R.id.refresh:
                 initiateRefresh(mEditor);
                 break;
-            case R.id.deleteAll:
-                deleteAllComic();
-                break;
         }
         return true;
     }
@@ -357,47 +354,6 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         // Update refresh spinner
         if (isRefreshing()) {
             setRefreshing(false);
-        }
-    }
-
-    private void deleteAllComic() {
-        ContentValues mUpdateValues = new ContentValues();
-        int updateResult;
-        switch (mEditor) {
-            case FAVORITE:
-                // Update all favorite
-                mUpdateValues.put(ComicDatabase.COMICS_FAVORITE_KEY, "no");
-                updateResult = ComicDatabaseManager.update(getActivity(), mUpdateValues, null, null);
-                if (updateResult > 0) {
-                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_favorite), Toast.LENGTH_SHORT).show();
-                    CCLogger.d(TAG, "onContextItemSelected - deleting all favorite comic");
-                } else {
-                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
-                    CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from favorite");
-                }
-                break;
-            case CART:
-                // Remove comic from cart
-                updateResult = removeAllComicFromCart();
-                if (updateResult > 0) {
-                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_all_cart), Toast.LENGTH_SHORT).show();
-                    CCLogger.d(TAG, "onContextItemSelected - deleting " + updateResult + " from cart");
-                } else {
-                    Toast.makeText(getActivity(), getResources().getString(R.string.comic_delete_all_fail), Toast.LENGTH_SHORT).show();
-                    CCLogger.w(TAG, "onContextItemSelected - error while removing all comic from cart");
-                }
-                break;
-            default:
-                // Removing all comics of current editor
-                CCLogger.v(TAG, "deleteAllComic - Deleting all comics from this editor " + mEditor);
-                String selection = ComicDatabase.COMICS_EDITOR_KEY + " =? AND " +
-                        ComicDatabase.COMICS_CART_KEY + " =? AND " +
-                        ComicDatabase.COMICS_FAVORITE_KEY + " =?";
-                String[] selectionArgs = new String[]{mEditor.getName(), "no", "no"};
-                int result = ComicDatabaseManager.delete(getActivity(), ComicContentProvider.CONTENT_URI, selection, selectionArgs);
-                CCLogger.d(TAG, "Deleted " + result + " entries of " + mEditor + " section");
-                break;
-
         }
     }
 
