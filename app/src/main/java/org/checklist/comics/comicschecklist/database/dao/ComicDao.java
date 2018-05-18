@@ -18,6 +18,9 @@ public interface ComicDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(List<ComicEntity> comics);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    long insert(ComicEntity comic);
+
     @Delete
     int deleteComic(ComicEntity comic);
 

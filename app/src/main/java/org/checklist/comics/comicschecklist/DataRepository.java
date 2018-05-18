@@ -89,6 +89,10 @@ public class DataRepository {
         mDatabase.comicDao().update(comicEntity);
     }
 
+    public long insertComic(ComicEntity comicEntity) {
+        return mDatabase.comicDao().insert(comicEntity);
+    }
+
     public void deleteComic(ComicEntity comicEntity) {
         mDatabase.comicDao().deleteComic(comicEntity);
     }

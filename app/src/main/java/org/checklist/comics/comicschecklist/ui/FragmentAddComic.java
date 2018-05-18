@@ -1,8 +1,7 @@
 package org.checklist.comics.comicschecklist.ui;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.net.Uri;
+import android.arch.lifecycle.LiveData;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,14 +10,15 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
+
+import java.util.concurrent.Callable;
 
 /**
  * Fragment which manage the comic creation.
@@ -27,7 +27,7 @@ public class FragmentAddComic extends Fragment {
 
     private static final String TAG = FragmentAddComic.class.getSimpleName();
 
-    private long mComicId = -1;
+    private int mComicId = -1;
 
     private EditText mNameEditText;
     private EditText mInfoEditText;
@@ -66,7 +66,7 @@ public class FragmentAddComic extends Fragment {
 
         if (savedInstanceState != null) {
             // Restore last state for checked position.
-            mComicId = savedInstanceState.getLong(Constants.ARG_SAVED_COMIC_ID, -1);
+            mComicId = savedInstanceState.getInt(Constants.ARG_SAVED_COMIC_ID, -1);
             CCLogger.d(TAG, "onActivityCreated - mComicId (initiated from BUNDLE) = " + mComicId);
         }
 
@@ -78,17 +78,18 @@ public class FragmentAddComic extends Fragment {
         super.onResume();
         // Load data from database if ID is passed from activity
         if (mComicId > -1) {
-            Uri uri = Uri.parse(ComicContentProvider.CONTENT_URI + "/" + mComicId);
-            String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_RELEASE_KEY,
-                    ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY, ComicDatabase.COMICS_PRICE_KEY,
-                    ComicDatabase.COMICS_FEATURE_KEY, ComicDatabase.COMICS_COVER_KEY, ComicDatabase.COMICS_EDITOR_KEY,
-                    ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_CART_KEY};
-            Cursor mCursor = ComicDatabaseManager.query(getActivity(), uri, projection, null, null, null);
-            mCursor.moveToFirst();
-            mNameEditText.setText(mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY)));
-            mInfoEditText.setText(mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY)));
-            mDateTextView.setText(mCursor.getString(mCursor.getColumnIndex(ComicDatabase.COMICS_RELEASE_KEY)));
-            mCursor.close();
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    LiveData<ComicEntity> liveData = ((CCApp) getActivity().getApplication()).getRepository().loadComic(mComicId);
+                    ComicEntity comicEntity = liveData.getValue();
+                    CCLogger.d(TAG, "loadComicWithID - Comic : " + comicEntity);
+
+                    mNameEditText.setText(comicEntity.getName());
+                    mInfoEditText.setText(comicEntity.getDescription());
+                    mDateTextView.setText(DateCreator.elaborateDate(comicEntity.getReleaseDate()));
+                }
+            });
         } else {
             // Leave all form in blank and set default date
             updateDate(DateCreator.getTodayString());
@@ -99,7 +100,7 @@ public class FragmentAddComic extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         CCLogger.d(TAG, "onSaveInstanceState - saving mComicId " + mComicId);
-        outState.putLong(Constants.ARG_SAVED_COMIC_ID, mComicId);
+        outState.putInt(Constants.ARG_SAVED_COMIC_ID, mComicId);
     }
 
     @Override
@@ -107,39 +108,40 @@ public class FragmentAddComic extends Fragment {
         String name = mNameEditText.getText().toString();
         String info = mInfoEditText.getText().toString();
         String date = mDateTextView.getText().toString();
+
         if (info.length() > 0) {
             // Save data if there is at least some info and put a default title
             if (name.length() == 0) {
                 name = getString(R.string.text_default_title);
             }
 
+            // Insert new entry
+            ComicEntity comicEntity = new ComicEntity(name,
+                    DateCreator.elaborateDate(date),
+                    info,
+                    "N.D.",
+                    "N.D.",
+                    "N.D.",
+                    Constants.Sections.getName(Constants.Sections.CART),
+                    false, false,
+                    "");
+
             if (mComicId == -1) {
-                // Insert new entry
-                mComicId = ComicDatabaseManager.insert(
-                        getActivity(),
-                        name,
-                        Constants.Sections.getName(Constants.Sections.CART),
-                        info,
-                        date,
-                        DateCreator.elaborateDate(date),
-                        "error", "N.D.", "N.D.", "yes", "no", "");
-                CCLogger.d(TAG, "INSERTED new entry on database with ID " + mComicId);
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        mComicId = (int)((CCApp) getActivity().getApplication()).getRepository().insertComic(comicEntity);
+                        CCLogger.d(TAG, "onPause - INSERTED new entry on database with ID " + mComicId);
+                    }
+                });
             } else {
-                // Update entry
-                ContentValues mUpdateValues = new ContentValues();
-                mUpdateValues.put(ComicDatabase.COMICS_NAME_KEY, name);
-                mUpdateValues.put(ComicDatabase.COMICS_DESCRIPTION_KEY, info);
-                mUpdateValues.put(ComicDatabase.COMICS_DATE_KEY, DateCreator.elaborateDate(date).getTime());
-                mUpdateValues.put(ComicDatabase.COMICS_RELEASE_KEY, date);
-                // Defines selection criteria for the rows you want to update
-                String mSelectionClause = ComicDatabase.ID +  "=?";
-                String[] mSelectionArgs = new String[]{String.valueOf(mComicId)};
-                int rowUpdated = ComicDatabaseManager.update(getActivity(), mUpdateValues, mSelectionClause, mSelectionArgs);
-                if (rowUpdated > 0) {
-                    CCLogger.d(TAG, "UPDATED entry on database with ID " + mComicId);
-                } else {
-                    CCLogger.w(TAG, "UPDATE failed for entry with ID " + mComicId);
-                }
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        ((CCApp) getActivity().getApplication()).getRepository().updateComic(comicEntity);
+                        CCLogger.d(TAG, "onPause - UPDATED entry on database with ID " + mComicId);
+                    }
+                });
             }
 
             // Update widget

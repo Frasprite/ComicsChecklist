@@ -54,6 +54,16 @@ public class DateCreator {
     }
 
     /**
+     * Elaborate a date from given day, month (which is from 0 to 11) and year.
+     * @param date the {@link Date} elaborated
+     * @return a date in following format "dd/MM/yyyy"
+     */
+    public static String elaborateDate(Date date) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        return simpleDateFormat.format(date);
+    }
+
+    /**
      * Method used to create an human readable date ("dd/MM/yyyy").
      * @return the date in a good human format
      */
