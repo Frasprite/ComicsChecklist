@@ -227,7 +227,7 @@ public class ParserPanini extends Parser {
                 case "format":
                 case "includes":
                     // For other info, take all text
-                    feature.append(element.text());
+                    feature.append(element.text()).append(" ");
                     break;
             }
         }
