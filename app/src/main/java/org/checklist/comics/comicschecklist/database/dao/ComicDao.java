@@ -24,13 +24,12 @@ public interface ComicDao {
     @Delete
     void deleteComic(ComicEntity comic);
 
-    @Query("DELETE FROM comics WHERE release_date <= :time")
+    @Query("DELETE FROM comics WHERE release_date <= :time AND isFavorite = 0 AND isOnCart = 0")
     int deleteOldComics(long time);
 
-    @Query("DELETE FROM comics WHERE editor LIKE :editor")
+    @Query("DELETE FROM comics WHERE editor LIKE :editor AND isFavorite = 0 AND isOnCart = 0")
     int deleteComics(String editor);
 
-    // Room maps boolean 'true' to 1 and 'false' to 0.
     @Query("SELECT * FROM comics WHERE isFavorite = 1 ORDER BY release_date")
     LiveData<List<ComicEntity>> loadFavoriteComics();
 

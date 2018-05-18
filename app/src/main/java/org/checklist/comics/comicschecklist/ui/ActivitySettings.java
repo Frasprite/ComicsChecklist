@@ -348,7 +348,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                 @Override
                 public void run() {
                     int rowsDeleted = ((CCApp) context.getApplicationContext()).getRepository().deleteComics(section.getName());
-                    CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted + " with given section " + section.getName());
+                    CCLogger.d(TAG, "deleteComics - Entries deleted: " + rowsDeleted + " with given section " + section.getName());
                     if (rowsDeleted > 0) {
                         // Update widgets as well
                         WidgetService.updateWidget(context);
