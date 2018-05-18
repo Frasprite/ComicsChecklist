@@ -22,7 +22,13 @@ public interface ComicDao {
     long insert(ComicEntity comic);
 
     @Delete
-    int deleteComic(ComicEntity comic);
+    void deleteComic(ComicEntity comic);
+
+    @Query("DELETE FROM comics WHERE release_date <= :time")
+    int deleteOldComics(long time);
+
+    @Query("DELETE FROM comics WHERE editor LIKE :editor")
+    int deleteComics(String editor);
 
     // Room maps boolean 'true' to 1 and 'false' to 0.
     @Query("SELECT * FROM comics WHERE isFavorite = 1 ORDER BY release_date")
@@ -45,6 +51,9 @@ public interface ComicDao {
 
     @Query("SELECT * FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     List<ComicEntity> loadComicsByEditorSync(String editorName);
+
+    @Query("SELECT * FROM comics WHERE isFavorite = 1 AND release_date = :time")
+    int checkFavoritesRelease(long time);
 
     @Update
     int update(ComicEntity comic);

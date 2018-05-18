@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
@@ -16,12 +17,11 @@ import android.view.MenuItem;
 
 import com.evernote.android.job.JobManager;
 
+import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.notification.ComicReleaseSyncJob;
 import org.checklist.comics.comicschecklist.log.CCLogger;
+import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -323,12 +323,7 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                             }
                             if (section != null) {
                                 CCLogger.v(TAG, "Selected item on position " + which + " - obtaining section " + section);
-                                String selection = ComicDatabase.COMICS_EDITOR_KEY + " =? AND " +
-                                                    ComicDatabase.COMICS_CART_KEY + " =? AND " +
-                                                    ComicDatabase.COMICS_FAVORITE_KEY + " =?";
-                                String[] selectionArgs = new String[]{section.getName(), "no", "no"};
-                                int result = ComicDatabaseManager.delete(context, ComicContentProvider.CONTENT_URI, selection, selectionArgs);
-                                CCLogger.d(TAG, "Deleted " + result + " entries of " + section + " section");
+                                deleteComics(context, section);
                             } else {
                                 CCLogger.w(TAG, "No section found with index " + which);
                                 dialog.dismiss();
@@ -346,6 +341,20 @@ public class ActivitySettings extends AppCompatPreferenceActivity {
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+
+        private void deleteComics(Context context, Constants.Sections section) {
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    int rowsDeleted = ((CCApp) context.getApplicationContext()).getRepository().deleteComics(section.getName());
+                    CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted + " with given section " + section.getName());
+                    if (rowsDeleted > 0) {
+                        // Update widgets as well
+                        WidgetService.updateWidget(context);
+                    }
+                }
+            });
         }
     }
 }

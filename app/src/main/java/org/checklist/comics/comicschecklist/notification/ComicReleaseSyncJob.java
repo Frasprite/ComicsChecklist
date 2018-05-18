@@ -1,15 +1,12 @@
 package org.checklist.comics.comicschecklist.notification;
 
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 
 import com.evernote.android.job.DailyJob;
 import com.evernote.android.job.JobRequest;
 
+import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
@@ -25,27 +22,21 @@ public class ComicReleaseSyncJob extends DailyJob {
     @NonNull
     @Override
     protected DailyJobResult onRunDailyJob(@NonNull Params params) {
-        // Run your job here
-        CCLogger.d(TAG, "onRunJob - start");
-        // Do the work that requires your app to keep the CPU running.
-        String[] columns = new String[]{ComicDatabase.COMICS_NAME_KEY, ComicDatabase.COMICS_EDITOR_KEY, ComicDatabase.COMICS_RELEASE_KEY};
-        String selection = ComicDatabase.COMICS_RELEASE_KEY + " LIKE ? AND " + ComicDatabase.COMICS_FAVORITE_KEY + " LIKE ?";
-        String[] selectionArguments = new String[]{DateCreator.getTodayString(), "yes"};
-        String order = ComicDatabase.COMICS_DATE_KEY + " " + "ASC";
-        Cursor cursor = ComicDatabaseManager.query(getContext(), ComicContentProvider.CONTENT_URI, columns, selection,
-                selectionArguments, order);
-        if (cursor != null) {
-            if (cursor.getCount() == 1) {
-                CCLogger.i(TAG, "onRunJob - Favorite comic found");
-                CCNotificationManager.createNotification(getContext(), getContext().getResources().getString(R.string.notification_comic_out), false);
-            } else if (cursor.getCount() > 1) {
-                CCLogger.i(TAG, "onRunJob - Founded more favorite comics");
-                String text = getContext().getResources().getString(R.string.notification_comics_out_1) + " " + cursor.getCount() + " " +
-                        getContext().getResources().getString(R.string.notification_comics_out_2);
-                CCNotificationManager.createNotification(getContext(), text, false);
-            }
-            cursor.close();
+        CCLogger.d(TAG, "onRunDailyJob - start");
+        // Do the work that requires your app to keep the CPU running
+        String today = DateCreator.getTodayString();
+        CCLogger.v(TAG, "onRunDailyJob - Today is " + today);
+        int totalItems = ((CCApp) getContext().getApplicationContext()).getRepository().checkFavoritesRelease(DateCreator.getTimeInMillis(today));
+
+        String message = getContext().getResources().getString(R.string.notification_comic_out);
+        if (totalItems == 1) {
+            CCLogger.i(TAG, "onRunDailyJob - Favorite comic found");
+        } else if (totalItems > 1) {
+            CCLogger.i(TAG, "onRunDailyJob - Founded more favorite comics");
+            message = getContext().getResources().getString(R.string.notification_comics_out, totalItems);
         }
+
+        CCNotificationManager.createNotification(getContext(), message, false);
 
         return DailyJobResult.SUCCESS;
     }

@@ -7,19 +7,18 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
+import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.database.AppDatabase;
 import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.parser.ParserBonelli;
 import org.checklist.comics.comicschecklist.parser.ParserPanini;
 import org.checklist.comics.comicschecklist.parser.ParserRW;
 import org.checklist.comics.comicschecklist.parser.ParserStar;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.notification.CCNotificationManager;
 import org.checklist.comics.comicschecklist.util.Constants;
@@ -223,23 +222,19 @@ public class DownloadService extends IntentService {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String deletePref = sharedPref.getString(Constants.PREF_DELETE_FREQUENCY, "-1");
         int frequency = Integer.parseInt(deletePref);
-        int rowsDeleted = 0;
         if (frequency > -1) {
-            // Defines selection criteria for the rows to delete
-            String mSelectionClause = ComicDatabase.COMICS_DATE_KEY + "<?";
-            String[] mSelectionArgs = {"" + DateCreator.getPastDay(frequency).getTime()};
-            rowsDeleted = ComicDatabaseManager.delete(this,
-                    ComicContentProvider.CONTENT_URI,   // the comic content URI
-                    mSelectionClause,                   // the column to select on
-                    mSelectionArgs                      // the value to compare to
-            );
-
-            CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted);
-        }
-
-        if (rowsDeleted > 0) {
-            // Update widgets as well
-            WidgetService.updateWidget(this);
+            long time = DateCreator.getPastDay(frequency).getTime();
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    int rowsDeleted = ((CCApp) DownloadService.this.getApplicationContext()).getRepository().deleteOldComics(time);
+                    CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted + " with given frequency " + frequency);
+                    if (rowsDeleted > 0) {
+                        // Update widgets as well
+                        WidgetService.updateWidget(DownloadService.this);
+                    }
+                }
+            });
         }
     }
 

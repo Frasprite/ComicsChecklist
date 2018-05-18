@@ -186,9 +186,8 @@
     <string name="pref_summary_delete_content">Seleziona un editore dalla lista per cancellare le relative uscite (ATTENZIONE: le uscite presenti nelle sezioni "Da comprare" o "Liste preferiti" non verranno cancellate)</string>
 
     <!-- Notification text -->
-    <string name="notification_comic_out">Oggi esce un solo fumetto, apri la lista dei preferiti!</string>
-    <string name="notification_comics_out_1">Oggi escono</string>
-    <string name="notification_comics_out_2">fumetti, apri la lista dei preferiti!</string>
+    <string name="notification_comic_out">Oggi esce un fumetto, apri la lista dei preferiti!</string>
+    <string name="notification_comics_out">Oggi escono %1$d fumetti, apri la lista dei preferiti!</string>
 
     <!-- Various text -->
     <string name="comic_deleted_all_favorite">La lista dei preferiti è stata cancellata.</string>

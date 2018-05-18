@@ -127,4 +127,16 @@ public class DataRepository {
     public void insertComics(ArrayList<ComicEntity> comicsList) {
         mDatabase.runInTransaction(() -> mDatabase.comicDao().insertAll(comicsList));
     }
+
+    public int deleteOldComics(long time) {
+        return mDatabase.comicDao().deleteOldComics(time);
+    }
+
+    public int deleteComics(String editor) {
+        return mDatabase.comicDao().deleteComics(editor);
+    }
+
+    public int checkFavoritesRelease(long time) {
+        return mDatabase.comicDao().checkFavoritesRelease(time);
+    }
 }
