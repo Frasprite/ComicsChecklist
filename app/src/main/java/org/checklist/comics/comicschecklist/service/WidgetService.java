@@ -76,7 +76,7 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                List<ComicEntity> list = ((CCApp) mContext).getDatabase().comicDao().loadComicsByEditorSync(mEditor);
+                List<ComicEntity> list = ((CCApp) mContext).getRepository().loadComicsByEditorSync(mEditor);
                 CCLogger.d(TAG, "populateWidget - List : " + list);
 
                 int mID;

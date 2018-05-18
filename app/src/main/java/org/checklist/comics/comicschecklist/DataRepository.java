@@ -89,6 +89,10 @@ public class DataRepository {
         return mDatabase.comicDao().loadComicSync(comicId);
     }
 
+    public List<ComicEntity> loadComicsByEditorSync(String editor) {
+        return mDatabase.comicDao().loadComicsByEditorSync(editor);
+    }
+
     public void updateComic(ComicEntity comicEntity) {
         mDatabase.comicDao().update(comicEntity);
     }
