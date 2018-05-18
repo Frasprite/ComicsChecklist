@@ -28,7 +28,7 @@ public interface ComicDao {
     @Query("SELECT * FROM comics WHERE isFavorite = 1 ORDER BY release_date")
     LiveData<List<ComicEntity>> loadFavoriteComics();
 
-    @Query("SELECT * FROM comics WHERE isOnCart = 1 ORDER BY release_date")
+    @Query("SELECT * FROM comics WHERE isOnCart = 1 OR editor LIKE 'da comprare' ORDER BY release_date")
     LiveData<List<ComicEntity>> loadWishlistComics();
 
     @Query("SELECT * FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
