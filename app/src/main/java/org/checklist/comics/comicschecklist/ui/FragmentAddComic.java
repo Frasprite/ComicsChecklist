@@ -1,6 +1,5 @@
 package org.checklist.comics.comicschecklist.ui;
 
-import android.arch.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,8 +16,6 @@ import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
-
-import java.util.concurrent.Callable;
 
 /**
  * Fragment which manage the comic creation.
@@ -81,8 +78,7 @@ public class FragmentAddComic extends Fragment {
             AsyncTask.execute(new Runnable() {
                 @Override
                 public void run() {
-                    LiveData<ComicEntity> liveData = ((CCApp) getActivity().getApplication()).getRepository().loadComic(mComicId);
-                    ComicEntity comicEntity = liveData.getValue();
+                    ComicEntity comicEntity = ((CCApp) getActivity().getApplication()).getRepository().loadComicSync(mComicId);
                     CCLogger.d(TAG, "loadComicWithID - Comic : " + comicEntity);
 
                     mNameEditText.setText(comicEntity.getName());

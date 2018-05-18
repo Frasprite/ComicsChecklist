@@ -299,7 +299,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                ComicEntity comicEntity = ((CCApp) getApplicationContext()).getDatabase().comicDao().loadComicSync(comicId);
+                ComicEntity comicEntity = ((CCApp) getApplication()).getRepository().loadComicSync(comicId);
                 CCLogger.d(TAG, "loadComicWithID - Comic : " + comicEntity);
                 launchDetailView(comicEntity);
             }
