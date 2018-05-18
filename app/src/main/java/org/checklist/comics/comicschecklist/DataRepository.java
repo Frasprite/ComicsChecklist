@@ -7,6 +7,7 @@ import org.checklist.comics.comicschecklist.database.AppDatabase;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.util.Constants;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -121,5 +122,9 @@ public class DataRepository {
                         mObservableComics.postValue(comicEntities);
                     }
                 });
+    }
+
+    public void insertComics(ArrayList<ComicEntity> comicsList) {
+        mDatabase.runInTransaction(() -> mDatabase.comicDao().insertAll(comicsList));
     }
 }

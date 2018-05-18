@@ -15,17 +15,12 @@ import android.support.annotation.VisibleForTesting;
 import org.checklist.comics.comicschecklist.database.converter.DateConverter;
 import org.checklist.comics.comicschecklist.database.dao.ComicDao;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
-import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.Constants;
-
-import java.util.List;
 
 @Database(entities = {ComicEntity.class}, version = 1)
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
-
-    private static final String TAG = AppDatabase.class.getSimpleName();
 
     private static AppDatabase sInstance;
 
@@ -74,11 +69,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public void setDatabaseCreated(){
         mIsDatabaseCreated.postValue(true);
-    }
-
-    public static void insertData(final AppDatabase database, final List<ComicEntity> comics) {
-        CCLogger.v(TAG, "insertData - Inserting " + comics.size() + " comics on DB");
-        database.runInTransaction(() -> database.comicDao().insertAll(comics));
     }
 
     public LiveData<Boolean> getDatabaseCreated() {

@@ -2,7 +2,7 @@ package org.checklist.comics.comicschecklist.parser;
 
 import android.content.Context;
 
-import org.checklist.comics.comicschecklist.database.AppDatabase;
+import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
@@ -267,9 +267,9 @@ public class ParserStar extends Parser {
             }
         }
 
-        // Get reference to database and insert data
-        AppDatabase database = AppDatabase.getInstance(mContext.getApplicationContext());
-        AppDatabase.insertData(database, mComicsList);
+        // Get reference to repository and insert data
+        CCLogger.v(TAG, "parseUrl - Inserting " + mComicsList.size() + " comics on DB");
+        ((CCApp) mContext.getApplicationContext()).getRepository().insertComics(mComicsList);
         mComicsList.clear();
 
         return parseError;
