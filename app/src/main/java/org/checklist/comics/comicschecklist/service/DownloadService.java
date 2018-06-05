@@ -283,7 +283,8 @@ public class DownloadService extends IntentService {
                 ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_EDITOR_KEY,
                 ComicDatabase.COMICS_CART_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY,
                 ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_FEATURE_KEY,
-                ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_URL_KEY};
+                ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_URL_KEY,
+                ComicDatabase.COMICS_COVER_KEY};
 
         Cursor cursor = ComicDatabaseManager.query(this, ComicContentProvider.CONTENT_URI, projection, null, null, null);
         if (cursor != null) {
