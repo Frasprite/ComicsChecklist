@@ -68,8 +68,7 @@
         <provider
             android:name=".provider.ComicContentProvider"
             android:authorities="org.checklist.comics.comicschecklist.contentprovider"
-            android:exported="true"
-            android:multiprocess="true"
+            android:exported="false"
             tools:ignore="ExportedContentProvider" />
 
         <!-- Widget stuff -->
