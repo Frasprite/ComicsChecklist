@@ -12,6 +12,11 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 
 import java.util.List;
 
+/**
+ * The DAO where all CRUD operation are defined.<br>
+ * When data is deleted, entries marked as on cart or favorite it will maintained.<br>
+ * This because those sections are special and contains data created by user (specially CART).
+ */
 @Dao
 public interface ComicDao {
 

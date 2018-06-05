@@ -50,6 +50,12 @@ class ComicsRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory 
 
     // TODO Widget content is empty at creation, but if screen is rotated it will appear
     // TODO when app is updated, widget content disappear
+    /*
+    https://medium.com/the-wtf-files/the-mysterious-case-of-the-disappearing-widget-f4177a8e2c2b
+    https://gist.github.com/rock3r/9809139
+    https://github.com/frakbot/FWeather
+    https://stackoverflow.com/questions/8304387/android-how-do-i-force-the-update-of-all-widgets-of-a-particular-kind/8304682#8304682
+     */
     ComicsRemoteViewsFactory(Context applicationContext, Intent intent) {
         mContext = applicationContext;
         mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID);

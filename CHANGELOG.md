@@ -16,6 +16,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Find new editors ?
 - Make some advertisement on forums (http://www.dcleaguers.it/)
 
+## [2.1] - 05/06/2018
+### Added
+- Migrated to Room database
+- Added Android Architecture
+- Added CHANGELOG and README file
+
+### Changed
+- Improved main UI
+- Improved details UI
+
+### Removed
+- Removed some filter options on settings
+
 ## [2.0] - 19/12/2017
 ### Added
 - Updated code for Android 8.1
