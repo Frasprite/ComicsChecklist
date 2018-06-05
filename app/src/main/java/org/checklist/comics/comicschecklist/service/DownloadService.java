@@ -179,16 +179,16 @@ public class DownloadService extends IntentService {
         // Select editor
         switch (editor) {
             case PANINI:
-                error = new ParserPanini(getApplicationContext()).startParsing();
+                //error = new ParserPanini(getApplicationContext()).startParsing();
                 break;
             case STAR:
-                error = new ParserStar(getApplicationContext()).startParsing();
+                //error = new ParserStar(getApplicationContext()).startParsing();
                 break;
             case BONELLI:
                 error = new ParserBonelli(getApplicationContext()).startParsing();
                 break;
             case RW:
-                error = new ParserRW(getApplicationContext()).startParsing();
+                //error = new ParserRW(getApplicationContext()).startParsing();
                 break;
         }
 
