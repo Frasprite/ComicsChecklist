@@ -5,7 +5,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -13,10 +12,6 @@ import android.preference.PreferenceManager;
 
 import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.database.AppDatabase;
-import org.checklist.comics.comicschecklist.database.ComicDatabase;
-import org.checklist.comics.comicschecklist.database.ComicDatabaseManager;
-import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
-import org.checklist.comics.comicschecklist.provider.ComicContentProvider;
 import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.log.ParserLog;
@@ -29,10 +24,8 @@ import org.checklist.comics.comicschecklist.notification.CCNotificationManager;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -102,9 +95,6 @@ public class DownloadService extends IntentService {
             AppDatabase database = AppDatabase.getInstance(this.getApplicationContext());
             database.setDatabaseCreated();
         }
-
-        // Check if there is data on old SQL database
-        migrateFromOldDatabase();
 
         deleteOldRows();
     }
@@ -273,61 +263,6 @@ public class DownloadService extends IntentService {
         intent.putExtra(Constants.NOTIFICATION_RESULT, result);
         intent.putExtra(Constants.NOTIFICATION_EDITOR, editor);
         sendBroadcast(intent);
-    }
-
-    /**
-     * Method which check if there is data on previous database and migrate it.
-     */
-    private void migrateFromOldDatabase() {
-        String[] projection = {ComicDatabase.ID, ComicDatabase.COMICS_NAME_KEY,
-                ComicDatabase.COMICS_DATE_KEY, ComicDatabase.COMICS_EDITOR_KEY,
-                ComicDatabase.COMICS_CART_KEY, ComicDatabase.COMICS_DESCRIPTION_KEY,
-                ComicDatabase.COMICS_FAVORITE_KEY, ComicDatabase.COMICS_FEATURE_KEY,
-                ComicDatabase.COMICS_PRICE_KEY, ComicDatabase.COMICS_URL_KEY,
-                ComicDatabase.COMICS_COVER_KEY};
-
-        Cursor cursor = ComicDatabaseManager.query(this, ComicContentProvider.CONTENT_URI, projection, null, null, null);
-        if (cursor != null) {
-            CCLogger.v(TAG, "migrateFromOldDatabase - Entries on cursor : " + cursor.getCount());
-            ArrayList<ComicEntity> comicEntities = new ArrayList<>();
-            while (cursor.moveToNext()) {
-                ComicEntity comicEntity = new ComicEntity(
-                        cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_NAME_KEY)),
-                        new Date(cursor.getInt(cursor.getColumnIndex(ComicDatabase.COMICS_DATE_KEY))),
-                        cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_DESCRIPTION_KEY)),
-                        cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_PRICE_KEY)),
-                        cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_FEATURE_KEY)),
-                        cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_COVER_KEY)),
-                        cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_EDITOR_KEY)),
-                        elaborateBoolean(cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_FAVORITE_KEY))),
-                        elaborateBoolean(cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_CART_KEY))),
-                        cursor.getString(cursor.getColumnIndex(ComicDatabase.COMICS_URL_KEY))
-                );
-                CCLogger.v(TAG, "migrateFromOldDatabase - Migrating comic : " + comicEntity.getName() + " " + comicEntity.getReleaseDate().toString());
-            }
-
-            cursor.close();
-
-            if (comicEntities.size() > 0) {
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        ((CCApp) DownloadService.this.getApplicationContext()).getRepository().insertComics(comicEntities);
-                    }
-                });
-            }
-        }
-
-        this.deleteDatabase("comictable.db");
-    }
-
-    /**
-     * Support method which evaluate a boolean from string.
-     * @param raw the string to evaluate
-     * @return true if raw is 'yes'; false otherwise or by default
-     */
-    private boolean elaborateBoolean(String raw) {
-        return raw.equalsIgnoreCase("yes");
     }
 
     /**
