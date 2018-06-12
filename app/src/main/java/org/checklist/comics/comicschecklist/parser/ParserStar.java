@@ -1,13 +1,11 @@
 package org.checklist.comics.comicschecklist.parser;
 
-import android.content.Context;
-
-import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,114 +23,56 @@ public class ParserStar extends Parser {
     private static final String ROOT = BASE_URL + "/UsciteMensili.aspx?AspxAutoDetectCookieSupport=1";
     private static final String COMIC_ROOT = BASE_URL + "/fumetto.aspx?Fumetto=";
 
-    private ArrayList<ComicEntity> mComicsList = new ArrayList<>();
-
-    public ParserStar(Context context) {
-        super(context);
-    }
-
     /**
      * Method used to start search for SC comics. <br>
      * This method will launch a search for each comic URL.
-     * @return true if search was successful, false otherwise
+     * @return a list found comic
      */
     @Override
-    public boolean startParsing() {
-        CCLogger.i(TAG, "startParsing - Start searching Star Comics comics");
-        boolean parseError;
+    public ArrayList<ComicEntity> initParser() {
+        CCLogger.i(TAG, "initParser - Start searching Star Comics comics");
 
-        // Parse rootPath and find the first comic of the month
-        Document doc;
-        try {
-            doc = Jsoup.parse(new URL(ROOT).openStream(), "UTF-8", ROOT);
-        } catch (Exception e) {
-            // Unable to find data for Star Comics
-            CCLogger.w(TAG, "startParsing - Error while searching release from Star Comics site " + e.toString());
-            ParserLog.increaseWrongStarURL();
-            return false;
-        }
-
-        parseError = parseDoc(doc);
-
-        return parseError;
+        return parseUrl(ROOT);
     }
 
     @Override
-    public boolean parseUrl(String url) {
+    public ArrayList<ComicEntity> parseUrl(String url) {
         CCLogger.v(TAG, "parseUrl - Parsing " + url);
 
-        // Take data from web and save it on document
+        // First part: arse root page and find the first comic of the month
         Document doc;
         try {
-            // Create doc (ISO-8859-1 CP1252 UTF-8)
-            doc = Jsoup.parse(new URL(url)
-                    .openStream(), "UTF-8", url);
+            doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
         } catch (Exception e) {
-            CCLogger.w(TAG, "parseUrl - This url does not exists " + url + " " + e.toString());
+            // Unable to find data for Star Comics
+            CCLogger.w(TAG, "parseUrl - Error while searching release from Star Comics site " + e.toString());
             ParserLog.increaseWrongStarURL();
-            return true;
+            return null;
         }
 
-        ParserLog.increaseParsedStarURL();
-
-        // Take every info about comic on element
-        Element content;
-        try {
-            content = doc.getElementsByTag("article").first();
-        } catch (Exception e) {
-            CCLogger.w(TAG, "parseUrl - Can't take a list of elements " + url + " " + e.toString());
-            ParserLog.increaseWrongStarElements();
-            return true;
+        // Second part: elaborate first index where to start parse comic one by one
+        int firstIndex = elaborateFirstComicIndex(doc);
+        if (firstIndex <= 0) {
+            return null;
         }
 
-        // Init mandatory data
-        String title, releaseDate;
-        Date myDate;
-        // Init optional data
-        String description, price, feature, coverUrl;
+        // Third part: parse every single URL to find comic data
+        int lastIndex = firstIndex + 40;
+        CCLogger.v(TAG, "parseUrl - Parsing from " + firstIndex + " to " + lastIndex);
 
-        try {
-            // Take various info (name, release date and number)
-            CCLogger.v(TAG, "parseUrl - Start inspecting element:\n" + content.toString());
-
-            title = searchTitle(content);
-            if (title == null) {
-                CCLogger.w(TAG, "parseUrl - Title not found!");
-                ParserLog.increaseErrorOnParsingComic();
-                return true;
+        ArrayList<ComicEntity> comicEntities = new ArrayList<>();
+        ComicEntity comicEntity;
+        for (int i = firstIndex; i <= lastIndex; i++) {
+            String URL = COMIC_ROOT + i;
+            comicEntity = parseSingleComicURL(URL);
+            if (comicEntity != null) {
+                comicEntities.add(comicEntity);
             }
-
-            releaseDate = searchReleaseDate(content);
-            if (releaseDate == null) {
-                CCLogger.w(TAG, "parseUrl - Release date not found!");
-                ParserLog.increaseErrorOnParsingComic();
-                return true;
-            } else {
-                // Calculating date for SQL
-                myDate = DateCreator.elaborateDate(releaseDate);
-            }
-
-            CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + releaseDate);
-
-            coverUrl = searchCover(content);
-            description = searchDescription(content);
-            feature = searchFeature(content);
-            price = searchPrice(content);
-
-            CCLogger.d(TAG, "parseUrl - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
-
-            // Insert found comic on list
-            ComicEntity comic = new ComicEntity(title.toUpperCase(), myDate, description,
-                    price, feature, coverUrl, Constants.Sections.STAR.getName(), false, false, url);
-
-            mComicsList.add(comic);
-        } catch (Exception e) {
-            CCLogger.w(TAG, "parseUrlStarC - Error while searching data for comic id " + e.toString() + "\n" + url);
-            ParserLog.increaseErrorOnParsingComic();
-            return true;
         }
 
-        return false;
+        CCLogger.v(TAG, "parseUrl - Found " + comicEntities.size() + " comics!");
+
+        return comicEntities;
     }
 
     @Override
@@ -232,46 +172,95 @@ public class ParserStar extends Parser {
         return price;
     }
 
-    private boolean parseDoc(Document doc) {
-        int from;
-        int to;
-        boolean parseError = false;
+    private ComicEntity parseSingleComicURL(String url) {
+        // Take data from web and save it on document
+        Document docSingleComic;
+        try {
+            // Create doc (ISO-8859-1 CP1252 UTF-8)
+            docSingleComic = Jsoup.parse(new URL(url)
+                    .openStream(), "UTF-8", url);
+        } catch (Exception e) {
+            CCLogger.w(TAG, "parseSingleComicURL - This url does not exists " + url + " " + e.toString());
+            ParserLog.increaseWrongStarURL();
+            return null;
+        }
 
+        ParserLog.increaseParsedStarURL();
+
+        // Take every info about comic on element
+        Element content;
+        try {
+            content = docSingleComic.getElementsByTag("article").first();
+        } catch (Exception e) {
+            CCLogger.w(TAG, "parseSingleComicURL - Can't take a list of elements " + url + " " + e.toString());
+            ParserLog.increaseWrongStarElements();
+            return null;
+        }
+
+        // Init mandatory data
+        String title, releaseDate;
+        Date myDate;
+        // Init optional data
+        String description, price, feature, coverUrl;
+
+        try {
+            // Take various info (name, release date and number)
+            CCLogger.v(TAG, "parseSingleComicURL - Start inspecting element:\n" + content.toString());
+
+            title = searchTitle(content);
+            if (title == null) {
+                CCLogger.w(TAG, "parseSingleComicURL - Title not found!");
+                ParserLog.increaseErrorOnParsingComic();
+                return null;
+            }
+
+            releaseDate = searchReleaseDate(content);
+            if (releaseDate == null) {
+                CCLogger.w(TAG, "parseSingleComicURL - Release date not found!");
+                ParserLog.increaseErrorOnParsingComic();
+                return null;
+            } else {
+                // Calculating date for SQL
+                myDate = DateCreator.elaborateDate(releaseDate);
+            }
+
+            CCLogger.d(TAG, "parseSingleComicURL - Results:\nComic title : " + title + "\nRelease date : " + releaseDate);
+
+            coverUrl = searchCover(content);
+            description = searchDescription(content);
+            feature = searchFeature(content);
+            price = searchPrice(content);
+
+            CCLogger.d(TAG, "parseSingleComicURL - Results:\nCover url : " + coverUrl + "\nFeature : " + feature + "\nDescription : " + description + "\nPrice : " + price);
+
+            return new ComicEntity(title.toUpperCase(), myDate, description,
+                    price, feature, coverUrl, Constants.Sections.STAR.getName(), false, false, url);
+        } catch (Exception e) {
+            CCLogger.w(TAG, "parseSingleComicURL - Error while searching data for comic id " + e.toString() + "\n" + url);
+            ParserLog.increaseErrorOnParsingComic();
+            return null;
+        }
+    }
+
+    private int elaborateFirstComicIndex(Document doc) {
         Element content = doc.select("div.content.clearfix").first();
         if (content == null) {
-            CCLogger.w(TAG, "parseDoc - Element 'content' is NULL!");
-            return false;
+            CCLogger.w(TAG, "elaborateFirstComicIndex - Element 'content' is NULL!");
+            return -1;
         }
 
         Element photo = content.select("a[href]").first();
         if (photo == null) {
-            CCLogger.w(TAG, "parseDoc - Element 'photo' is NULL!");
-            return false;
+            CCLogger.w(TAG, "elaborateFirstComicIndex - Element 'photo' is NULL!");
+            return -1;
         }
 
         String myLink = photo.attr("href").replace("fumetto.aspx?Fumetto=", "");
         try {
-            from = Integer.parseInt(myLink);
+            return Integer.parseInt(myLink);
         } catch (Exception e) {
-            CCLogger.w(TAG, "parseDoc - Element 'href' is NULL! " + e.toString());
-            return false;
+            CCLogger.w(TAG, "elaborateFirstComicIndex - Element 'href' is NULL! " + e.toString());
+            return -1;
         }
-
-        to = from + 40;
-        CCLogger.v(TAG, "parseDoc - Parsing from " + from + " to " + to);
-
-        if (from != 0 && to != 0 && from < to) {
-            for (int i = from; i <= to; i++) {
-                String URL = COMIC_ROOT + i;
-                parseError = parseUrl(URL);
-            }
-        }
-
-        // Get reference to repository and insert data
-        CCLogger.v(TAG, "parseUrl - Inserting " + mComicsList.size() + " comics on DB");
-        ((CCApp) mContext.getApplicationContext()).getRepository().insertComics(mComicsList);
-        mComicsList.clear();
-
-        return parseError;
     }
 }

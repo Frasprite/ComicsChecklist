@@ -1,13 +1,11 @@
 package org.checklist.comics.comicschecklist.parser;
 
-import android.content.Context;
-
-import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,6 +13,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class ParserPanini extends Parser {
@@ -23,39 +22,50 @@ public class ParserPanini extends Parser {
 
     private static final String BASE_URL = "http://comics.panini.it";
 
-    public ParserPanini(Context context) {
-        super(context);
+    private enum LINKS {
+        QUESTA_SETTIMANA       (BASE_URL + "/calendario/uscite-questa-settimana/"),
+        PROSSIME_SETTIMANE     (BASE_URL + "/calendario/uscite-prossime-settimane/"),
+        MAGAZINE_9L            (BASE_URL + "/store/pub_ita_it/magazines/9l.html"),
+        PANINI_DISNEY          (BASE_URL + "/store/pub_ita_it/magazines/cmc-d.html"),
+        PLANET_MANGA           (BASE_URL + "/store/pub_ita_it/magazines/manga.html"),
+        MARVEL                 (BASE_URL + "/store/pub_ita_it/magazines/cmc-m.html"),
+        PANINI_COMICS          (BASE_URL + "/store/pub_ita_it/magazines/comics.html");
+
+        private final String _url;
+
+        LINKS(String url) {
+            _url = url;
+        }
+
+        public String getUrl() {
+            return _url;
+        }
     }
 
     /**
      * Method used to search Panini comics.
-     * @return true if search was successful, false otherwise
+     * @return a list found comic
      */
     @Override
-    public boolean startParsing() {
-        CCLogger.i(TAG, "startParsing - Start searching for Panini comics");
-        boolean parseError;
+    public ArrayList<ComicEntity> initParser() {
+        CCLogger.i(TAG, "initParser - Start searching for Panini comics");
+        ArrayList<ComicEntity> comicEntities = new ArrayList<>();
+        List<ComicEntity> foundComics;
 
-        parseError = parseUrl(BASE_URL + "/calendario/uscite-questa-settimana/");
-        CCLogger.v(TAG, "startParsing - Result on this week is " + parseError);
-        parseError = parseUrl(BASE_URL + "/calendario/uscite-prossime-settimane/");
-        CCLogger.v(TAG, "startParsing - Result on next week is " + parseError);
-        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/9l.html");
-        CCLogger.v(TAG, "startParsing - Result on 9L is" + parseError);
-        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/cmc-d.html");
-        CCLogger.v(TAG, "startParsing - Result on Panini Disney is " + parseError);
-        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/manga.html");
-        CCLogger.v(TAG, "startParsing - Result on Planet Manga is " + parseError);
-        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/cmc-m.html");
-        CCLogger.v(TAG, "startParsing - Result on Marvel is " + parseError);
-        parseError = parseUrl(BASE_URL + "/store/pub_ita_it/magazines/comics.html");
-        CCLogger.v(TAG, "startParsing - Result on Panini Comics is " + parseError);
+        for (LINKS link : LINKS.values()) {
+            foundComics = parseUrl(link.getUrl());
+            if (foundComics == null) {
+                CCLogger.w(TAG, "initParser - No results from link " + link.getUrl());
+                continue;
+            }
+            comicEntities.addAll(foundComics);
+        }
 
-        return parseError;
+        return comicEntities;
     }
 
     @Override
-    public boolean parseUrl(String url) {
+    public ArrayList<ComicEntity> parseUrl(String url) {
         CCLogger.d(TAG, "parseUrl - Parsing " + url);
 
         // Take data from web and save it on document
@@ -69,7 +79,7 @@ public class ParserPanini extends Parser {
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - This url does not exists " + url + " " + e.toString());
             ParserLog.increaseWrongPaniniURL();
-            return true;
+            return null;
         }
 
         ParserLog.increaseParsedPaniniURL();
@@ -84,7 +94,7 @@ public class ParserPanini extends Parser {
         } else {
             CCLogger.w(TAG, "parseUrl - Can't take a list of elements, because content 'products-list' return NULL\n" + doc.toString());
             ParserLog.increaseWrongPaniniElements();
-            return true;
+            return null;
         }
 
         // Init mandatory data
@@ -93,7 +103,7 @@ public class ParserPanini extends Parser {
         // Init optional data
         String description, price, feature, coverUrl;
 
-        ArrayList<ComicEntity> comicsList = new ArrayList<>();
+        ArrayList<ComicEntity> comicEntities = new ArrayList<>();
 
         for (Element element : links) {
             title = searchTitle(element);
@@ -138,14 +148,12 @@ public class ParserPanini extends Parser {
             ComicEntity comic = new ComicEntity(title.toUpperCase(), releaseDate, description,
                     price, feature, coverUrl, Constants.Sections.PANINI.getName(), false, false, linkMoreInfo);
 
-            comicsList.add(comic);
+            comicEntities.add(comic);
         }
 
-        // Get reference to repository and insert data
-        CCLogger.v(TAG, "parseUrl - Inserting " + comicsList.size() + " comics on DB");
-        ((CCApp) mContext.getApplicationContext()).getRepository().insertComics(comicsList);
+        CCLogger.v(TAG, "parseUrl - Found " + comicEntities.size() + " comics!");
 
-        return false;
+        return comicEntities;
     }
 
     @Override

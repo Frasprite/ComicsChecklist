@@ -1,7 +1,6 @@
 package org.checklist.comics.comicschecklist.service;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +11,7 @@ import android.preference.PreferenceManager;
 
 import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.database.AppDatabase;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.log.ParserLog;
@@ -24,6 +24,7 @@ import org.checklist.comics.comicschecklist.notification.CCNotificationManager;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,7 +38,6 @@ import java.util.Set;
 public class DownloadService extends IntentService {
 
     private static final String TAG = DownloadService.class.getSimpleName();
-    private boolean error = false;
 
     /* Init a static map of editor to search */
     private static final Map<Constants.Sections, String> mEditorMap;
@@ -103,12 +103,7 @@ public class DownloadService extends IntentService {
     public void onDestroy() {
         publishResults(Constants.SearchResults.RESULT_DESTROYED, "noEditor");
         // Notification is not needed (only if there isn't an error)
-        if (!error) {
-            NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-            if (notificationManager != null) {
-                notificationManager.cancel(Constants.NOTIFICATION_ID);
-            }
-        }
+        CCNotificationManager.deleteNotification(this);
     }
 
     /**
@@ -198,28 +193,32 @@ public class DownloadService extends IntentService {
         }
 
         // Select editor
+        ArrayList<ComicEntity> comicEntities = null;
         switch (editor) {
             case PANINI:
-                error = new ParserPanini(getApplicationContext()).startParsing();
+                comicEntities = new ParserPanini().initParser();
                 break;
             case STAR:
-                error = new ParserStar(getApplicationContext()).startParsing();
+                comicEntities = new ParserStar().initParser();
                 break;
             case BONELLI:
-                error = new ParserBonelli(getApplicationContext()).startParsing();
+                comicEntities = new ParserBonelli().initParser();
                 break;
             case RW:
-                error = new ParserRW(getApplicationContext()).startParsing();
+                comicEntities = new ParserRW().initParser();
                 break;
         }
 
         // See result
-        if (error) {
+        if (comicEntities == null || comicEntities.size() == 0) {
             publishResults(Constants.SearchResults.RESULT_CANCELED, editorTitle);
             if (notificationPref) {
                 CCNotificationManager.updateNotification(this, editorTitle + getResources().getString(R.string.search_failed), false);
             }
         } else {
+            // Inserting found comics into database
+            ((CCApp) this.getApplicationContext()).getRepository().insertComics(comicEntities);
+
             publishResults(Constants.SearchResults.RESULT_EDITOR_FINISHED, editorTitle);
             if (notificationPref) {
                 CCNotificationManager.updateNotification(this, editorTitle + getResources().getString(R.string.search_editor_completed), true);
@@ -238,15 +237,12 @@ public class DownloadService extends IntentService {
         int frequency = Integer.parseInt(deletePref);
         if (frequency > -1) {
             long time = DateCreator.getPastDay(frequency).getTime();
-            AsyncTask.execute(new Runnable() {
-                @Override
-                public void run() {
-                    int rowsDeleted = ((CCApp) DownloadService.this.getApplicationContext()).getRepository().deleteOldComics(time);
-                    CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted + " with given frequency " + frequency);
-                    if (rowsDeleted > 0) {
-                        // Update widgets as well
-                        WidgetService.updateWidget(DownloadService.this);
-                    }
+            AsyncTask.execute(() -> {
+                int rowsDeleted = ((CCApp) DownloadService.this.getApplicationContext()).getRepository().deleteOldComics(time);
+                CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted + " with given frequency " + frequency);
+                if (rowsDeleted > 0) {
+                    // Update widgets as well
+                    WidgetService.updateWidget(DownloadService.this);
                 }
             });
         }

@@ -1,13 +1,11 @@
 package org.checklist.comics.comicschecklist.parser;
 
-import android.content.Context;
-
-import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,44 +19,50 @@ public class ParserBonelli extends Parser {
     private static final String TAG = ParserBonelli.class.getSimpleName();
 
     private static final String BASE_URL = "http://www.sergiobonelli.it";
-    private static final String EDICOLA_INEDITI = BASE_URL + "/sezioni/1025/inediti";
-    private static final String EDICOLA_RISTAMPE = BASE_URL + "/sezioni/1016/ristampe";
-    private static final String EDICOLA_RACCOLTE = BASE_URL + "/sezioni/1017/raccolte";
-    private static final String PROSSIMAMENTE_INEDITI = BASE_URL + "/sezioni/1026/inediti1026";
-    private static final String PROSSIMAMENTE_RISTAMPE = BASE_URL + "/sezioni/1018/ristampe1018";
-    private static final String PROSSIMAMENTE_RACCOLTE = BASE_URL + "/sezioni/1019/raccolte1019";
 
-    public ParserBonelli(Context context) {
-        super(context);
+    private enum LINKS {
+        EDICOLA_INEDITI        (BASE_URL + "/sezioni/1025/inediti"),
+        EDICOLA_RISTAMPE       (BASE_URL + "/sezioni/1016/ristampe"),
+        EDICOLA_RACCOLTE       (BASE_URL + "/sezioni/1017/raccolte"),
+        PROSSIMAMENTE_INEDITI  (BASE_URL + "/sezioni/1026/inediti1026"),
+        PROSSIMAMENTE_RISTAMPE (BASE_URL + "/sezioni/1018/ristampe1018"),
+        PROSSIMAMENTE_RACCOLTE (BASE_URL + "/sezioni/1019/raccolte1019");
+
+        private final String _url;
+
+        LINKS(String url) {
+            _url = url;
+        }
+
+        public String getUrl() {
+            return _url;
+        }
     }
 
     /**
      * Method used to start search for Bonneli comics.
-     * @return true if search was successful, false otherwise
+     * @return a list found comic
      */
     @Override
-    public boolean startParsing() {
-        CCLogger.i(TAG, "startParsing - Start searching Bonelli comics");
-        boolean parseError;
+    public ArrayList<ComicEntity> initParser() {
+        CCLogger.i(TAG, "initParser - Start searching Bonelli comics");
+        ArrayList<ComicEntity> comicEntities = new ArrayList<>();
+        ArrayList<ComicEntity> foundComics;
 
-        parseError = parseUrl(EDICOLA_INEDITI);
-        CCLogger.v(TAG, "startParsing - Edicola inediti results " + parseError);
-        parseError = parseUrl(EDICOLA_RISTAMPE);
-        CCLogger.v(TAG, "startParsing - Edicola ristampe results " + parseError);
-        parseError = parseUrl(EDICOLA_RACCOLTE);
-        CCLogger.v(TAG, "startParsing - Edicola raccolte results " + parseError);
-        parseError = parseUrl(PROSSIMAMENTE_INEDITI);
-        CCLogger.v(TAG, "startParsing - Prossimamente inediti results " + parseError);
-        parseError = parseUrl(PROSSIMAMENTE_RISTAMPE);
-        CCLogger.v(TAG, "startParsing - Prossimamente ristampe results " + parseError);
-        parseError = parseUrl(PROSSIMAMENTE_RACCOLTE);
-        CCLogger.v(TAG, "startParsing - Prossimamente raccolte results " + parseError);
+        for (LINKS link : LINKS.values()) {
+            foundComics = parseUrl(link.getUrl());
+            if (foundComics == null) {
+                CCLogger.w(TAG, "initParser - No results from link " + link.getUrl());
+                continue;
+            }
+            comicEntities.addAll(foundComics);
+        }
 
-        return parseError;
+        return comicEntities;
     }
 
     @Override
-    public boolean parseUrl(String url) {
+    public ArrayList<ComicEntity> parseUrl(String url) {
         CCLogger.d(TAG, "parseUrl - Parsing " + url);
 
         // Take data from web and save it on document
@@ -72,7 +76,7 @@ public class ParserBonelli extends Parser {
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - This url does not exists " + url + " " + e.toString());
             ParserLog.increaseWrongBonelliURL();
-            return true;
+            return null;
         }
 
         ParserLog.increaseParsedBonelliURL();
@@ -89,7 +93,7 @@ public class ParserBonelli extends Parser {
             CCLogger.w(TAG, "parseUrl - List of elements have different size!\n" +
                     "Total release " + spanRelease.size() + "\nTotal entries " + spanOther.size());
             ParserLog.increaseWrongBonelliElements();
-            return true;
+            return null;
         }
 
         // Init mandatory data
@@ -98,7 +102,7 @@ public class ParserBonelli extends Parser {
         // Init optional data
         String description, price, feature, coverUrl, moreInfoUrl;
 
-        ArrayList<ComicEntity> comicsList = new ArrayList<>();
+        ArrayList<ComicEntity> comicEntities = new ArrayList<>();
 
         for (int i = 0; i < spanRelease.size(); i++) {
             try {
@@ -143,18 +147,16 @@ public class ParserBonelli extends Parser {
                 ComicEntity comic = new ComicEntity(title.toUpperCase(), myDate, description,
                         price, feature, coverUrl, Constants.Sections.BONELLI.getName(), false, false, url);
 
-                comicsList.add(comic);
+                comicEntities.add(comic);
             } catch (Exception e) {
                 CCLogger.w(TAG, "parseUrl - Can't take more info from " + e.toString() + " comic not fetched", e);
                 ParserLog.increaseErrorOnParsingComic();
             }
         }
 
-        // Get reference to repository and insert data
-        CCLogger.v(TAG, "parseUrl - Inserting " + comicsList.size() + " comics on DB");
-        ((CCApp) mContext.getApplicationContext()).getRepository().insertComics(comicsList);
+        CCLogger.v(TAG, "parseUrl - Found " + comicEntities.size() + " comics!");
 
-        return false;
+        return comicEntities;
     }
 
     @Override

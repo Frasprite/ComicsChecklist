@@ -1,8 +1,5 @@
 package org.checklist.comics.comicschecklist.parser;
 
-import android.content.Context;
-
-import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
@@ -16,6 +13,7 @@ import org.jsoup.select.Elements;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class ParserRW extends Parser {
 
@@ -29,41 +27,37 @@ public class ParserRW extends Parser {
 
     private String mCurrentReleaseDate;
 
-    public ParserRW(Context context) {
-        super(context);
-    }
-
     /**
      * Method used to search RW comics. <br>
      * This method will search URL by URL, which is supposed to have a list of comics.
-     * @return true if search was successful, false otherwise
+     * @return a list found comic
      */
     @Override
-    public boolean startParsing() {
-        CCLogger.i(TAG, "startParsing - Start searching for RW comics");
-        boolean parseError = false;
+    public ArrayList<ComicEntity> initParser() {
+        CCLogger.i(TAG, "initParser - Start searching for RW comics");
 
+        ArrayList<ComicEntity> comicEntities = new ArrayList<>();
+        List<ComicEntity> rawComicEntities;
         int dayToSearch = 5;
         for (int i = -3; i <= dayToSearch; i++) {
-            CCLogger.d(TAG, "startParsing - Today is " + DateCreator.getTodayString() + " adding " + i + " day(s)");
+            CCLogger.d(TAG, "initParser - Today is " + DateCreator.getTodayString() + " adding " + i + " day(s)");
             mCurrentReleaseDate = searchReleaseDate(i);
             int day = DateCreator.getTargetDay(i).get(Calendar.DAY_OF_MONTH);
 
             // Example : http://www.rwedizioni.it/news/uscite-2-dicembre/
             String url = FIRST_RW + MIDDLE_RW + day + MIDDLE_RW +
                     DateCreator.getTargetReadableMonth(i) + END_RW;
-            parseError = parseUrl(url);
+            rawComicEntities = parseUrl(url);
+            if (rawComicEntities != null) {
+                comicEntities.addAll(rawComicEntities);
+            }
         }
 
-        return parseError;
+        return comicEntities;
     }
 
-    /**
-     * Method used to search data from RW URL.
-     * @param url the URL to parse
-     */
     @Override
-    public boolean parseUrl(String url) {
+    public ArrayList<ComicEntity> parseUrl(String url) {
         CCLogger.d(TAG, "parseUrl - Parsing " + url);
 
         // Take data from web and save it on document
@@ -77,7 +71,7 @@ public class ParserRW extends Parser {
         } catch (Exception e) {
             CCLogger.w(TAG, "parseUrl - Error while parsing URL " + url + " " + e.toString());
             ParserLog.increaseWrongRWURL();
-            return true;
+            return null;
         }
 
         ParserLog.increaseParsedRWURL();
@@ -87,7 +81,7 @@ public class ParserRW extends Parser {
         if (content == null) {
             CCLogger.w(TAG, "parseUrl - Can't take a list of elements " + url + " because content is NULL!");
             ParserLog.increaseWrongRWElements();
-            return true;
+            return null;
         }
 
         // Init mandatory data (we already have computed the release date)
@@ -96,7 +90,7 @@ public class ParserRW extends Parser {
         // Init optional data
         String description, coverUrl, feature, price;
 
-        ArrayList<ComicEntity> comicsList = new ArrayList<>();
+        ArrayList<ComicEntity> comicEntities = new ArrayList<>();
 
         // Parse comic data
         Elements pElements = content.select("p");
@@ -124,14 +118,12 @@ public class ParserRW extends Parser {
             ComicEntity comic = new ComicEntity(title.toUpperCase(), myDate, description,
                     price, feature, coverUrl, Constants.Sections.RW.getName(), false, false, url);
 
-            comicsList.add(comic);
+            comicEntities.add(comic);
         }
 
-        // Get reference to repository and insert data
-        CCLogger.v(TAG, "parseUrl - Inserting " + comicsList.size() + " comics on DB");
-        ((CCApp) mContext.getApplicationContext()).getRepository().insertComics(comicsList);
+        CCLogger.v(TAG, "parseUrl - Found " + comicEntities.size() + " comics!");
 
-        return false;
+        return comicEntities;
     }
 
     @Override
