@@ -35,16 +35,16 @@ public interface ComicDao {
     @Query("DELETE FROM comics WHERE editor LIKE :editor AND isFavorite = 0 AND isOnCart = 0")
     int deleteComics(String editor);
 
-    @Query("SELECT * FROM comics WHERE isFavorite = 1 ORDER BY release_date")
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE isFavorite = 1 ORDER BY release_date")
     LiveData<List<ComicEntity>> loadFavoriteComics();
 
-    @Query("SELECT * FROM comics WHERE isOnCart = 1 OR editor LIKE 'da comprare' ORDER BY release_date")
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE isOnCart = 1 OR editor LIKE 'da comprare' ORDER BY release_date")
     LiveData<List<ComicEntity>> loadWishlistComics();
 
-    @Query("SELECT * FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     LiveData<List<ComicEntity>> loadComicsByEditor(String editorName);
 
-    @Query("SELECT * FROM comics WHERE editor LIKE :editorName AND comic_name LIKE '%' || :character || '%' ORDER BY release_date")
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editorName AND comic_name LIKE '%' || :character || '%' ORDER BY release_date")
     LiveData<List<ComicEntity>> loadComicsContainingText(String editorName, String character);
 
     @Query("SELECT * FROM comics WHERE id = :id")
@@ -53,10 +53,10 @@ public interface ComicDao {
     @Query("SELECT * FROM comics WHERE id = :id")
     ComicEntity loadComicSync(int id);
 
-    @Query("SELECT * FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     List<ComicEntity> loadComicsByEditorSync(String editorName);
 
-    @Query("SELECT * FROM comics WHERE isFavorite = 1 AND release_date = :time")
+    @Query("SELECT id, isFavorite, release_date FROM comics WHERE isFavorite = 1 AND release_date = :time")
     int checkFavoritesRelease(long time);
 
     @Update

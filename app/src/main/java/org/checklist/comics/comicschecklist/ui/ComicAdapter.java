@@ -1,7 +1,6 @@
 package org.checklist.comics.comicschecklist.ui;
 
 import android.databinding.DataBindingUtil;
-import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +12,6 @@ import org.checklist.comics.comicschecklist.databinding.ListItemViewBinding;
 import org.checklist.comics.comicschecklist.model.Comic;
 
 import java.util.List;
-import java.util.Objects;
 
 public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ComicViewHolder> {
 
@@ -22,7 +20,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ComicViewHol
     @Nullable
     private final ComicClickCallback mComicClickCallback;
 
-    public ComicAdapter(@Nullable ComicClickCallback clickCallback) {
+    ComicAdapter(@Nullable ComicClickCallback clickCallback) {
         mComicClickCallback = clickCallback;
     }
 
@@ -31,40 +29,7 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ComicViewHol
             mComicList = comicList;
             notifyItemRangeInserted(0, comicList.size());
         } else {
-            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new DiffUtil.Callback() {
-                @Override
-                public int getOldListSize() {
-                    return mComicList.size();
-                }
-
-                @Override
-                public int getNewListSize() {
-                    return comicList.size();
-                }
-
-                @Override
-                public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                    return mComicList.get(oldItemPosition).getId() ==
-                            comicList.get(newItemPosition).getId();
-                }
-
-                @Override
-                public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                    Comic newComic = comicList.get(newItemPosition);
-                    Comic oldComic = mComicList.get(oldItemPosition);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                        return newComic.getId() == oldComic.getId()
-                                && Objects.equals(newComic.getDescription(), oldComic.getDescription())
-                                && Objects.equals(newComic.getName(), oldComic.getName())
-                                && Objects.equals(newComic.getPrice(), oldComic.getPrice());
-                    } else {
-                        return newComic.getId() == oldComic.getId()
-                                && newComic.getDescription().equalsIgnoreCase(oldComic.getDescription())
-                                && newComic.getName().equalsIgnoreCase(oldComic.getName())
-                                && newComic.getPrice().equalsIgnoreCase(oldComic.getPrice());
-                    }
-                }
-            });
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new ComicDiffCallback((List<Comic>) comicList, (List<Comic>) mComicList));
             mComicList = comicList;
             result.dispatchUpdatesTo(this);
         }
