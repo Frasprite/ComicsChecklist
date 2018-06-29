@@ -51,7 +51,7 @@ class ActivityAddComic : AppCompatActivity() {
 
     fun changeDate(view: View) {
         when (view.id) {
-            R.id.button_change_data -> {
+            R.id.buttonChangeData -> {
                 val newFragment = DatePickerFragment()
                 newFragment.show(supportFragmentManager, "datePicker")
             }
