@@ -224,7 +224,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         startService(intent);
 
         // Launch AppRater
-        AppRater.appLaunched(this);
+        AppRater.INSTANCE.appLaunched(this);
 
         // Handle search intent
         if (getIntent() != null) {
