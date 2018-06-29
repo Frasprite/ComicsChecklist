@@ -22,8 +22,7 @@
         <activity
             android:name=".ui.ActivityMain"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -49,13 +48,11 @@
 
         <activity
             android:name=".ui.ActivityDetail"
-            android:label="@string/activity_title_comic_detail"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/activity_title_comic_detail" />
 
         <activity
             android:name=".ui.ActivityAddComic"
-            android:label="@string/activity_title_add_comic"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/activity_title_add_comic" />
 
         <activity
             android:name=".ui.ActivitySettings"

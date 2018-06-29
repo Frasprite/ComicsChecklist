@@ -553,7 +553,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                 break;
             case INFO:
                 // Open info dialog
-                AlertDialog.Builder infoBuilder = new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+                AlertDialog.Builder infoBuilder = new AlertDialog.Builder(this);
                 infoBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // Send the negative button event back to the host activity
