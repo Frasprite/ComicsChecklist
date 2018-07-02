@@ -61,13 +61,6 @@
         <!-- Service which launch search & download data -->
         <service android:name="org.checklist.comics.comicschecklist.service.DownloadService" />
 
-        <!-- Database provider -->
-        <provider
-            android:name=".provider.ComicContentProvider"
-            android:authorities="org.checklist.comics.comicschecklist.contentprovider"
-            android:exported="false"
-            tools:ignore="ExportedContentProvider" />
-
         <!-- Widget stuff -->
         <receiver
             android:name=".provider.WidgetProvider"
