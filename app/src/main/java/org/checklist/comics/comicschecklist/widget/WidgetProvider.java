@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist.provider;
+package org.checklist.comics.comicschecklist.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -11,7 +11,6 @@ import android.widget.RemoteViews;
 import org.checklist.comics.comicschecklist.ui.ActivityMain;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.ui.WidgetSettings;
-import org.checklist.comics.comicschecklist.service.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 

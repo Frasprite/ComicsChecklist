@@ -63,7 +63,7 @@
 
         <!-- Widget stuff -->
         <receiver
-            android:name=".provider.WidgetProvider"
+            android:name=".widget.WidgetProvider"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/widget_label">
             <intent-filter>
@@ -75,7 +75,7 @@
         </receiver>
 
         <service
-            android:name=".service.WidgetService"
+            android:name=".widget.WidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 

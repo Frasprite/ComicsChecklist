@@ -21,7 +21,7 @@ import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.notification.ComicReleaseSyncJob;
 import org.checklist.comics.comicschecklist.log.CCLogger;
-import org.checklist.comics.comicschecklist.service.WidgetService;
+import org.checklist.comics.comicschecklist.widget.WidgetService;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
 

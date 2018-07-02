@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist.service;
+package org.checklist.comics.comicschecklist.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -11,10 +11,8 @@ import android.widget.RemoteViewsService;
 import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
-import org.checklist.comics.comicschecklist.provider.WidgetProvider;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.WidgetItem;
 
 import java.util.ArrayList;
 import java.util.List;

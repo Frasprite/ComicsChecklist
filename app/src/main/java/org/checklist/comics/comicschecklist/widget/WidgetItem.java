@@ -1,4 +1,4 @@
-package org.checklist.comics.comicschecklist.util;
+package org.checklist.comics.comicschecklist.widget;
 
 /**
  * Class used to create a widget row.

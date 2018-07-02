@@ -23,6 +23,7 @@ import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.notification.CCNotificationManager;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.util.DateCreator;
+import org.checklist.comics.comicschecklist.widget.WidgetService;
 
 import java.util.ArrayList;
 import java.util.Arrays;

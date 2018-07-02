@@ -29,7 +29,7 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBinding;
 import org.checklist.comics.comicschecklist.model.Comic;
 import org.checklist.comics.comicschecklist.service.DownloadService;
-import org.checklist.comics.comicschecklist.service.WidgetService;
+import org.checklist.comics.comicschecklist.widget.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.viewmodel.ComicListViewModel;

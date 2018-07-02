@@ -17,7 +17,7 @@ import android.widget.ListView;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.provider.WidgetProvider;
+import org.checklist.comics.comicschecklist.widget.WidgetProvider;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -17,7 +17,7 @@ import android.widget.Toast;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.databinding.FragmentDetailBinding;
-import org.checklist.comics.comicschecklist.service.WidgetService;
+import org.checklist.comics.comicschecklist.widget.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.viewmodel.ComicViewModel;
