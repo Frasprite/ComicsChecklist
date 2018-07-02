@@ -147,7 +147,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         // large-screen layouts (res/values-large-land and
         // res/values-sw600dp-land). If this view is present, then the
         // activity should be in two-pane mode.
-        mTwoPane = findViewById(R.id.comic_detail_container) != null;
+        mTwoPane = findViewById(R.id.comicDetailContainer) != null;
         CCLogger.d(TAG, mTwoPane ? "Application is running on singlePane" : "Application is running on twoPane");
 
         mTitle = mDrawerTitle = getTitle();
@@ -494,7 +494,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     arguments.putInt(Constants.ARG_COMIC_ID, comicId);
                     FragmentDetail mDetailFragment = new FragmentDetail();
                     mDetailFragment.setArguments(arguments);
-                    getSupportFragmentManager().beginTransaction().replace(R.id.comic_detail_container, mDetailFragment).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.comicDetailContainer, mDetailFragment).commit();
                 } else {
                     CCLogger.d(TAG, "launchDetailView - Launching detail view in SINGLE PANE mode");
                     // In single-pane mode, simply start the detail activity

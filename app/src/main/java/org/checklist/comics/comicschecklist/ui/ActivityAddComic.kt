@@ -36,17 +36,15 @@ class ActivityAddComic : AppCompatActivity() {
         arguments.putInt(Constants.ARG_COMIC_ID, intent.getIntExtra(Constants.ARG_COMIC_ID, -1))
         val fragment = FragmentAddComic()
         fragment.arguments = arguments
-        supportFragmentManager.beginTransaction().add(R.id.comic_detail_container, fragment, "addComicFragment").commit()
+        supportFragmentManager.beginTransaction().add(R.id.comicDetailContainer, fragment, "addComicFragment").commit()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                NavUtils.navigateUpTo(this, Intent(this, ActivityMain::class.java))
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        android.R.id.home -> {
+            NavUtils.navigateUpTo(this, Intent(this, ActivityMain::class.java))
+            true
         }
+        else -> super.onOptionsItemSelected(item)
     }
 
     fun changeDate(view: View) {
