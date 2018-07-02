@@ -13,31 +13,38 @@ import org.jetbrains.anko.alert
  */
 object AppRater {
 
+    private const val PREF_USER_NOT_RATING = "not_showing_again"
+    private const val PREF_APP_RATER = "app_rater"
+    private const val PREF_LAUNCH_COUNT = "launch_count"
+    private const val PREF_DATE_FIRST_LAUNCH = "date_first_launch"
+    private const val DAYS_UNTIL_PROMPT = 7
+    private const val LAUNCHES_UNTIL_PROMPT = 7
+
     /**
      * Method which is launched every time the app is opened.
      */
     fun appLaunched(context: Context) {
-        val prefs = context.getSharedPreferences(Constants.PREF_APP_RATER, 0)
-        if (prefs.getBoolean(Constants.PREF_USER_DONT_RATE, false)) {
+        val prefs = context.getSharedPreferences(PREF_APP_RATER, 0)
+        if (prefs.getBoolean(PREF_USER_NOT_RATING, false)) {
             return
         }
 
         val editor = prefs.edit()
 
         // Increment counter of how many times user launched the app
-        val launchCount = prefs.getLong(Constants.PREF_LAUNCH_COUNT, 0) + 1
-        editor.putLong(Constants.PREF_LAUNCH_COUNT, launchCount)
+        val launchCount = prefs.getLong(PREF_LAUNCH_COUNT, 0) + 1
+        editor.putLong(PREF_LAUNCH_COUNT, launchCount)
 
         // Take date of first launch
-        var dateFirstLaunch: Long? = prefs.getLong(Constants.PREF_DATE_FIRST_LAUNCH, 0)
+        var dateFirstLaunch: Long? = prefs.getLong(PREF_DATE_FIRST_LAUNCH, 0)
         if (dateFirstLaunch == 0L) {
             dateFirstLaunch = System.currentTimeMillis()
-            editor.putLong(Constants.PREF_DATE_FIRST_LAUNCH, dateFirstLaunch)
+            editor.putLong(PREF_DATE_FIRST_LAUNCH, dateFirstLaunch)
         }
 
         // Wait at least 7 days before opening rate window
-        if (launchCount >= Constants.LAUNCHES_UNTIL_PROMPT) {
-            if (System.currentTimeMillis() >= dateFirstLaunch!! + Constants.DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000) {
+        if (launchCount >= LAUNCHES_UNTIL_PROMPT) {
+            if (System.currentTimeMillis() >= dateFirstLaunch!! + DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000) {
 
                 // Show dialog
                 context.alert {
@@ -50,9 +57,9 @@ object AppRater {
                     }
 
                     negativeButton(R.string.dialog_no_thanks_button) { dialog ->
-                        val editorPref = context.getSharedPreferences(Constants.PREF_APP_RATER, 0).edit()
+                        val editorPref = context.getSharedPreferences(PREF_APP_RATER, 0).edit()
                         if (editorPref != null) {
-                            editorPref.putBoolean(Constants.PREF_USER_DONT_RATE, true)
+                            editorPref.putBoolean(PREF_USER_NOT_RATING, true)
                             editorPref.apply()
                         }
 

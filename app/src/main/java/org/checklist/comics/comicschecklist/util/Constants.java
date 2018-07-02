@@ -12,20 +12,6 @@ public class Constants {
     /* The fragment argument representing the section number for this fragment. */
     public static final String ARG_EDITOR = "editor";
     public static final String ARG_COMIC_ID = "comic_id";
-    public static final String ARG_SAVED_COMIC_ID = "comic_id";
-    /**
-     * Flag used to show the drawer on launch until the user manually
-     * expands it. This shared preference tracks this.
-     */
-    public static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
-
-    /* AppRater */
-    static final String PREF_USER_DONT_RATE = "dont_show_again";
-    static final String PREF_APP_RATER = "app_rater";
-    static final String PREF_LAUNCH_COUNT = "launch_count";
-    static final String PREF_DATE_FIRST_LAUNCH = "date_first_launch";
-    final static int DAYS_UNTIL_PROMPT = 7;
-    final static int LAUNCHES_UNTIL_PROMPT = 7;
 
     /* Enum of sections available on menu */
     public enum Sections {
@@ -131,7 +117,6 @@ public class Constants {
     public static final String NOTIFICATION_RESULT = "result";
     public static final String NOTIFICATION_EDITOR = "editor";
     public static final String NOTIFICATION = "org.checklist.comics.comicschecklist.service.receiver";
-    public static final int NOTIFICATION_ID = 299;
     public static final String PREF_SEARCH_NOTIFICATION = "notifications_new_message";
     public static final String PREF_FAVORITE_NOTIFICATION = "notifications_favorite_available";
 
@@ -144,10 +129,4 @@ public class Constants {
     public static final String ACTION_WIDGET_OPEN_APP = "action_open_app";
     public static final String ACTION_ADD_COMIC = "org.checklist.comics.comicschecklist.ADD_COMIC";
     public static final String ACTION_SEARCH_STORE = "org.checklist.comics.comicschecklist.SEARCH_STORE";
-
-    /* Constants for old database migration */
-    public static final String URL_PANINI = "http://www.paninicomics.it";
-    public static final String URL_RW = "http://www.rwedizioni.it";
-    public static final String URL_STAR = "https://www.starcomics.com";
-    public static final String URL_BONELLI = "http://www.sergiobonelli.it/";
 }

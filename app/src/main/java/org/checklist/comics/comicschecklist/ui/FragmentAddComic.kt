@@ -47,7 +47,7 @@ class FragmentAddComic : Fragment() {
 
         if (savedInstanceState != null) {
             // Restore last state for checked position.
-            mComicId = savedInstanceState.getInt(Constants.ARG_SAVED_COMIC_ID, -1)
+            mComicId = savedInstanceState.getInt(ARG_SAVED_COMIC_ID, -1)
             CCLogger.d(TAG, "onActivityCreated - mComicId (initiated from BUNDLE) = $mComicId")
         }
 
@@ -76,7 +76,7 @@ class FragmentAddComic : Fragment() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         CCLogger.d(TAG, "onSaveInstanceState - saving mComicId $mComicId")
-        outState.putInt(Constants.ARG_SAVED_COMIC_ID, mComicId)
+        outState.putInt(ARG_SAVED_COMIC_ID, mComicId)
     }
 
     override fun onPause() {
@@ -129,5 +129,6 @@ class FragmentAddComic : Fragment() {
     companion object {
 
         private val TAG = FragmentAddComic::class.java.simpleName
+        private const val ARG_SAVED_COMIC_ID = "comic_id"
     }
 }

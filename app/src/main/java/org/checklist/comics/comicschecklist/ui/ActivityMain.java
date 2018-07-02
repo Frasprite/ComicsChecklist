@@ -64,6 +64,12 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
     private static final String TAG = ActivityMain.class.getSimpleName();
 
+    /*
+     * Flag used to show the drawer on launch until the user manually
+     * expands it. This shared preference tracks this.
+     */
+    private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
+
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device
     private boolean mTwoPane;
 
@@ -137,7 +143,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        mUserLearnedDrawer = sp.getBoolean(Constants.PREF_USER_LEARNED_DRAWER, false);
+        mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
         setContentView(R.layout.activity_comic_list);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -185,7 +191,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
                     // the navigation drawer automatically in the future.
                     mUserLearnedDrawer = true;
                     SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(ActivityMain.this);
-                    sp.edit().putBoolean(Constants.PREF_USER_LEARNED_DRAWER, true).apply();
+                    sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).apply();
                 }
 
                 invalidateOptionsMenu(); // creates call to onPrepareOptionsMenu()
