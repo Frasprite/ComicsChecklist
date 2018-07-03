@@ -56,7 +56,8 @@
 
         <activity
             android:name=".ui.ActivitySettings"
-            android:label="@string/activity_help_settings" />
+            android:label="@string/activity_help_settings"
+            android:theme="@style/SettingsTheme" />
 
         <!-- Service which launch search & download data -->
         <service android:name="org.checklist.comics.comicschecklist.service.DownloadService" />
