@@ -14,9 +14,11 @@ import android.widget.DatePicker
 import kotlinx.android.synthetic.main.app_bar_detail.*
 
 import org.checklist.comics.comicschecklist.R
-import org.checklist.comics.comicschecklist.log.CCLogger
+import org.checklist.comics.comicschecklist.extensions.lazyLogger
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.util.DateCreator
+
+import org.jetbrains.anko.info
 
 /**
  * Activity used to add a comic on database.
@@ -65,7 +67,7 @@ class ActivityAddComic : AppCompatActivity() {
             val day = DateCreator.getCurrentDay()
 
             // Create a new instance of DatePickerDialog and return it
-            CCLogger.d(TAG, "onCreateDialog - date is $day/$month/$year")
+            LOG.info("onCreateDialog - date is $day/$month/$year")
             return DatePickerDialog(activity!!, this, year, month, day)
         }
 
@@ -73,13 +75,13 @@ class ActivityAddComic : AppCompatActivity() {
             // Set chosen date to text view
             val articleFrag = activity!!.supportFragmentManager.findFragmentByTag("addComicFragment") as FragmentAddComic
             val date = DateCreator.elaborateDate(year, month, day)
-            CCLogger.i(TAG, "onDateSet - returning $date")
+            LOG.info("onDateSet - returning $date")
             articleFrag.updateDate(date)
         }
     }
 
     companion object {
 
-        private val TAG = ActivityAddComic::class.java.simpleName
+        val LOG by lazyLogger()
     }
 }

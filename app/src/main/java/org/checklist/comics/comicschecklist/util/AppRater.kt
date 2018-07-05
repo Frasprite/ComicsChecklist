@@ -6,12 +6,16 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 
+import org.checklist.comics.comicschecklist.extensions.Loggable
+import org.checklist.comics.comicschecklist.extensions.lazyLogger
+
 import org.jetbrains.anko.alert
+import org.jetbrains.anko.verbose
 
 /**
  * Class which launch a dialog asking for rate the app.
  */
-object AppRater {
+object AppRater: Loggable {
 
     private const val PREF_USER_NOT_RATING = "not_showing_again"
     private const val PREF_APP_RATER = "app_rater"
@@ -19,6 +23,8 @@ object AppRater {
     private const val PREF_DATE_FIRST_LAUNCH = "date_first_launch"
     private const val DAYS_UNTIL_PROMPT = 7
     private const val LAUNCHES_UNTIL_PROMPT = 7
+
+    private val LOG by lazyLogger()
 
     /**
      * Method which is launched every time the app is opened.
@@ -57,6 +63,7 @@ object AppRater {
                     }
 
                     negativeButton(R.string.dialog_no_thanks_button) { dialog ->
+                        LOG.verbose("onClick - User refused to rate app..")
                         val editorPref = context.getSharedPreferences(PREF_APP_RATER, 0).edit()
                         if (editorPref != null) {
                             editorPref.putBoolean(PREF_USER_NOT_RATING, true)

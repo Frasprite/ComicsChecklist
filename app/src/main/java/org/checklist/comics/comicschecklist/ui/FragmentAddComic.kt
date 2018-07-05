@@ -11,10 +11,12 @@ import kotlinx.android.synthetic.main.fragment_add_comic.*
 import org.checklist.comics.comicschecklist.CCApp
 import org.checklist.comics.comicschecklist.R
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity
+import org.checklist.comics.comicschecklist.extensions.lazyLogger
 import org.checklist.comics.comicschecklist.widget.WidgetService
-import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.util.DateCreator
+
+import org.jetbrains.anko.debug
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -30,28 +32,23 @@ class FragmentAddComic : Fragment() {
     private var mComicId = -1
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        CCLogger.d(TAG, "onCreateView - start")
-
         return inflater.inflate(R.layout.fragment_add_comic, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        CCLogger.d(TAG, "onActivityCreated - start")
 
         if (arguments!!.containsKey(Constants.ARG_COMIC_ID)) {
             // Load comic content specified by the fragment arguments from ComicContentProvider.
             mComicId = arguments!!.getInt(Constants.ARG_COMIC_ID, -1)
-            CCLogger.d(TAG, "onActivityCreated - mComicId (initiated from ARGUMENTS) = $mComicId")
+            LOG.debug("onActivityCreated - mComicId (initiated from ARGUMENTS) = $mComicId")
         }
 
         if (savedInstanceState != null) {
             // Restore last state for checked position.
             mComicId = savedInstanceState.getInt(ARG_SAVED_COMIC_ID, -1)
-            CCLogger.d(TAG, "onActivityCreated - mComicId (initiated from BUNDLE) = $mComicId")
+            LOG.debug("onActivityCreated - mComicId (initiated from BUNDLE) = $mComicId")
         }
-
-        CCLogger.v(TAG, "onActivityCreated - end")
     }
 
     override fun onResume() {
@@ -60,7 +57,7 @@ class FragmentAddComic : Fragment() {
         if (mComicId > -1) {
             doAsync {
                 val comicEntity = (activity!!.application as CCApp).repository.loadComicSync(mComicId)
-                CCLogger.d(TAG, "loadComicWithID - Comic : $comicEntity")
+                LOG.debug("loadComicWithID - Comic : $comicEntity")
                 uiThread {
                     nameEditText.setText(comicEntity.name)
                     infoEditText.setText(comicEntity.description)
@@ -75,7 +72,7 @@ class FragmentAddComic : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        CCLogger.d(TAG, "onSaveInstanceState - saving mComicId $mComicId")
+        LOG.debug("onSaveInstanceState - saving mComicId $mComicId")
         outState.putInt(ARG_SAVED_COMIC_ID, mComicId)
     }
 
@@ -105,13 +102,13 @@ class FragmentAddComic : Fragment() {
                 -1 -> {
                     doAsync {
                         mComicId = CCApp.instance.repository.insertComic(comicEntity).toInt()
-                        CCLogger.d(TAG, "onPause - INSERTED new entry on database with ID $mComicId")
+                        LOG.debug("onPause - INSERTED new entry on database with ID $mComicId")
                     }
                 }
                 else -> {
                     doAsync {
                         CCApp.instance.repository.updateComic(comicEntity)
-                        CCLogger.d(TAG, "onPause - UPDATED entry on database with ID $mComicId")
+                        LOG.debug("onPause - UPDATED entry on database with ID $mComicId")
                     }
                 }
             }
@@ -128,7 +125,7 @@ class FragmentAddComic : Fragment() {
 
     companion object {
 
-        private val TAG = FragmentAddComic::class.java.simpleName
+        val LOG by lazyLogger()
         private const val ARG_SAVED_COMIC_ID = "comic_id"
     }
 }
