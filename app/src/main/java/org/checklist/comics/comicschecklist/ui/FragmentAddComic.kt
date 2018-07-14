@@ -2,9 +2,16 @@ package org.checklist.comics.comicschecklist.ui
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+
+import com.transitionseverywhere.ChangeBounds
+import com.transitionseverywhere.Fade
+import com.transitionseverywhere.TransitionManager
+import com.transitionseverywhere.TransitionSet
+import com.transitionseverywhere.extra.Scale
 
 import kotlinx.android.synthetic.main.fragment_add_comic.*
 
@@ -14,25 +21,40 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 import org.checklist.comics.comicschecklist.extensions.lazyLogger
 import org.checklist.comics.comicschecklist.widget.WidgetService
 import org.checklist.comics.comicschecklist.util.Constants
-import org.checklist.comics.comicschecklist.util.DateCreator
 
 import org.jetbrains.anko.debug
 import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.info
 import org.jetbrains.anko.uiThread
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import java.util.*
+
 
 /**
  * Fragment which manage the comic creation.
- */
-/**
  * Mandatory empty constructor for the fragment manager to instantiate the
  * fragment (e.g. upon screen orientation changes).
  */
 class FragmentAddComic : Fragment() {
 
     private var mComicId = -1
+    private var mDateTime: DateTime = DateTime()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_add_comic, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        buttonChangeData.setOnClickListener {
+                    openCalendar()
+        }
+
+        datePicker.setFirstVisibleDate(mDateTime.year, (mDateTime.monthOfYear - 1), mDateTime.dayOfMonth)
+
+        datePicker.setOnDateSelectedListener { year, month, day, _ -> updateDate(year, month, day) }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -61,12 +83,12 @@ class FragmentAddComic : Fragment() {
                 uiThread {
                     nameEditText.setText(comicEntity.name)
                     infoEditText.setText(comicEntity.description)
-                    dateTextView.text = DateCreator.elaborateDate(comicEntity.releaseDate)
+                    mDateTime = DateTime(comicEntity.releaseDate.time)
+                    datePicker.setFirstVisibleDate(mDateTime.year, (mDateTime.monthOfYear -1), mDateTime.dayOfMonth)
+                    val dateTimeFormatter = DateTimeFormat.forPattern("dd/MM/yyyy")
+                    buttonChangeData.text = dateTimeFormatter.print(mDateTime)
                 }
             }
-        } else {
-            // Leave all form in blank and set default date
-            updateDate(DateCreator.getTodayString())
         }
     }
 
@@ -79,7 +101,7 @@ class FragmentAddComic : Fragment() {
     override fun onPause() {
         var name = nameEditText!!.text.toString()
         val info = infoEditText!!.text.toString()
-        val date = dateTextView!!.text.toString()
+        LOG.info { "onPause - Saving data $name $info" }
 
         if (info.isNotEmpty()) {
             // Save data if there is at least some info and put a default title
@@ -87,28 +109,27 @@ class FragmentAddComic : Fragment() {
                 name = getString(R.string.text_default_title)
             }
 
-            // Insert new entry
-            val comicEntity = ComicEntity(name,
-                    DateCreator.elaborateDate(date),
-                    info,
-                    "N.D.",
-                    "N.D.",
-                    "N.D.",
-                    Constants.Sections.getName(Constants.Sections.CART),
-                    false, false,
-                    "")
-
             when (mComicId) {
                 -1 -> {
                     doAsync {
+                        // Create new entry
+                        val comicEntity = ComicEntity(name,
+                                Date(mDateTime.millis),
+                                info,
+                                "N.D.",
+                                "N.D.",
+                                "N.D.",
+                                Constants.Sections.getName(Constants.Sections.CART),
+                                false, false,
+                                "")
                         mComicId = CCApp.instance.repository.insertComic(comicEntity).toInt()
-                        LOG.debug("onPause - INSERTED new entry on database with ID $mComicId")
+                        LOG.info("onPause - INSERTED new entry on database with ID $mComicId")
                     }
                 }
                 else -> {
                     doAsync {
-                        CCApp.instance.repository.updateComic(comicEntity)
-                        LOG.debug("onPause - UPDATED entry on database with ID $mComicId")
+                        CCApp.instance.repository.updateComic(mComicId, name, info, Date(mDateTime.millis))
+                        LOG.info("onPause - UPDATED entry on database with ID $mComicId")
                     }
                 }
             }
@@ -119,8 +140,26 @@ class FragmentAddComic : Fragment() {
         super.onPause()
     }
 
-    fun updateDate(date: String) {
-        dateTextView.text = date
+    private fun openCalendar() {
+        val transitionForGrid = TransitionSet()
+                .addTransition(Scale(0.5f))
+                .addTransition(Fade())
+                .setInterpolator(LinearOutSlowInInterpolator())
+
+        val transitionForCardView = TransitionSet()
+                .addTransition(ChangeBounds())
+                .setInterpolator(LinearOutSlowInInterpolator())
+
+        TransitionManager.beginDelayedTransition(cardContainer, transitionForGrid)
+        TransitionManager.beginDelayedTransition(datePickerContainer, transitionForCardView)
+
+        datePicker.visibility = if (datePicker.visibility == View.GONE) View.VISIBLE else View.GONE
+    }
+
+    private fun updateDate(year: Int, month: Int, day: Int) {
+        mDateTime = DateTime(year, (month + 1), day, 0, 0)
+        val dateTimeFormatter = DateTimeFormat.forPattern("dd/MM/yyyy")
+        buttonChangeData.text = dateTimeFormatter.print(mDateTime)
     }
 
     companion object {

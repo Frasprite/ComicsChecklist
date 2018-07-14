@@ -1,24 +1,15 @@
 package org.checklist.comics.comicschecklist.ui
 
-import android.app.DatePickerDialog
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import android.support.v4.app.NavUtils
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
-import android.view.View
-import android.widget.DatePicker
 
 import kotlinx.android.synthetic.main.app_bar_detail.*
 
 import org.checklist.comics.comicschecklist.R
-import org.checklist.comics.comicschecklist.extensions.lazyLogger
 import org.checklist.comics.comicschecklist.util.Constants
-import org.checklist.comics.comicschecklist.util.DateCreator
-
-import org.jetbrains.anko.info
 
 /**
  * Activity used to add a comic on database.
@@ -47,41 +38,5 @@ class ActivityAddComic : AppCompatActivity() {
             true
         }
         else -> super.onOptionsItemSelected(item)
-    }
-
-    fun changeDate(view: View) {
-        when (view.id) {
-            R.id.buttonChangeData -> {
-                val newFragment = DatePickerFragment()
-                newFragment.show(supportFragmentManager, "datePicker")
-            }
-        }
-    }
-
-    class DatePickerFragment : DialogFragment(), DatePickerDialog.OnDateSetListener {
-
-        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            // Use the current date as the default date in the picker
-            val year = DateCreator.getCurrentYear()
-            val month = DateCreator.getCurrentMonth()
-            val day = DateCreator.getCurrentDay()
-
-            // Create a new instance of DatePickerDialog and return it
-            LOG.info("onCreateDialog - date is $day/$month/$year")
-            return DatePickerDialog(activity!!, this, year, month, day)
-        }
-
-        override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
-            // Set chosen date to text view
-            val articleFrag = activity!!.supportFragmentManager.findFragmentByTag("addComicFragment") as FragmentAddComic
-            val date = DateCreator.elaborateDate(year, month, day)
-            LOG.info("onDateSet - returning $date")
-            articleFrag.updateDate(date)
-        }
-    }
-
-    companion object {
-
-        val LOG by lazyLogger()
     }
 }
