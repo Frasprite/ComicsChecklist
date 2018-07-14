@@ -10,6 +10,7 @@ import android.arch.persistence.room.Update;
 
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -61,4 +62,7 @@ public interface ComicDao {
 
     @Update
     int update(ComicEntity comic);
+
+    @Query("UPDATE comics SET comic_name = :name, description = :info, release_date = :date  WHERE id = :comicId")
+    int update(int comicId, String name, String info, Date date);
 }

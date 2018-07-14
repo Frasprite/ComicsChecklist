@@ -8,6 +8,7 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.util.Constants;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -96,6 +97,10 @@ public class DataRepository {
 
     public void updateComic(ComicEntity comicEntity) {
         mDatabase.comicDao().update(comicEntity);
+    }
+
+    public void updateComic(int comicId, String name, String info, Date date) {
+        mDatabase.comicDao().update(comicId, name, info, date);
     }
 
     public long insertComic(ComicEntity comicEntity) {
