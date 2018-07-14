@@ -60,6 +60,9 @@ dependencies {
     implementation 'com.github.apl-devs:appintro:v4.2.2'
     implementation 'org.jsoup:jsoup:1.11.2'
     implementation 'com.evernote:android-job:1.2.1'
+    implementation 'joda-time:joda-time:2.10'
+    implementation 'com.github.badoualy:datepicker-timeline:c6dcd05737'
+    implementation 'com.andkulikov:transitionseverywhere:1.8.0'
 
     // Unit test stuff
     testImplementation 'junit:junit:4.12'

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Comics Checklist</string>
-    <string name="bottom_bar_image_description">Bottom image</string>
     <string name="placeholder_description">Image of side menu</string>
+
+    <!-- Activity add comic -->
+    <string name="activity_date_button">Data uscita (facoltativa)</string>
 
     <!-- Activity title -->
     <string name="activity_title_comic_detail">Dettagli</string>
@@ -53,8 +55,15 @@
     <string name="dialog_jsoup_link">https://jsoup.org/</string>
     <string name="dialog_app_intro_title_text">AppIntro</string>
     <string name="dialog_app_intro_link">https://github.com/apl-devs/AppIntro</string>
+    <string name="dialog_transition_everywhere_title_text">Transition Everywhere</string>
+    <string name="dialog_transition_everywhere_link">https://github.com/andkulikov/Transitions-Everywhere</string>
+    <string name="dialog_jodatime_title_text">Joda-Time</string>
+    <string name="dialog_jodatime_link">http://www.joda.org/joda-time/</string>
+    <string name="dialog_datepicker_title_text">Datepicker-Timeline</string>
+    <string name="dialog_datepicker_link">https://github.com/badoualy/datepicker-timeline</string>
     <string name="dialog_android_job_title_text">android-job</string>
     <string name="dialog_android_job_link">https://github.com/evernote/android-job</string>
+
     <string name="dialog_delete_content_title">Scegli un editore</string>
     <string name="dialog_last_sync_title">Ultime sincronizzazioni</string>
     <string name="dialog_context_action">Scegli cosa fare</string>
@@ -92,8 +101,6 @@
     <string name="menu_comic_site">Sito web</string>
 	<string name="menu_favorites">Aggiungi ai preferiti</string>
     <string name="menu_wishlist">Da comprare</string>
-    <string name="menu_remove_favorites">Togli dai preferiti</string>
-    <string name="menu_remove_wishlist">Togli da comprare</string>
     <string name="menu_layout">Layout lista</string>
 
     <!-- Search text -->
@@ -190,13 +197,10 @@
     <string name="notification_comics_out">Oggi escono %1$d fumetti, apri la lista dei preferiti!</string>
 
     <!-- Various text -->
-    <string name="comic_deleted_all_favorite">La lista dei preferiti è stata cancellata.</string>
-    <string name="comic_deleted_all_cart">La lista dei fumetti da comprare è stata cancellata.</string>
     <string name="comic_added_cart">Fumetto aggiunto alla lista da comprare!</string>
     <string name="comic_deleted_cart">Fumetto tolto dalla lista da comprare.</string>
     <string name="comic_added_favorite">Fumetto agggiunto alla lista dei preferiti!</string>
     <string name="comic_deleted_favorite">Fumetto tolto dalla lista dei preferiti.</string>
-    <string name="comic_delete_all_fail">Spiacente, impossibile rimuovere i dati.</string>
 
     <string name="toast_no_connection">Problema alla connessione di rete: verifica la tua connettività.</string>
 
@@ -223,7 +227,6 @@
     <!-- Activity add comic -->
     <string name="text_preview_title"><b>Nome fumetto</b></string>
     <string name="text_preview_other">Altre info, es.: editore, numeri mancanti</string>
-    <string name="text_change_date">Cambia data</string>
     <string name="text_default_title">Fumetto senza titolo</string>
 
     <string name="pref_header_data_filter">Gestione liste</string>
