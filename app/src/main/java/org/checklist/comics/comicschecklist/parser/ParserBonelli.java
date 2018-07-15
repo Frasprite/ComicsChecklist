@@ -4,7 +4,6 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.DateCreator;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -131,7 +130,7 @@ public class ParserBonelli extends Parser {
                     continue;
                 } else {
                     // Calculating date for SQL
-                    myDate = DateCreator.elaborateDate(releaseDate);
+                    myDate = elaborateDate(releaseDate);
                 }
 
                 CCLogger.d(TAG, "parseUrl - Results:\nComic title : " + title + "\nRelease date : " + releaseDate);

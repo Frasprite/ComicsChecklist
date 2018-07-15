@@ -22,8 +22,10 @@ import org.checklist.comics.comicschecklist.parser.ParserStar;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.notification.CCNotificationManager;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.DateCreator;
 import org.checklist.comics.comicschecklist.widget.WidgetService;
+
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -156,19 +158,19 @@ public class DownloadService extends IntentService {
             searchComics(notificationPref, editorTitle, editor);
 
             // Update last scan for editor on shared preference
-            String today = DateCreator.getTodayString();
+            long today = System.currentTimeMillis();
             switch (editor) {
                 case PANINI:
-                    sharedPref.edit().putString(Constants.PREF_PANINI_LAST_SCAN, today).apply();
+                    sharedPref.edit().putLong(Constants.PREF_PANINI_LAST_SCAN, today).apply();
                     break;
                 case BONELLI:
-                    sharedPref.edit().putString(Constants.PREF_BONELLI_LAST_SCAN, today).apply();
+                    sharedPref.edit().putLong(Constants.PREF_BONELLI_LAST_SCAN, today).apply();
                     break;
                 case STAR:
-                    sharedPref.edit().putString(Constants.PREF_STAR_LAST_SCAN, today).apply();
+                    sharedPref.edit().putLong(Constants.PREF_STAR_LAST_SCAN, today).apply();
                     break;
                 case RW:
-                    sharedPref.edit().putString(Constants.PREF_RW_LAST_SCAN, today).apply();
+                    sharedPref.edit().putLong(Constants.PREF_RW_LAST_SCAN, today).apply();
                     break;
             }
 
@@ -237,7 +239,8 @@ public class DownloadService extends IntentService {
         String deletePref = sharedPref.getString(Constants.PREF_DELETE_FREQUENCY, "-1");
         int frequency = Integer.parseInt(deletePref);
         if (frequency > -1) {
-            long time = DateCreator.getPastDay(frequency).getTime();
+            DateTime dateTime = new DateTime();
+            long time = dateTime.minus(frequency).getMillis();
             AsyncTask.execute(() -> {
                 int rowsDeleted = ((CCApp) DownloadService.this.getApplicationContext()).getRepository().deleteOldComics(time);
                 CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted + " with given frequency " + frequency);
@@ -267,27 +270,27 @@ public class DownloadService extends IntentService {
      * @param editorLastScan the editor target
      * @return the difference in long data
      */
-    private long calculateDayDifference(String editorLastScan) {
+    private int calculateDayDifference(String editorLastScan) {
         CCLogger.v(TAG, "calculateDayDifference - Editor last scan " + editorLastScan + " - start");
-        long result; // If result is 3, we need a refresh
-        String today = DateCreator.getTodayString();
+        int result; // If result is 3, we need a refresh
+        DateTime today = new DateTime();
 
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String dateStart = sp.getString(editorLastScan, "01/01/2012");
+        long dateStart = sp.getLong(editorLastScan, -1);
+        DateTime dateLastScan = new DateTime(dateStart);
 
         CCLogger.d(TAG, "calculateDayDifference - (in milliseconds) today is " + today + " target is " + dateStart);
-        // Calculate day difference in milliseconds
-        long diff = DateCreator.getDifferenceInMillis(today, dateStart);
+        // Calculate day difference
+        result = Days.daysBetween(today, dateLastScan).getDays();
 
-        result = diff / (24 * 60 * 60 * 1000);
-        sp.edit().putString(editorLastScan, today).apply();
+        sp.edit().putLong(editorLastScan, today.getMillis()).apply();
 
         // Set default value in case of error
         if (result < 0) {
             result = 3;
         }
 
-        CCLogger.v(TAG, "calculateDayDifference - result is " + result + " - end");
+        CCLogger.v(TAG, "calculateDayDifference - Result is " + result + " - end");
 
         return result;
     }

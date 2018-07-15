@@ -4,16 +4,20 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.log.ParserLog;
 import org.checklist.comics.comicschecklist.util.Constants;
-import org.checklist.comics.comicschecklist.util.DateCreator;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ParserRW extends Parser {
 
@@ -39,14 +43,14 @@ public class ParserRW extends Parser {
         ArrayList<ComicEntity> comicEntities = new ArrayList<>();
         List<ComicEntity> rawComicEntities;
         int dayToSearch = 5;
+        DateTime dateTime = new DateTime();
         for (int i = -3; i <= dayToSearch; i++) {
-            CCLogger.d(TAG, "initParser - Today is " + DateCreator.getTodayString() + " adding " + i + " day(s)");
+            CCLogger.d(TAG, "initParser - Today is " + dateTime.toString() + " adding " + i + " day(s)");
             mCurrentReleaseDate = searchReleaseDate(i);
-            int day = DateCreator.getTargetDay(i).get(Calendar.DAY_OF_MONTH);
+            int day = dateTime.plusDays(i).getDayOfMonth();
 
             // Example : http://www.rwedizioni.it/news/uscite-2-dicembre/
-            String url = FIRST_RW + MIDDLE_RW + day + MIDDLE_RW +
-                    DateCreator.getTargetReadableMonth(i) + END_RW;
+            String url = FIRST_RW + MIDDLE_RW + day + MIDDLE_RW + getTargetReadableMonth(i) + END_RW;
             rawComicEntities = parseUrl(url);
             if (rawComicEntities != null) {
                 comicEntities.addAll(rawComicEntities);
@@ -86,7 +90,7 @@ public class ParserRW extends Parser {
 
         // Init mandatory data (we already have computed the release date)
         String title;
-        Date myDate = DateCreator.elaborateDate(mCurrentReleaseDate);
+        Date myDate = elaborateDate(mCurrentReleaseDate);
         // Init optional data
         String description, coverUrl, feature, price;
 
@@ -151,7 +155,10 @@ public class ParserRW extends Parser {
     @Override
     public String searchReleaseDate(Object object) {
         int daysToAdd = (Integer) object;
-        String releaseDate = DateCreator.getStringTargetDay(daysToAdd);
+        DateTime dateTime = new DateTime();
+        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("dd/MM/yyyy");
+        String releaseDate = dateTimeFormatter.print(dateTime.plusDays(daysToAdd));
+
         CCLogger.v(TAG, "searchReleaseDate - Computed release date " + releaseDate);
         return releaseDate;
     }
@@ -231,5 +238,19 @@ public class ParserRW extends Parser {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Return the current month in {@link String} format.
+     * @param days the days to add
+     * @return current month in a readable form
+     */
+    private String getTargetReadableMonth(int days) {
+        DateTime dateTime = new DateTime();
+        dateTime.plusDays(days);
+        int month = dateTime.getMonthOfYear();
+        String monthString = DateFormatSymbols.getInstance(Locale.ITALIAN).getMonths()[month].toLowerCase();
+        CCLogger.d(TAG, "getCurrentReadableMonth - Month is " + monthString);
+        return monthString;
     }
 }

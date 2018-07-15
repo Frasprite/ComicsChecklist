@@ -8,7 +8,8 @@ import com.evernote.android.job.JobRequest;
 import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.log.CCLogger;
-import org.checklist.comics.comicschecklist.util.DateCreator;
+
+import org.joda.time.DateTime;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,9 +25,9 @@ public class ComicReleaseSyncJob extends DailyJob {
     protected DailyJobResult onRunDailyJob(@NonNull Params params) {
         CCLogger.d(TAG, "onRunDailyJob - start");
         // Do the work that requires your app to keep the CPU running
-        String today = DateCreator.getTodayString();
-        CCLogger.v(TAG, "onRunDailyJob - Today is " + today);
-        int totalItems = ((CCApp) getContext().getApplicationContext()).getRepository().checkFavoritesRelease(DateCreator.getTimeInMillis(today));
+        DateTime today = new DateTime();
+        CCLogger.v(TAG, "onRunDailyJob - Today is " + today.toString());
+        int totalItems = ((CCApp) getContext().getApplicationContext()).getRepository().checkFavoritesRelease(today.getMillis());
 
         String message = getContext().getResources().getString(R.string.notification_comic_out);
         if (totalItems == 1) {

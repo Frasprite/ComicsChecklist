@@ -16,9 +16,10 @@ import org.checklist.comics.comicschecklist.extensions.lazyLogger
 import org.checklist.comics.comicschecklist.notification.ComicReleaseSyncJob
 import org.checklist.comics.comicschecklist.widget.WidgetService
 import org.checklist.comics.comicschecklist.util.Constants
-import org.checklist.comics.comicschecklist.util.DateCreator
 
 import org.jetbrains.anko.*
+
+import org.joda.time.format.DateTimeFormat
 
 /**
  * A [android.preference.PreferenceActivity] that presents a set of application settings. On
@@ -144,13 +145,21 @@ class ActivitySettings : AppCompatPreferenceActivity() {
         }
 
         private fun composeLastSyncMessage(context: Context): String {
-            var message: String
+            val message: String
             val sp = PreferenceManager.getDefaultSharedPreferences(context)
-            message = "Panini Comics : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_PANINI_LAST_SCAN, "01/01/2012")) + "\n"
-            message = message + "RW Edizioni : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_RW_LAST_SCAN, "01/01/2012")) + "\n"
-            message = message + "Bonelli : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_BONELLI_LAST_SCAN, "01/01/2012")) + "\n"
-            message = message + "Star Comics : " + DateCreator.elaborateHumanDate(sp.getString(Constants.PREF_STAR_LAST_SCAN, "01/01/2012"))
+            message = "Panini Comics : ${composeSubString(sp.getLong(Constants.PREF_PANINI_LAST_SCAN, -1))} \n" +
+                      "RW Edizioni : ${sp.getLong(Constants.PREF_RW_LAST_SCAN, -1)} \n" +
+                      "Bonelli : ${sp.getLong(Constants.PREF_BONELLI_LAST_SCAN, -1)} \n" +
+                      "Star Comics : ${sp.getLong(Constants.PREF_STAR_LAST_SCAN, -1)}"
             return message
+        }
+
+        private fun composeSubString(timestamp: Long): String {
+            if (timestamp <= -1)
+                return resources.getString(R.string.activity_settings_never)
+
+            val dateTimeFormatter = DateTimeFormat.forPattern("dd/MM/yyyy")
+            return dateTimeFormatter.print(timestamp)
         }
 
         override fun onOptionsItemSelected(item: MenuItem): Boolean {

@@ -2,7 +2,6 @@ package org.checklist.comics.comicschecklist.parser;
 
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.log.CCLogger;
-import org.checklist.comics.comicschecklist.util.DateCreator;
 
 import java.util.ArrayList;
 
@@ -23,7 +22,7 @@ public class ParserMockEditor extends Parser {
 
         // Adding comics to cart
         comicEntities.add(new ComicEntity("Sport Stars 4",
-                DateCreator.elaborateDate("29/06/2018"),
+                elaborateDate("29/06/2018"),
                 "da comprare",
                 "N.D.",
                 "http://digitalcomicmuseum.com/thumbnails/27228.jpg",
@@ -32,7 +31,7 @@ public class ParserMockEditor extends Parser {
                 true, false,
                 "http://digitalcomicmuseum.com/"));
         comicEntities.add(new ComicEntity("Football Thrills 1",
-                DateCreator.elaborateDate("02/07/2018"),
+                elaborateDate("02/07/2018"),
                 "da comprare",
                 "N.D.",
                 "http://digitalcomicmuseum.com/thumbnails/27227.jpg",
@@ -41,7 +40,7 @@ public class ParserMockEditor extends Parser {
                 true, false,
                 "http://digitalcomicmuseum.com/"));
         comicEntities.add(new ComicEntity("True Confidence 3",
-                DateCreator.elaborateDate("07/07/2018"),
+                elaborateDate("07/07/2018"),
                 "da comprare",
                 "N.D.",
                 "http://digitalcomicmuseum.com/thumbnails/27223.jpg",
@@ -52,7 +51,7 @@ public class ParserMockEditor extends Parser {
 
         // Adding favorite comics
         comicEntities.add(new ComicEntity("Wanted Comics 11",
-                DateCreator.elaborateDate("01/07/2018"),
+                elaborateDate("01/07/2018"),
                 "preferiti",
                 "N.D.",
                 "http://digitalcomicmuseum.com/thumbnails/20652.jpg",
@@ -61,7 +60,7 @@ public class ParserMockEditor extends Parser {
                 false, true,
                 "http://digitalcomicmuseum.com/"));
         comicEntities.add(new ComicEntity("Billy The Kid 13",
-                DateCreator.elaborateDate("03/07/2018"),
+                elaborateDate("03/07/2018"),
                 "preferiti",
                 "N.D.",
                 "http://digitalcomicmuseum.com/thumbnails/27228.jpg",
@@ -70,7 +69,7 @@ public class ParserMockEditor extends Parser {
                 false, true,
                 "http://digitalcomicmuseum.com/"));
         comicEntities.add(new ComicEntity("Woman in red 10",
-                DateCreator.elaborateDate("04/07/2018"),
+                elaborateDate("04/07/2018"),
                 "preferiti",
                 "N.D.",
                 "http://digitalcomicmuseum.com/thumbnails/17932.jpg",

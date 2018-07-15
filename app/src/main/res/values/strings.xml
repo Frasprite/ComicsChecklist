@@ -3,6 +3,9 @@
     <string name="app_name">Comics Checklist</string>
     <string name="placeholder_description">Image of side menu</string>
 
+    <!-- Activity settings -->
+    <string name="activity_settings_never">mai effettuata</string>
+
     <!-- Activity add comic -->
     <string name="activity_date_button">Data uscita (facoltativa)</string>
 
