@@ -36,7 +36,6 @@ import android.widget.Toast;
 import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
-import org.checklist.comics.comicschecklist.model.Comic;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.AppRater;
 import org.checklist.comics.comicschecklist.log.CCLogger;
@@ -478,7 +477,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
      * This method launch detail view in a Fragment or on a new Activity.
      * @param comic the comic to show on details UI
      */
-    public void launchDetailView(Comic comic) {
+    public void launchDetailView(ComicEntity comic) {
         String rawEditor = comic.getEditor();
         int comicId = comic.getId();
         CCLogger.d(TAG, "launchDetailView - Comic ID is " + comicId + " editor is " + rawEditor);

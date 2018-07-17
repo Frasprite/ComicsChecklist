@@ -27,7 +27,6 @@ import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBinding;
-import org.checklist.comics.comicschecklist.model.Comic;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.widget.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
@@ -62,7 +61,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
             // Remove swiped item from list
             int position = viewHolder.getAdapterPosition();
-            Comic comic = mComicAdapter.mComicList.get(position);
+            ComicEntity comic = mComicAdapter.mComicList.get(position);
             CCLogger.v(TAG, "onSwiped - Comic ID " + comic.getId());
             updateComic(comic);
         }
@@ -70,7 +69,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
 
     private final ComicClickCallback mComicClickCallback = new ComicClickCallback() {
         @Override
-        public void onClick(Comic comic) {
+        public void onClick(ComicEntity comic) {
             if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
                 ((ActivityMain) getActivity()).launchDetailView(comic);
             }
@@ -278,7 +277,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * Update a changes of favorite or wished comic on database.
      * @param comic the entry to update on database
      */
-    public void updateComic(Comic comic) {
+    public void updateComic(ComicEntity comic) {
         if (mEditor.equals(Constants.Sections.FAVORITE)) {
             CCLogger.d(TAG, "deleteComic - Removing favorite comic with ID " + comic.getId());
             // Remove comic from favorite
@@ -299,20 +298,19 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * If the comic was created by user, it will be deleted; otherwise it is just updated.
      * @param comic the comic to update or remove
      */
-    private void removeComicFromCart(Comic comic) {
+    private void removeComicFromCart(ComicEntity comic) {
         // Evaluate if comic was created by user or it is coming from network
-        ComicEntity comicEntity = (ComicEntity) comic;
-        Constants.Sections editor = Constants.Sections.getEditorFromName(comicEntity.getEditor());
+        Constants.Sections editor = Constants.Sections.getEditorFromName(comic.getEditor());
         switch (editor) {
             case CART:
                 // Simply delete comic because was created by user
-                deleteData(comicEntity);
+                deleteData(comic);
                 CCLogger.v(TAG, "removeComicFromCart - Comic deleted!");
                 break;
             default:
                 // Update comic because it is created from web data
-                comicEntity.setToCart(!comicEntity.isOnCart());
-                updateData(comicEntity);
+                comic.setToCart(!comic.isOnCart());
+                updateData(comic);
                 CCLogger.v(TAG, "removeComicFromCart - Comic updated!");
                 break;
         }

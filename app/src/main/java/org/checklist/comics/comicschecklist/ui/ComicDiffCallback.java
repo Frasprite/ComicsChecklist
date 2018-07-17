@@ -4,17 +4,17 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v7.util.DiffUtil;
 
-import org.checklist.comics.comicschecklist.model.Comic;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 
 import java.util.List;
 import java.util.Objects;
 
 public class ComicDiffCallback extends DiffUtil.Callback {
 
-    private List<Comic> mOldComics;
-    private List<Comic> mNewComics;
+    private List<ComicEntity> mOldComics;
+    private List<ComicEntity> mNewComics;
 
-    ComicDiffCallback(List<Comic> newComics, List<Comic> oldComics) {
+    ComicDiffCallback(List<ComicEntity> newComics, List<ComicEntity> oldComics) {
         this.mNewComics = newComics;
         this.mOldComics = oldComics;
     }
@@ -37,8 +37,8 @@ public class ComicDiffCallback extends DiffUtil.Callback {
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        Comic newComic = mNewComics.get(newItemPosition);
-        Comic oldComic = mOldComics.get(oldItemPosition);
+        ComicEntity newComic = mNewComics.get(newItemPosition);
+        ComicEntity oldComic = mOldComics.get(oldItemPosition);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             return newComic.getId() == oldComic.getId()
                     && Objects.equals(newComic.isFavorite(), oldComic.isFavorite())

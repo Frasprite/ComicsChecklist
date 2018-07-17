@@ -8,14 +8,14 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import org.checklist.comics.comicschecklist.R;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.databinding.ListItemViewBinding;
-import org.checklist.comics.comicschecklist.model.Comic;
 
 import java.util.List;
 
 public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ComicViewHolder> {
 
-    List<? extends Comic> mComicList;
+    List<? extends ComicEntity> mComicList;
 
     @Nullable
     private final ComicClickCallback mComicClickCallback;
@@ -24,12 +24,12 @@ public class ComicAdapter extends RecyclerView.Adapter<ComicAdapter.ComicViewHol
         mComicClickCallback = clickCallback;
     }
 
-    public void setComicList(final List<? extends Comic> comicList) {
+    public void setComicList(final List<? extends ComicEntity> comicList) {
         if (mComicList == null) {
             mComicList = comicList;
             notifyItemRangeInserted(0, comicList.size());
         } else {
-            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new ComicDiffCallback((List<Comic>) comicList, (List<Comic>) mComicList));
+            DiffUtil.DiffResult result = DiffUtil.calculateDiff(new ComicDiffCallback((List<ComicEntity>) comicList, (List<ComicEntity>) mComicList));
             mComicList = comicList;
             result.dispatchUpdatesTo(this);
         }

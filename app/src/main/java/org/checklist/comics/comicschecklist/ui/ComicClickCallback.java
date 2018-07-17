@@ -1,7 +1,7 @@
 package org.checklist.comics.comicschecklist.ui;
 
-import org.checklist.comics.comicschecklist.model.Comic;
+import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 
 public interface ComicClickCallback {
-    void onClick(Comic comic);
+    void onClick(ComicEntity comic);
 }
