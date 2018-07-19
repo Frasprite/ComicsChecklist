@@ -105,14 +105,12 @@ public class Constants {
     public static final String MANUAL_SEARCH = "manual_search";
     public static final String CREATE_DATABASE = "create_database";
 
-    public enum SearchResults {
-        RESULT_START,
-        RESULT_CANCELED,
-        RESULT_FINISHED,
-        RESULT_DESTROYED,
-        RESULT_NOT_CONNECTED,
-        RESULT_EDITOR_FINISHED
-    }
+    public static final int RESULT_START = 0;
+    public static final int RESULT_CANCELED = 1;
+    public static final int RESULT_FINISHED = 2;
+    public static final int RESULT_DESTROYED = 3;
+    public static final int RESULT_NOT_CONNECTED = 4;
+    public static final int RESULT_EDITOR_FINISHED = 5;
 
     public static final String NOTIFICATION_RESULT = "result";
     public static final String NOTIFICATION_EDITOR = "editor";

@@ -14,15 +14,6 @@ import java.util.Date
 
 class ParserBonelli : Parser() {
 
-    private enum class LINKS constructor(val url: String) {
-        EDICOLA_INEDITI("$BASE_URL/sezioni/1025/inediti"),
-        EDICOLA_RISTAMPE("$BASE_URL/sezioni/1016/ristampe"),
-        EDICOLA_RACCOLTE("$BASE_URL/sezioni/1017/raccolte"),
-        PROSSIMAMENTE_INEDITI("$BASE_URL/sezioni/1026/inediti1026"),
-        PROSSIMAMENTE_RISTAMPE("$BASE_URL/sezioni/1018/ristampe1018"),
-        PROSSIMAMENTE_RACCOLTE("$BASE_URL/sezioni/1019/raccolte1019")
-    }
-
     /**
      * Method used to start search for Bonneli comics.
      * @return a list found comic
@@ -32,10 +23,10 @@ class ParserBonelli : Parser() {
         val comicEntities = ArrayList<ComicEntity>()
         var foundComics: ArrayList<ComicEntity>?
 
-        for (link in LINKS.values()) {
-            foundComics = parseUrl(link.url)
+        for (link in LINKS) {
+            foundComics = parseUrl(link)
             if (foundComics.isEmpty()) {
-                CCLogger.w(TAG, "initParser - No results from link " + link.url)
+                CCLogger.w(TAG, "initParser - No results from link $link")
                 continue
             }
             comicEntities.addAll(foundComics)
@@ -246,5 +237,14 @@ class ParserBonelli : Parser() {
         private val TAG = ParserBonelli::class.java.simpleName
 
         private const val BASE_URL = "http://www.sergiobonelli.it"
+
+        private const val EDICOLA_INEDITI = "$BASE_URL/sezioni/1025/inediti"
+        private const val EDICOLA_RISTAMPE = "$BASE_URL/sezioni/1016/ristampe"
+        private const val EDICOLA_RACCOLTE = "$BASE_URL/sezioni/1017/raccolte"
+        private const val PROSSIMAMENTE_INEDITI = "$BASE_URL/sezioni/1026/inediti1026"
+        private const val PROSSIMAMENTE_RISTAMPE = "$BASE_URL/sezioni/1018/ristampe1018"
+        private const val PROSSIMAMENTE_RACCOLTE = "$BASE_URL/sezioni/1019/raccolte1019"
+
+        private val LINKS = arrayOf(EDICOLA_INEDITI, EDICOLA_RISTAMPE, EDICOLA_RACCOLTE, PROSSIMAMENTE_INEDITI, PROSSIMAMENTE_RISTAMPE, PROSSIMAMENTE_RACCOLTE)
     }
 }

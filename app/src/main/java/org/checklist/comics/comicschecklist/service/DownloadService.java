@@ -66,7 +66,7 @@ public class DownloadService extends IntentService {
         boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
 
         if (!isConnected) {
-            publishResults(Constants.SearchResults.RESULT_NOT_CONNECTED, "noEditor");
+            publishResults(Constants.RESULT_NOT_CONNECTED, "noEditor");
             CCNotificationManager.createNotification(this, getResources().getString(R.string.toast_no_connection), false);
             return;
         }
@@ -104,7 +104,7 @@ public class DownloadService extends IntentService {
 
     @Override
     public void onDestroy() {
-        publishResults(Constants.SearchResults.RESULT_DESTROYED, "noEditor");
+        publishResults(Constants.RESULT_DESTROYED, "noEditor");
         // Notification is not needed (only if there isn't an error)
         CCNotificationManager.deleteNotification(this);
     }
@@ -132,10 +132,10 @@ public class DownloadService extends IntentService {
             if (calculateDayDifference(entry.getValue()) >= frequency &&
                     editorSet.contains(String.valueOf(currentSection.getCode()))) {
                 String editorTitle = Constants.Sections.getTitle(currentSection);
-                publishResults(Constants.SearchResults.RESULT_START, editorTitle);
+                publishResults(Constants.RESULT_START, editorTitle);
                 searchComics(notificationPref, editorTitle, currentSection);
 
-                publishResults(Constants.SearchResults.RESULT_FINISHED, "noEditor");
+                publishResults(Constants.RESULT_FINISHED, "noEditor");
                 if (notificationPref) {
                     CCNotificationManager.deleteNotification(this);
                 }
@@ -154,7 +154,7 @@ public class DownloadService extends IntentService {
             CCLogger.i(TAG, "manualSearch - Manual search for editor " + editor.toString());
 
             String editorTitle = Constants.Sections.getTitle(editor);
-            publishResults(Constants.SearchResults.RESULT_START, editorTitle);
+            publishResults(Constants.RESULT_START, editorTitle);
             searchComics(notificationPref, editorTitle, editor);
 
             // Update last scan for editor on shared preference
@@ -174,7 +174,7 @@ public class DownloadService extends IntentService {
                     break;
             }
 
-            publishResults(Constants.SearchResults.RESULT_FINISHED, "noEditor");
+            publishResults(Constants.RESULT_FINISHED, "noEditor");
             if (notificationPref) {
                 CCNotificationManager.deleteNotification(this);
                 // Favorite data may have changed, update widget as well
@@ -214,7 +214,7 @@ public class DownloadService extends IntentService {
 
         // See result
         if (comicEntities == null || comicEntities.size() == 0) {
-            publishResults(Constants.SearchResults.RESULT_CANCELED, editorTitle);
+            publishResults(Constants.RESULT_CANCELED, editorTitle);
             if (notificationPref) {
                 CCNotificationManager.updateNotification(this, editorTitle + getResources().getString(R.string.search_failed), false);
             }
@@ -222,7 +222,7 @@ public class DownloadService extends IntentService {
             // Inserting found comics into database
             ((CCApp) this.getApplicationContext()).getRepository().insertComics(comicEntities);
 
-            publishResults(Constants.SearchResults.RESULT_EDITOR_FINISHED, editorTitle);
+            publishResults(Constants.RESULT_EDITOR_FINISHED, editorTitle);
             if (notificationPref) {
                 CCNotificationManager.updateNotification(this, editorTitle + getResources().getString(R.string.search_editor_completed), true);
             }
@@ -257,8 +257,8 @@ public class DownloadService extends IntentService {
      * @param result the result of search
      * @param editor the editor searched
      */
-    private void publishResults(Constants.SearchResults result, String editor) {
-        CCLogger.v(TAG, "publishResults - Result of search " + result.name() + " " + editor);
+    private void publishResults(int result, String editor) {
+        CCLogger.v(TAG, "publishResults - Result of search " + result + " " + editor);
         Intent intent = new Intent(Constants.NOTIFICATION);
         intent.putExtra(Constants.NOTIFICATION_RESULT, result);
         intent.putExtra(Constants.NOTIFICATION_EDITOR, editor);

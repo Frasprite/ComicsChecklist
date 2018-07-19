@@ -16,16 +16,6 @@ import java.util.StringTokenizer
 
 class ParserPanini : Parser() {
 
-    private enum class LINKS constructor(val url: String) {
-        QUESTA_SETTIMANA("$BASE_URL/calendario/uscite-questa-settimana/"),
-        PROSSIME_SETTIMANE("$BASE_URL/calendario/uscite-prossime-settimane/"),
-        MAGAZINE_9L("$BASE_URL/store/pub_ita_it/magazines/9l.html"),
-        PANINI_DISNEY("$BASE_URL/store/pub_ita_it/magazines/cmc-d.html"),
-        PLANET_MANGA("$BASE_URL/store/pub_ita_it/magazines/manga.html"),
-        MARVEL("$BASE_URL/store/pub_ita_it/magazines/cmc-m.html"),
-        PANINI_COMICS("$BASE_URL/store/pub_ita_it/magazines/comics.html")
-    }
-
     /**
      * Method used to search Panini comics.
      * @return a list found comic
@@ -35,10 +25,10 @@ class ParserPanini : Parser() {
         val comicEntities = ArrayList<ComicEntity>()
         var foundComics: List<ComicEntity>?
 
-        for (link in LINKS.values()) {
-            foundComics = parseUrl(link.url)
+        for (link in LINKS) {
+            foundComics = parseUrl(link)
             if (foundComics.isEmpty()) {
-                CCLogger.w(TAG, "initParser - No results from link " + link.url)
+                CCLogger.w(TAG, "initParser - No results from link $link")
                 continue
             }
             comicEntities.addAll(foundComics)
@@ -259,5 +249,15 @@ class ParserPanini : Parser() {
         private val TAG = ParserPanini::class.java.simpleName
 
         private const val BASE_URL = "http://comics.panini.it"
+
+        private const val QUESTA_SETTIMANA = "$BASE_URL/calendario/uscite-questa-settimana/"
+        private const val PROSSIME_SETTIMANE = "$BASE_URL/calendario/uscite-prossime-settimane/"
+        private const val MAGAZINE_9L = "$BASE_URL/store/pub_ita_it/magazines/9l.html"
+        private const val PANINI_DISNEY = "$BASE_URL/store/pub_ita_it/magazines/cmc-d.html"
+        private const val PLANET_MANGA = "$BASE_URL/store/pub_ita_it/magazines/manga.html"
+        private const val MARVEL = "$BASE_URL/store/pub_ita_it/magazines/cmc-m.html"
+        private const val PANINI_COMICS = "$BASE_URL/store/pub_ita_it/magazines/comics.html"
+
+        private val LINKS = arrayOf(QUESTA_SETTIMANA, PROSSIME_SETTIMANE, MAGAZINE_9L, PANINI_DISNEY, PLANET_MANGA, MARVEL, PANINI_COMICS)
     }
 }

@@ -91,7 +91,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         public void onReceive(Context context, Intent intent) {
             Bundle bundle = intent.getExtras();
             if (bundle != null) {
-                Constants.SearchResults result = (Constants.SearchResults) bundle.get(Constants.NOTIFICATION_RESULT);
+                int result = bundle.getInt(Constants.NOTIFICATION_RESULT);
                 String mCurrentEditor = bundle.getString(Constants.NOTIFICATION_EDITOR);
                 inspectResultCode(result, mCurrentEditor);
             }
@@ -102,26 +102,26 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
          * @param result the result indicating download status
          * @param currentEditor the editor searched
          */
-        private void inspectResultCode(Constants.SearchResults result, String currentEditor) {
+        private void inspectResultCode(int result, String currentEditor) {
             boolean shouldSetRefresh = false;
             switch (result) {
-                case RESULT_START:
+                case Constants.RESULT_START:
                     Toast.makeText(getApplicationContext(), currentEditor + getString(R.string.search_started), Toast.LENGTH_SHORT).show();
                     shouldSetRefresh = true;
                     break;
-                case RESULT_FINISHED:
+                case Constants.RESULT_FINISHED:
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.search_completed), Toast.LENGTH_SHORT).show();
                     break;
-                case RESULT_EDITOR_FINISHED:
+                case Constants.RESULT_EDITOR_FINISHED:
                     Toast.makeText(getApplicationContext(), currentEditor + getResources().getString(R.string.search_editor_completed), Toast.LENGTH_SHORT).show();
                     break;
-                case RESULT_CANCELED:
+                case Constants.RESULT_CANCELED:
                     Toast.makeText(getApplicationContext(), currentEditor + getResources().getString(R.string.search_failed), Toast.LENGTH_LONG).show();
                     break;
-                case RESULT_NOT_CONNECTED:
+                case Constants.RESULT_NOT_CONNECTED:
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.toast_no_connection), Toast.LENGTH_LONG).show();
                     break;
-                case RESULT_DESTROYED:
+                case Constants.RESULT_DESTROYED:
                     CCLogger.i(TAG, "Service destroyed");
                     break;
             }
