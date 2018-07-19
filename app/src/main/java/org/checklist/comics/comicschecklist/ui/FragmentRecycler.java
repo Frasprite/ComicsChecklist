@@ -264,7 +264,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
             removeComicFromCart(comic);
         }
 
-        WidgetService.updateWidget(getActivity());
+        WidgetService.Companion.updateWidget(getActivity());
     }
 
     /**
@@ -302,7 +302,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
             }
         });
 
-        WidgetService.updateWidget(getActivity());
+        WidgetService.Companion.updateWidget(getActivity());
     }
 
     /**
@@ -317,7 +317,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
             }
         });
 
-        WidgetService.updateWidget(getActivity());
+        WidgetService.Companion.updateWidget(getActivity());
     }
 
     /* ****************************************************************************************

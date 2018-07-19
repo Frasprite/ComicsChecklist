@@ -130,7 +130,7 @@ public class WidgetSettings extends AppCompatActivity {
 
         // It is the responsibility of the configuration activity to update the app widget
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-        WidgetProvider.updateAppWidget(context, appWidgetManager, mAppWidgetId);
+        WidgetProvider.Companion.updateAppWidget(context, appWidgetManager, mAppWidgetId);
 
         // Make sure we pass back the original appWidgetId
         Intent resultValue = new Intent();

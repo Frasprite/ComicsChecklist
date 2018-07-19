@@ -135,7 +135,7 @@ class FragmentAddComic : Fragment() {
             }
 
             // Update widget
-            WidgetService.updateWidget(activity)
+            WidgetService.updateWidget(context)
         }
         super.onPause()
     }

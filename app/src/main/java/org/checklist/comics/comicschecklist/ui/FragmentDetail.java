@@ -179,6 +179,6 @@ public class FragmentDetail extends Fragment implements View.OnClickListener {
             }
         });
 
-        WidgetService.updateWidget(getActivity());
+        WidgetService.Companion.updateWidget(getActivity());
     }
 }

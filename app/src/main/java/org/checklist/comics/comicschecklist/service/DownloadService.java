@@ -178,7 +178,7 @@ public class DownloadService extends IntentService {
             if (notificationPref) {
                 CCNotificationManager.deleteNotification(this);
                 // Favorite data may have changed, update widget as well
-                WidgetService.updateWidget(this);
+                WidgetService.Companion.updateWidget(this);
             }
         }
     }
@@ -246,7 +246,7 @@ public class DownloadService extends IntentService {
                 CCLogger.d(TAG, "deleteOldRows - Entries deleted: " + rowsDeleted + " with given frequency " + frequency);
                 if (rowsDeleted > 0) {
                     // Update widgets as well
-                    WidgetService.updateWidget(DownloadService.this);
+                    WidgetService.Companion.updateWidget(DownloadService.this);
                 }
             });
         }
