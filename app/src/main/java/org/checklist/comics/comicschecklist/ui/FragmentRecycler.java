@@ -21,7 +21,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
@@ -48,8 +47,6 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
 
     private ComicAdapter mComicAdapter;
     private FragmentRecyclerViewBinding mBinding;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private Constants.Sections mEditor;
 
     private ItemTouchHelper.SimpleCallback sItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
         @Override
@@ -89,21 +86,27 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // Find editor
-        mEditor = (Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR);
-        CCLogger.d(TAG, "onCreate - name " + mEditor);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         CCLogger.d(TAG, "onCreateView - start");
         // Create the list fragment's content view by calling the super method
         super.onCreateView(inflater, container, savedInstanceState);
 
+        // Find editor
+        Constants.Sections editor = (Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR);
+        CCLogger.d(TAG, "onCreateView - name " + editor);
+
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_recycler_view, container, false);
+
+        // Set proper empty view
+        if (editor.equals(Constants.Sections.FAVORITE)) {
+            mBinding.emptyTextView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
+            mBinding.emptyTextView.setText(getString(R.string.empty_favorite_list));
+        } else if (editor.equals(Constants.Sections.CART)) {
+            mBinding.emptyTextView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
+            mBinding.emptyTextView.setText(getString(R.string.empty_cart_list));
+        } else {
+            mBinding.emptyTextView.setText(getString(R.string.empty_editor_list));
+        }
 
         // Init adapter
         mComicAdapter = new ComicAdapter(mComicClickCallback);
@@ -112,49 +115,25 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         // Attach listener to navigation bottom
         mBinding.bottomNavigation.setOnNavigationItemSelectedListener(this);
 
-        // Init swipe refresh layout
-        RecyclerView recyclerView = mBinding.getRoot().findViewById(R.id.recycler_view);
-        mSwipeRefreshLayout = mBinding.getRoot().findViewById(R.id.swipe_refresh_layout);
-
         // Attach swipe to delete (right / left) if we are in CART or FAVORITE section
-        if (mEditor.equals(Constants.Sections.CART) || mEditor.equals(Constants.Sections.FAVORITE)) {
+        if (editor.equals(Constants.Sections.CART) || editor.equals(Constants.Sections.FAVORITE)) {
             ItemTouchHelper itemTouchHelper = new ItemTouchHelper(sItemTouchCallback);
-            itemTouchHelper.attachToRecyclerView(recyclerView);
+            itemTouchHelper.attachToRecyclerView(mBinding.recyclerView);
         }
 
         // Set title into toolbar
-        getActivity().setTitle(Constants.Sections.getTitle(mEditor));
+        getActivity().setTitle(Constants.Sections.getTitle(editor));
 
         // Enable swipe to refresh if we are on other categories
-        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
+        if (editor.equals(Constants.Sections.FAVORITE) || editor.equals(Constants.Sections.CART)) {
             CCLogger.v(TAG, "onCreateView - Locking swipe to refresh");
-            mSwipeRefreshLayout.setEnabled(false);
+            mBinding.swipeRefreshLayout.setEnabled(false);
         }
 
         // Set color of progress view
-        mSwipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent);
+        mBinding.swipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent);
 
-        setRecyclerViewLayoutManager(recyclerView);
-
-        return mBinding.getRoot();
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        CCLogger.d(TAG, "onViewCreated - start");
-
-        TextView emptyText = view.findViewById(R.id.empty_text_view);
-
-        if (mEditor.equals(Constants.Sections.FAVORITE)) {
-            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
-            emptyText.setText(getString(R.string.empty_favorite_list));
-        } else if (mEditor.equals(Constants.Sections.CART)) {
-            emptyText.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_empty_list_stub, 0, 0);
-            emptyText.setText(getString(R.string.empty_cart_list));
-        } else {
-            emptyText.setText(getString(R.string.empty_editor_list));
-        }
+        setRecyclerViewLayoutManager(mBinding.recyclerView);
 
         /*
           Implement {@link SwipeRefreshLayout.OnRefreshListener}. When users do the "swipe to
@@ -164,14 +143,9 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
           refreshes the content. Call the same method in response to the Refresh action from the
           action bar.
          */
-        setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                initiateRefresh(mEditor);
-            }
-        });
+        setOnRefreshListener( () -> initiateRefresh(editor) );
 
-        CCLogger.v(TAG, "onViewCreated - end");
+        return mBinding.getRoot();
     }
 
     @Override
@@ -180,7 +154,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         final ComicListViewModel viewModel =
                 ViewModelProviders.of(this).get(ComicListViewModel.class);
 
-        subscribeUi(viewModel, null);
+        subscribeUi(viewModel, null, (Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR));
     }
 
     @Override
@@ -196,7 +170,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
                 activityMain.addComic();
                 break;
             case R.id.refresh:
-                initiateRefresh(mEditor);
+                initiateRefresh((Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR));
                 break;
         }
         return true;
@@ -225,10 +199,10 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * @param viewModel the view model which store and manage the data to show
      * @param text the part of text to search on database
      */
-    private void subscribeUi(ComicListViewModel viewModel, String text) {
+    private void subscribeUi(ComicListViewModel viewModel, String text, Constants.Sections editor) {
         // Update the list when the data changes
         if (text == null) {
-            switch (mEditor) {
+            switch (editor) {
                 case FAVORITE:
                     viewModel.getFavoriteComics();
                     break;
@@ -236,12 +210,13 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
                     viewModel.getWishlistComics();
                     break;
                 default:
-                    viewModel.filterByEditor(mEditor.getName());
+                    viewModel.filterByEditor(editor.getName());
                     break;
             }
         } else {
-            viewModel.filterComicsContainingText(mEditor.getName(), text);
+            viewModel.filterComicsContainingText(editor.getName(), text);
         }
+
         viewModel.getComics().observe(this, new Observer<List<ComicEntity>>() {
             @Override
             public void onChanged(@Nullable List<ComicEntity> myComics) {
@@ -270,7 +245,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         final ComicListViewModel viewModel =
                 ViewModelProviders.of(this).get(ComicListViewModel.class);
 
-        subscribeUi(viewModel, newText);
+        subscribeUi(viewModel, newText, (Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR));
     }
 
     /**
@@ -278,13 +253,12 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * @param comic the entry to update on database
      */
     public void updateComic(ComicEntity comic) {
-        if (mEditor.equals(Constants.Sections.FAVORITE)) {
+        if (comic.getEditor().equals(Constants.Sections.FAVORITE.getName())) {
             CCLogger.d(TAG, "deleteComic - Removing favorite comic with ID " + comic.getId());
             // Remove comic from favorite
-            ComicEntity comicEntity = (ComicEntity) comic;
-            comicEntity.setFavorite(!comicEntity.isFavorite());
-            updateData(comicEntity);
-        } else if (mEditor.equals(Constants.Sections.CART)) {
+            comic.setFavorite(!comic.isFavorite());
+            updateData(comic);
+        } else if (comic.getEditor().equals(Constants.Sections.CART.getName())) {
             CCLogger.d(TAG, "onContextItemSelected - Removing comic in cart with ID " + comic.getId());
             // Remove comic from cart
             removeComicFromCart(comic);
@@ -423,9 +397,8 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * @see android.support.v4.widget.SwipeRefreshLayout#setOnRefreshListener(android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener)
      */
     private void setOnRefreshListener(SwipeRefreshLayout.OnRefreshListener listener) {
-        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
-        if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setOnRefreshListener(listener);
+        if (mBinding.swipeRefreshLayout != null) {
+            mBinding.swipeRefreshLayout.setOnRefreshListener(listener);
         }
     }
 
@@ -436,13 +409,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * @see android.support.v4.widget.SwipeRefreshLayout#isRefreshing()
      */
     public boolean isRefreshing() {
-        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
-        if (swipeRefreshLayout != null) {
-            return swipeRefreshLayout.isRefreshing();
-        } else {
-            CCLogger.v(TAG, "isRefreshing - Returning FALSE because swipe refresh layout is null");
-            return false;
-        }
+        return mBinding.swipeRefreshLayout != null && mBinding.swipeRefreshLayout.isRefreshing();
     }
 
     /**
@@ -452,16 +419,8 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * @see android.support.v4.widget.SwipeRefreshLayout#setRefreshing(boolean)
      */
     public void setRefreshing(boolean refreshing) {
-        SwipeRefreshLayout swipeRefreshLayout = getSwipeRefreshLayout();
-        if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setRefreshing(refreshing);
+        if (mBinding.swipeRefreshLayout != null) {
+            mBinding.swipeRefreshLayout.setRefreshing(refreshing);
         }
-    }
-
-    /**
-     * @return the fragment's {@link android.support.v4.widget.SwipeRefreshLayout} widget.
-     */
-    public SwipeRefreshLayout getSwipeRefreshLayout() {
-        return mSwipeRefreshLayout;
     }
 }
