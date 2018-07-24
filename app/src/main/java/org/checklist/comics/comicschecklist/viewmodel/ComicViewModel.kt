@@ -21,10 +21,6 @@ class ComicViewModel(application: Application, repository: DataRepository, mComi
         this.comic.set(comic)
     }
 
-    fun updateComic(comicEntity: ComicEntity) {
-        (getApplication<Application>() as CCApp).repository.updateComic(comicEntity)
-    }
-
     /**
      * A creator is used to inject the comic ID into the ViewModel.
      *
