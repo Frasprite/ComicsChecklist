@@ -629,7 +629,7 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             case RW:
             case STAR:
                 // Update the main content by replacing fragments
-                mFragmentRecycler = FragmentRecycler.newInstance(section);
+                mFragmentRecycler = FragmentRecycler.Companion.newInstance(section);
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, mFragmentRecycler).commit();
                 break;
             case SETTINGS:
