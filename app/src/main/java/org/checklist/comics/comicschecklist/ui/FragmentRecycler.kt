@@ -34,7 +34,7 @@ import org.jetbrains.anko.doAsync
  */
 class FragmentRecycler : Fragment() {
 
-    private var mComicAdapter: ComicAdapter? = null
+    private lateinit var mComicAdapter: ComicAdapter
     private var mBinding: FragmentRecyclerViewBinding? = null
 
     private val sItemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
@@ -45,7 +45,7 @@ class FragmentRecycler : Fragment() {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
             // Remove swiped item from list
             val position = viewHolder.adapterPosition
-            val comic = mComicAdapter!!.mComicList[position]
+            val comic = mComicAdapter.mComicList[position]
             CCLogger.v(TAG, "onSwiped - Comic ID " + comic.id)
             updateComic(comic)
         }
@@ -185,7 +185,7 @@ class FragmentRecycler : Fragment() {
             myComics ->
             if (myComics != null) {
                 mBinding!!.isLoading = myComics.isEmpty()
-                mComicAdapter!!.setComicList(myComics)
+                mComicAdapter.setComicList(myComics)
             } else {
                 mBinding!!.isLoading = true
             }
