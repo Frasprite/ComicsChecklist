@@ -1,24 +1,17 @@
 package org.checklist.comics.comicschecklist.ui;
 
 import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -26,13 +19,10 @@ import org.checklist.comics.comicschecklist.CCApp;
 import org.checklist.comics.comicschecklist.R;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBinding;
-import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.widget.WidgetService;
 import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.util.Constants;
 import org.checklist.comics.comicschecklist.viewmodel.ComicListViewModel;
-
-import java.util.List;
 
 /**
  * A fragment representing a list of Comics. This fragment
@@ -41,7 +31,7 @@ import java.util.List;
  * currently being viewed in a {@link FragmentDetail}.
  * <p>
  */
-public class FragmentRecycler extends Fragment implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class FragmentRecycler extends Fragment {
 
     private static final String TAG = FragmentRecycler.class.getSimpleName();
 
@@ -64,12 +54,9 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         }
     };
 
-    private final ComicClickCallback mComicClickCallback = new ComicClickCallback() {
-        @Override
-        public void onClick(ComicEntity comic) {
-            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-                ((ActivityMain) getActivity()).launchDetailView(comic);
-            }
+    private final ComicClickCallback mComicClickCallback = comic -> {
+        if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+            ((ActivityMain) getActivity()).launchDetailView(comic);
         }
     };
 
@@ -112,9 +99,6 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
         mComicAdapter = new ComicAdapter(mComicClickCallback);
         mBinding.recyclerView.setAdapter(mComicAdapter);
 
-        // Attach listener to navigation bottom
-        mBinding.bottomNavigation.setOnNavigationItemSelectedListener(this);
-
         // Attach swipe to delete (right / left) if we are in CART or FAVORITE section
         if (editor.equals(Constants.Sections.CART) || editor.equals(Constants.Sections.FAVORITE)) {
             ItemTouchHelper itemTouchHelper = new ItemTouchHelper(sItemTouchCallback);
@@ -143,7 +127,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
           refreshes the content. Call the same method in response to the Refresh action from the
           action bar.
          */
-        setOnRefreshListener( () -> initiateRefresh(editor) );
+        setOnRefreshListener( () -> ((ActivityMain) getActivity()).initiateRefresh(editor) );
 
         return mBinding.getRoot();
     }
@@ -155,25 +139,6 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
                 ViewModelProviders.of(this).get(ComicListViewModel.class);
 
         subscribeUi(viewModel, null, (Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR));
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        ActivityMain activityMain = (ActivityMain) getActivity();
-        switch (item.getItemId()) {
-            case R.id.searchStore:
-                // This method can be called from shortcut (Android 7.1 and above)
-                activityMain.searchStore();
-                break;
-            case R.id.addComic:
-                // This method can be called from shortcut (Android 7.1 and above)
-                activityMain.addComic();
-                break;
-            case R.id.refresh:
-                initiateRefresh((Constants.Sections) getArguments().getSerializable(Constants.ARG_EDITOR));
-                break;
-        }
-        return true;
     }
 
     /**
@@ -217,23 +182,20 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
             viewModel.filterComicsContainingText(editor.getName(), text);
         }
 
-        viewModel.getComics().observe(this, new Observer<List<ComicEntity>>() {
-            @Override
-            public void onChanged(@Nullable List<ComicEntity> myComics) {
-                if (myComics != null) {
-                    if (myComics.size() == 0) {
-                        mBinding.setIsLoading(true);
-                    } else {
-                        mBinding.setIsLoading(false);
-                    }
-                    mComicAdapter.setComicList(myComics);
-                } else {
+        viewModel.getComics().observe(this, myComics -> {
+            if (myComics != null) {
+                if (myComics.size() == 0) {
                     mBinding.setIsLoading(true);
+                } else {
+                    mBinding.setIsLoading(false);
                 }
-                // Espresso does not know how to wait for data binding's loop so we execute changes
-                // sync.
-                mBinding.executePendingBindings();
+                mComicAdapter.setComicList(myComics);
+            } else {
+                mBinding.setIsLoading(true);
             }
+            // Espresso does not know how to wait for data binding's loop so we execute changes
+            // sync.
+            mBinding.executePendingBindings();
         });
     }
 
@@ -295,12 +257,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * @param comicEntity the comic to update
      */
     private void updateData(ComicEntity comicEntity) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                ((CCApp) getActivity().getApplication()).getRepository().updateComic(comicEntity);
-            }
-        });
+        AsyncTask.execute(() -> ((CCApp) getActivity().getApplication()).getRepository().updateComic(comicEntity));
 
         WidgetService.Companion.updateWidget(getActivity());
     }
@@ -310,12 +267,7 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
      * @param comicEntity the comic to delete
      */
     private void deleteData(ComicEntity comicEntity) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                ((CCApp) getActivity().getApplication()).getRepository().deleteComic(comicEntity);
-            }
-        });
+        AsyncTask.execute(() -> ((CCApp) getActivity().getApplication()).getRepository().deleteComic(comicEntity));
 
         WidgetService.Companion.updateWidget(getActivity());
     }
@@ -323,72 +275,6 @@ public class FragmentRecycler extends Fragment implements BottomNavigationView.O
     /* ****************************************************************************************
      * SwipeRefreshLayout methods
      ******************************************************************************************/
-
-    /**
-     * By abstracting the refresh process to a single method, the app allows both the
-     * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
-     * @param mEditor the editor picked by user
-     */
-    private void initiateRefresh(Constants.Sections mEditor) {
-        CCLogger.i(TAG, "initiateRefresh - start for editor " + mEditor);
-
-        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.dialog_pick_editor_title)
-                    .setItems(R.array.pref_available_editors, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // The 'which' argument contains the index position of the selected item
-                            CCLogger.v(TAG, "onClick - Selected position " + which);
-                            Constants.Sections pickedEditor = null;
-                            switch (which) {
-                                case 0:
-                                    pickedEditor = Constants.Sections.PANINI;
-                                    break;
-                                case 1:
-                                    pickedEditor = Constants.Sections.STAR;
-                                    break;
-                                case 2:
-                                    pickedEditor = Constants.Sections.BONELLI;
-                                    break;
-                                case 3:
-                                    pickedEditor = Constants.Sections.RW;
-                                    break;
-                            }
-
-                            if (pickedEditor != null) {
-                                startRefresh(pickedEditor);
-                                dialog.dismiss();
-                            }
-                        }
-                    });
-            builder.setNegativeButton(R.string.dialog_undo_button, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            builder.create().show();
-        } else {
-            startRefresh(mEditor);
-        }
-    }
-
-    /**
-     * Method used to start refresh.
-     * @param editor the editor picked by user
-     */
-    private void startRefresh(Constants.Sections editor) {
-        // Execute the background task, used on DownloadService to load the data
-        Intent intent = new Intent(getActivity(), DownloadService.class);
-        intent.putExtra(Constants.ARG_EDITOR, editor);
-        intent.putExtra(Constants.MANUAL_SEARCH, true);
-        getActivity().startService(intent);
-
-        // Update refresh spinner
-        if (isRefreshing()) {
-            setRefreshing(false);
-        }
-    }
 
     /**
      * Set the {@link android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener} to listen for

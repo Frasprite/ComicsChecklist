@@ -5,7 +5,6 @@ import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -16,6 +15,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -59,7 +59,8 @@ import java.util.Set;
  * <p>
  * to listen for item selections.
  */
-public class ActivityMain extends AppCompatActivity implements SearchView.OnQueryTextListener, NavigationView.OnNavigationItemSelectedListener {
+public class ActivityMain extends AppCompatActivity implements SearchView.OnQueryTextListener,
+        NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = ActivityMain.class.getSimpleName();
 
@@ -200,17 +201,28 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
 
         mNavigationView = findViewById(R.id.navigation_drawer);
         mNavigationView.setNavigationItemSelectedListener(this);
-        View headerLayout = mNavigationView.getHeaderView(0);
-        TextView versionTextView = headerLayout.findViewById(R.id.versionTextView);
-        PackageInfo pInfo;
-        String version = "";
-        try {
-            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            version = "v" + pInfo.versionName;
-        } catch (PackageManager.NameNotFoundException e) {
-            CCLogger.w(TAG, "Can't find app version!", e);
-        }
-        versionTextView.setText(version);
+        initVersionInfo();
+
+        // Attach listener to navigation bottom
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.searchStore:
+                    // This method can be called from shortcut (Android 7.1 and above)
+                    searchStore();
+                    break;
+                case R.id.addComic:
+                    // This method can be called from shortcut (Android 7.1 and above)
+                    addComic();
+                    break;
+                case R.id.refresh:
+                    if (mFragmentRecycler != null) {
+                        initiateRefresh(getSection());
+                    }
+                    break;
+            }
+            return true;
+        });
 
         // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer
         if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
@@ -301,13 +313,10 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
      * @param comicId the comic ID
      */
     private void loadComicWithID(int comicId) {
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                ComicEntity comicEntity = ((CCApp) getApplication()).getRepository().loadComicSync(comicId);
-                CCLogger.d(TAG, "loadComicWithID - Comic : " + comicEntity);
-                launchDetailView(comicEntity);
-            }
+        AsyncTask.execute(() -> {
+            ComicEntity comicEntity = ((CCApp) getApplication()).getRepository().loadComicSync(comicId);
+            CCLogger.d(TAG, "loadComicWithID - Comic : " + comicEntity);
+            launchDetailView(comicEntity);
         });
     }
 
@@ -473,6 +482,86 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
+    private Constants.Sections getSection() {
+        return Constants.Sections.getEditorFromTitle(String.valueOf(mTitle));
+    }
+
+    /**
+     * Method used to init some info on side menu.
+     */
+    private void initVersionInfo() {
+        View headerLayout = mNavigationView.getHeaderView(0);
+        TextView versionTextView = headerLayout.findViewById(R.id.versionTextView);
+        PackageInfo pInfo;
+        String version = "";
+        try {
+            pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = "v" + pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            CCLogger.w(TAG, "Can't find app version!", e);
+        }
+        versionTextView.setText(version);
+    }
+
+    /**
+     * By abstracting the refresh process to a single method, the app allows both the
+     * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
+     * @param mEditor the editor picked by user
+     */
+    public void initiateRefresh(Constants.Sections mEditor) {
+        CCLogger.i(TAG, "initiateRefresh - start for editor " + mEditor);
+
+        if (mEditor.equals(Constants.Sections.FAVORITE) || mEditor.equals(Constants.Sections.CART)) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.dialog_pick_editor_title)
+                    .setItems(R.array.pref_available_editors, (dialog, which) -> {
+                        // The 'which' argument contains the index position of the selected item
+                        CCLogger.v(TAG, "onClick - Selected position " + which);
+                        Constants.Sections pickedEditor = null;
+                        switch (which) {
+                            case 0:
+                                pickedEditor = Constants.Sections.PANINI;
+                                break;
+                            case 1:
+                                pickedEditor = Constants.Sections.STAR;
+                                break;
+                            case 2:
+                                pickedEditor = Constants.Sections.BONELLI;
+                                break;
+                            case 3:
+                                pickedEditor = Constants.Sections.RW;
+                                break;
+                        }
+
+                        if (pickedEditor != null) {
+                            startRefresh(pickedEditor);
+                            dialog.dismiss();
+                        }
+                    });
+            builder.setNegativeButton(R.string.dialog_undo_button, (dialog, which) -> dialog.dismiss());
+            builder.create().show();
+        } else {
+            startRefresh(mEditor);
+        }
+    }
+
+    /**
+     * Method used to start refresh.
+     * @param editor the editor picked by user
+     */
+    private void startRefresh(Constants.Sections editor) {
+        // Execute the background task, used on DownloadService to load the data
+        Intent intent = new Intent(this, DownloadService.class);
+        intent.putExtra(Constants.ARG_EDITOR, editor);
+        intent.putExtra(Constants.MANUAL_SEARCH, true);
+        startService(intent);
+
+        // Update refresh spinner
+        if (mFragmentRecycler != null && mFragmentRecycler.isRefreshing()) {
+            mFragmentRecycler.setRefreshing(false);
+        }
+    }
+
     /**
      * This method launch detail view in a Fragment or on a new Activity.
      * @param comic the comic to show on details UI
@@ -559,11 +648,9 @@ public class ActivityMain extends AppCompatActivity implements SearchView.OnQuer
             case INFO:
                 // Open info dialog
                 AlertDialog.Builder infoBuilder = new AlertDialog.Builder(this);
-                infoBuilder.setNegativeButton(R.string.dialog_confirm_button, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Send the negative button event back to the host activity
-                        dialog.dismiss();
-                    }
+                infoBuilder.setNegativeButton(R.string.dialog_confirm_button, (dialog, id) -> {
+                    // Send the negative button event back to the host activity
+                    dialog.dismiss();
                 });
                 // Get the layout inflater
                 LayoutInflater inflaterInfo = this.getLayoutInflater();
