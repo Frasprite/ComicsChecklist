@@ -98,7 +98,7 @@ public class FragmentDetail extends Fragment implements View.OnClickListener {
 
     private void goToSite() {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(
-                mBinding.getComicViewModel().comic.get().getURL()
+                mBinding.getComicViewModel().getComic().get().getURL()
         ));
         startActivity(browserIntent);
     }
@@ -109,11 +109,11 @@ public class FragmentDetail extends Fragment implements View.OnClickListener {
             // ACTION_INSERT does not work on all phones; use Intent.ACTION_EDIT in this case
             Intent intent = new Intent(Intent.ACTION_INSERT);
             intent.setType("vnd.android.cursor.item/event");
-            intent.putExtra(CalendarContract.Events.TITLE, mBinding.getComicViewModel().comic.get().getName());
+            intent.putExtra(CalendarContract.Events.TITLE, mBinding.getComicViewModel().getComic().get().getName());
             intent.putExtra(CalendarContract.Events.DESCRIPTION, getString(R.string.calendar_release));
 
             // Setting dates
-            long timeInMillis = mBinding.getComicViewModel().comic.get().getReleaseDate().getTime();
+            long timeInMillis = mBinding.getComicViewModel().getComic().get().getReleaseDate().getTime();
             intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, timeInMillis);
             intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, timeInMillis);
 
@@ -130,7 +130,7 @@ public class FragmentDetail extends Fragment implements View.OnClickListener {
     }
 
     private void manageFavorite() {
-        boolean isAFavoriteComic = mBinding.getComicViewModel().comic.get().isFavorite();
+        boolean isAFavoriteComic = mBinding.getComicViewModel().getComic().get().isFavorite();
 
         if (!isAFavoriteComic) {
             CCLogger.i(TAG, "manageFavorite - Add comic to favorite");
@@ -144,14 +144,14 @@ public class FragmentDetail extends Fragment implements View.OnClickListener {
             Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_favorite), Toast.LENGTH_SHORT).show();
         }
 
-        ComicEntity comicEntity = mBinding.getComicViewModel().comic.get();
+        ComicEntity comicEntity = mBinding.getComicViewModel().getComic().get();
         comicEntity.setFavorite(isAFavoriteComic);
 
         updateData(comicEntity);
     }
 
     private void manageWishlist() {
-        boolean isComicOnCart = mBinding.getComicViewModel().comic.get().isOnCart();
+        boolean isComicOnCart = mBinding.getComicViewModel().getComic().get().isOnCart();
 
         if (!isComicOnCart) {
             CCLogger.i(TAG, "manageWishlist - Update entry on comic database: add to cart");
@@ -165,7 +165,7 @@ public class FragmentDetail extends Fragment implements View.OnClickListener {
             Toast.makeText(getActivity(), getResources().getString(R.string.comic_deleted_cart), Toast.LENGTH_SHORT).show();
         }
 
-        ComicEntity comicEntity = mBinding.getComicViewModel().comic.get();
+        ComicEntity comicEntity = mBinding.getComicViewModel().getComic().get();
         comicEntity.setToCart(isComicOnCart);
 
         updateData(comicEntity);
