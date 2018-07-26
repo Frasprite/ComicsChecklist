@@ -60,10 +60,8 @@ class WidgetSettings : AppCompatActivity() {
 
         for (editor in editorSet) {
             // Get section and add it to list
-            val section = Constants.Sections.getEditor(Integer.parseInt(editor))
-            if (section != null) {
-                mUpdatableSectionList!!.add(section.title)
-            }
+            val section = Constants.Sections.fromCode(Integer.parseInt(editor))
+            mUpdatableSectionList!!.add(section.title)
         }
 
         val adapter = ArrayAdapter(this,
@@ -72,14 +70,13 @@ class WidgetSettings : AppCompatActivity() {
         widgetList.adapter = adapter
         widgetList.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             CCLogger.d(TAG, "onListItemClick - start - position $position")
-            val editorTitle = mUpdatableSectionList!![position]
-            val editor = Constants.Sections.getEditorFromTitle(editorTitle)
             // Take name and title reference of editor chosen
-            val title = Constants.Sections.getTitle(editor)
-            val name = Constants.Sections.getName(editor)
+            val editorTitle = mUpdatableSectionList!![position]
+            val name = Constants.Sections.fromTitle(editorTitle).sectionName
+
             // Create widget
-            CCLogger.v(TAG, "onListItemClick - end - title $title name $name")
-            createWidget(this@WidgetSettings , title, name)
+            CCLogger.v(TAG, "onListItemClick - end - title $editorTitle name $name")
+            createWidget(this@WidgetSettings , editorTitle, name)
         }
 
         buttonCancel.setOnClickListener { this@WidgetSettings.finish() }
@@ -136,8 +133,8 @@ class WidgetSettings : AppCompatActivity() {
         fun loadTitlePref(context: Context, appWidgetId: Int): String {
             val prefs = context.getSharedPreferences(PREFS_NAME, 0)
             val titleValue = prefs.getString(PREF_PREFIX_KEY + appWidgetId, null)
-            CCLogger.d(TAG, "loadTitlePref - $PREF_PREFIX_KEY$appWidgetId return $titleValue")
-            return titleValue ?: Constants.Sections.getTitle(Constants.Sections.FAVORITE)
+            CCLogger.d(TAG, "loadTitlePref - $PREF_PREFIX_KEY $appWidgetId return $titleValue")
+            return titleValue ?: Constants.Sections.FAVORITE.sectionName
         }
 
         fun deleteTitlePref(context: Context, appWidgetId: Int) {

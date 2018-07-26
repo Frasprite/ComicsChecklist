@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.AsyncTask
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 
@@ -12,6 +11,8 @@ import org.checklist.comics.comicschecklist.CCApp
 import org.checklist.comics.comicschecklist.R
 import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.util.Constants
+
+import org.jetbrains.anko.doAsync
 
 import java.util.ArrayList
 
@@ -65,10 +66,9 @@ internal class ComicsRemoteViewsFactory
         mWidgetItems.clear()
 
         // Load data based on selected editor
-        val editor = Constants.Sections.getEditorFromName(mEditor)
-        CCLogger.d(TAG, "populateWidget - Raw editor $mEditor gives $editor")
+        CCLogger.d(TAG, "populateWidget - Raw editor $mEditor")
 
-        AsyncTask.execute {
+        doAsync {
             val list = (mContext as CCApp).repository.loadComicsByEditorSync(mEditor)
             CCLogger.d(TAG, "populateWidget - List : " + list!!)
 

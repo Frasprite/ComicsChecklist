@@ -120,7 +120,7 @@ class ParserPanini : Parser() {
             }
 
             val comic = ComicEntity(title.toUpperCase(), releaseDate, description,
-                    price, feature, coverUrl, Constants.Sections.PANINI.getName(), false, false, linkMoreInfo)
+                    price, feature, coverUrl, Constants.Sections.PANINI.sectionName, false, false, linkMoreInfo)
 
             comicEntities.add(comic)
         }

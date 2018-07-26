@@ -170,15 +170,16 @@ class FragmentRecycler : Fragment() {
      * @param text the part of text to search on database
      */
     private fun subscribeUi(viewModel: ComicListViewModel, text: String?, editor: Constants.Sections) {
+        CCLogger.v(TAG, "subscribeUi - Text $text and editor $editor")
         // Update the list when the data changes
         if (text == null) {
             when (editor) {
                 Constants.Sections.FAVORITE -> viewModel.getFavoriteComics()
                 Constants.Sections.CART -> viewModel.getWishlistComics()
-                else -> viewModel.filterByEditor(editor.getName())
+                else -> viewModel.filterByEditor(editor.sectionName)
             }
         } else {
-            viewModel.filterComicsContainingText(editor.getName(), text)
+            viewModel.filterComicsContainingText(editor.sectionName, text)
         }
 
         viewModel.comics.observe(this, Observer<List<ComicEntity>> {
@@ -210,12 +211,12 @@ class FragmentRecycler : Fragment() {
      * @param comic the entry to update on database
      */
     fun updateComic(comic: ComicEntity) {
-        if (comic.editor == Constants.Sections.FAVORITE.getName()) {
+        if (comic.editor == Constants.Sections.FAVORITE.sectionName) {
             CCLogger.d(TAG, "deleteComic - Removing favorite comic with ID " + comic.id)
             // Remove comic from favorite
             comic.isFavorite = !comic.isFavorite
             updateData(comic)
-        } else if (comic.editor == Constants.Sections.CART.getName()) {
+        } else if (comic.editor == Constants.Sections.CART.sectionName) {
             CCLogger.d(TAG, "onContextItemSelected - Removing comic in cart with ID " + comic.id)
             // Remove comic from cart
             removeComicFromCart(comic)
@@ -231,7 +232,7 @@ class FragmentRecycler : Fragment() {
      */
     private fun removeComicFromCart(comic: ComicEntity) {
         // Evaluate if comic was created by user or it is coming from network
-        val editor = Constants.Sections.getEditorFromName(comic.editor)
+        val editor = Constants.Sections.fromName(comic.editor)
         when (editor) {
             Constants.Sections.CART -> {
                 // Simply delete comic because was created by user

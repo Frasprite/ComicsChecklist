@@ -64,7 +64,7 @@ class WidgetProvider : AppWidgetProvider() {
             // Add the app widget unique ID to the intent extras.
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
             intent.putExtra(Constants.WIDGET_TITLE, widgetText)
-            intent.putExtra(Constants.WIDGET_EDITOR, Constants.Sections.getName(widgetText))
+            intent.putExtra(Constants.WIDGET_EDITOR, Constants.Sections.fromTitle(widgetText))
             CCLogger.d(TAG, "updateAppWidget - widget ID: " + Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)).toString())
             intent.data = Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME))
             // Set up the RemoteViews object to use a RemoteViews adapter.

@@ -103,12 +103,11 @@ class DownloadService : IntentService(TAG) {
         }
 
         for ((currentSection, value) in mEditorMap) {
-            CCLogger.d(TAG, "automaticSearch - Current editor $currentSection key of last scan$value")
+            CCLogger.d(TAG, "automaticSearch - Current editor $currentSection key of last scan $value")
             // Check if editor is desired by user and if last day of scan has passed limits
             if (calculateDayDifference(value) >= frequency && editorSet.contains(currentSection.code.toString())) {
-                val editorTitle = Constants.Sections.getTitle(currentSection)
-                publishResults(Constants.RESULT_START, editorTitle)
-                searchComics(notificationPref, editorTitle, currentSection)
+                publishResults(Constants.RESULT_START, currentSection.title)
+                searchComics(notificationPref, currentSection.title, currentSection)
 
                 publishResults(Constants.RESULT_FINISHED, "noEditor")
                 if (notificationPref) {
@@ -123,31 +122,28 @@ class DownloadService : IntentService(TAG) {
      * @param sharedPref the [SharedPreferences] where to load list of editors to search
      * @param editor the editor to search
      */
-    private fun manualSearch(sharedPref: SharedPreferences, editor: Constants.Sections?) {
+    private fun manualSearch(sharedPref: SharedPreferences, editor: Constants.Sections) {
         val notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true)
-        if (editor != null) {
-            CCLogger.i(TAG, "manualSearch - Manual search for editor " + editor.toString())
+        CCLogger.i(TAG, "manualSearch - Manual search for editor " + editor.toString())
 
-            val editorTitle = Constants.Sections.getTitle(editor)
-            publishResults(Constants.RESULT_START, editorTitle)
-            searchComics(notificationPref, editorTitle, editor)
+        publishResults(Constants.RESULT_START, editor.title)
+        searchComics(notificationPref, editor.title, editor)
 
-            // Update last scan for editor on shared preference
-            val today = System.currentTimeMillis()
-            when (editor) {
-                Constants.Sections.PANINI -> sharedPref.edit().putLong(Constants.PREF_PANINI_LAST_SCAN, today).apply()
-                Constants.Sections.BONELLI -> sharedPref.edit().putLong(Constants.PREF_BONELLI_LAST_SCAN, today).apply()
-                Constants.Sections.STAR -> sharedPref.edit().putLong(Constants.PREF_STAR_LAST_SCAN, today).apply()
-                Constants.Sections.RW -> sharedPref.edit().putLong(Constants.PREF_RW_LAST_SCAN, today).apply()
-                else -> CCLogger.w(TAG, "Can't search data for given section ${editor.title}")
-            }
+        // Update last scan for editor on shared preference
+        val today = System.currentTimeMillis()
+        when (editor) {
+            Constants.Sections.PANINI -> sharedPref.edit().putLong(Constants.PREF_PANINI_LAST_SCAN, today).apply()
+            Constants.Sections.BONELLI -> sharedPref.edit().putLong(Constants.PREF_BONELLI_LAST_SCAN, today).apply()
+            Constants.Sections.STAR -> sharedPref.edit().putLong(Constants.PREF_STAR_LAST_SCAN, today).apply()
+            Constants.Sections.RW -> sharedPref.edit().putLong(Constants.PREF_RW_LAST_SCAN, today).apply()
+            else -> CCLogger.w(TAG, "Can't search data for given section ${editor.title}")
+        }
 
-            publishResults(Constants.RESULT_FINISHED, "noEditor")
-            if (notificationPref) {
-                CCNotificationManager.deleteNotification(this)
-                // Favorite data may have changed, update widget as well
-                WidgetService.updateWidget(this)
-            }
+        publishResults(Constants.RESULT_FINISHED, "noEditor")
+        if (notificationPref) {
+            CCNotificationManager.deleteNotification(this)
+            // Favorite data may have changed, update widget as well
+            WidgetService.updateWidget(this)
         }
     }
 

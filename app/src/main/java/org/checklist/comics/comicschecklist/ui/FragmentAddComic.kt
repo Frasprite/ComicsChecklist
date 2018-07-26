@@ -119,7 +119,7 @@ class FragmentAddComic : Fragment() {
                                 "N.D.",
                                 "N.D.",
                                 "N.D.",
-                                Constants.Sections.getName(Constants.Sections.CART),
+                                Constants.Sections.CART.sectionName,
                                 false, false,
                                 "")
                         mComicId = CCApp.instance.repository.insertComic(comicEntity).toInt()

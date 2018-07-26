@@ -110,7 +110,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     }
 
     private val section: Constants.Sections
-        get() = Constants.Sections.getEditorFromTitle(mTitle.toString())
+        get() = Constants.Sections.fromTitle(mTitle.toString())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -502,7 +502,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         val rawEditor = comic.editor
         val comicId = comic.id
         CCLogger.d(TAG, "launchDetailView - Comic ID is $comicId editor is $rawEditor")
-        val editor = Constants.Sections.getEditorFromName(rawEditor)
+        val editor = Constants.Sections.fromName(rawEditor)
         when (editor) {
             Constants.Sections.CART -> {
                 // Show note
@@ -546,7 +546,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                         section == Constants.Sections.PANINI || section == Constants.Sections.BONELLI ||
                         section == Constants.Sections.RW || section == Constants.Sections.STAR) {
                     // Update selected item title, then close the drawer
-                    title = Constants.Sections.getTitle(section)
+                    title = section.title
                     mDrawerLayout!!.closeDrawer(mNavigationView!!)
                 }
             }

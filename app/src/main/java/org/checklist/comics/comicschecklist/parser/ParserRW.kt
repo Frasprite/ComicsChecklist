@@ -109,7 +109,7 @@ class ParserRW : Parser() {
 
             // Insert found comic on list
             val comic = ComicEntity(title.toUpperCase(), myDate, description,
-                    price, feature, coverUrl, Constants.Sections.RW.getName(), false, false, url)
+                    price, feature, coverUrl, Constants.Sections.RW.sectionName, false, false, url)
 
             comicEntities.add(comic)
         }

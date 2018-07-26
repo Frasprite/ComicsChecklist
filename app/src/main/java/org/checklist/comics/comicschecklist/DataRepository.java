@@ -25,7 +25,7 @@ public class DataRepository {
         mDatabase = database;
         mObservableComics = new MediatorLiveData<>();
 
-        mObservableComics.addSource(mDatabase.comicDao().loadComicsByEditor(Constants.Sections.FAVORITE.getName()),
+        mObservableComics.addSource(mDatabase.comicDao().loadComicsByEditor(Constants.Sections.FAVORITE.getSectionName()),
                 comicEntities -> {
                     if (mDatabase.getDatabaseCreated().getValue() != null) {
                         mObservableComics.postValue(comicEntities);

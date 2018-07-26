@@ -3,7 +3,6 @@ package org.checklist.comics.comicschecklist.ui
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Resources
-import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.*
 import android.view.MenuItem
@@ -250,9 +249,9 @@ class ActivitySettings : AppCompatPreferenceActivity() {
         }
 
         private fun deleteComics(context: Context, section: Constants.Sections?) {
-            AsyncTask.execute {
-                val rowsDeleted = (context.applicationContext as CCApp).repository.deleteComics(section!!.getName())
-                LOG.debug("deleteComics - Entries deleted: " + rowsDeleted + " with given section " + section.getName())
+            doAsync {
+                val rowsDeleted = (context.applicationContext as CCApp).repository.deleteComics(section!!.sectionName)
+                LOG.debug("deleteComics - Entries deleted: " + rowsDeleted + " with given section " + section.sectionName)
                 if (rowsDeleted > 0) {
                     // Update widgets as well
                     WidgetService.updateWidget(context)

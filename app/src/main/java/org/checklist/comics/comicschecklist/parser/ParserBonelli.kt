@@ -122,7 +122,7 @@ class ParserBonelli : Parser() {
 
                 // Insert found comic on list
                 val comic = ComicEntity(title.toUpperCase(), myDate, description,
-                        price, feature, coverUrl, Constants.Sections.BONELLI.getName(), false, false, url)
+                        price, feature, coverUrl, Constants.Sections.BONELLI.sectionName, false, false, url)
 
                 comicEntities.add(comic)
             } catch (e: Exception) {

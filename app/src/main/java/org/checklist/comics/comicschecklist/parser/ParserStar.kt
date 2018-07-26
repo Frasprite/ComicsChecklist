@@ -224,7 +224,7 @@ class ParserStar : Parser() {
             CCLogger.d(TAG, "parseSingleComicURL - Results:\nCover url : $coverUrl\nFeature : $feature\nDescription : $description\nPrice : $price")
 
             return ComicEntity(title.toUpperCase(), myDate, description,
-                    price, feature, coverUrl, Constants.Sections.STAR.getName(), false, false, url)
+                    price, feature, coverUrl, Constants.Sections.STAR.sectionName, false, false, url)
         } catch (e: Exception) {
             CCLogger.w(TAG, "parseSingleComicURL - Error while searching data for comic id " + e.toString() + "\n" + url)
             ParserLog.increaseErrorOnParsingComic()
