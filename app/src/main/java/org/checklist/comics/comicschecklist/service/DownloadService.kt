@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
-import android.os.AsyncTask
 import android.preference.PreferenceManager
 
 import org.checklist.comics.comicschecklist.CCApp
@@ -22,6 +21,8 @@ import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.notification.CCNotificationManager
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.widget.WidgetService
+
+import org.jetbrains.anko.doAsync
 
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -198,7 +199,7 @@ class DownloadService : IntentService(TAG) {
         if (frequency > -1) {
             val dateTime = DateTime()
             val time = dateTime.minus(frequency.toLong()).millis
-            AsyncTask.execute {
+            doAsync {
                 val rowsDeleted = (this@DownloadService.applicationContext as CCApp).repository.deleteOldComics(time)
                 CCLogger.d(TAG, "deleteOldRows - Entries deleted: $rowsDeleted with given frequency $frequency")
                 if (rowsDeleted > 0) {
