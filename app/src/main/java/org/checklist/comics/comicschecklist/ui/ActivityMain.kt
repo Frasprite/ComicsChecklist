@@ -3,10 +3,8 @@ package org.checklist.comics.comicschecklist.ui
 import android.annotation.SuppressLint
 import android.app.ActivityOptions
 import android.app.SearchManager
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -32,7 +30,9 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 import org.checklist.comics.comicschecklist.service.DownloadService
 import org.checklist.comics.comicschecklist.util.AppRater
 import org.checklist.comics.comicschecklist.log.CCLogger
+import org.checklist.comics.comicschecklist.service.Message
 import org.checklist.comics.comicschecklist.util.Constants
+import org.checklist.comics.comicschecklist.service.ServiceEvents
 import org.jetbrains.anko.alert
 
 import org.jetbrains.anko.doAsync
@@ -70,44 +70,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
     private var mUserLearnedDrawer: Boolean = false
     private var mFromSavedInstanceState: Boolean = false
-
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val bundle = intent.extras
-            if (bundle != null) {
-                val result = bundle.getInt(Constants.NOTIFICATION_RESULT)
-                val mCurrentEditor = bundle.getString(Constants.NOTIFICATION_EDITOR)
-                inspectResultCode(result, mCurrentEditor)
-            }
-        }
-
-        /**
-         * Method used to inspect messages from [DownloadService].
-         * @param result the result indicating download status
-         * @param currentEditor the editor searched
-         */
-        private fun inspectResultCode(result: Int, currentEditor: String?) {
-            var shouldSetRefresh = false
-            when (result) {
-                Constants.RESULT_START -> {
-                    toast(currentEditor!! + getString(R.string.search_started))
-                    shouldSetRefresh = true
-                }
-                Constants.RESULT_FINISHED -> toast(resources.getString(R.string.search_completed))
-                Constants.RESULT_EDITOR_FINISHED -> toast(currentEditor!! + resources.getString(R.string.search_editor_completed))
-                Constants.RESULT_CANCELED -> toast(currentEditor!! + resources.getString(R.string.search_failed))
-                Constants.RESULT_NOT_CONNECTED -> toast(resources.getString(R.string.toast_no_connection))
-                Constants.RESULT_DESTROYED -> CCLogger.i(TAG, "Service destroyed")
-            }
-
-            // Set search animation on UI
-            if (mFragmentRecycler != null) {
-                if (!shouldSetRefresh) {
-                    mFragmentRecycler!!.isRefreshing = false
-                }
-            }
-        }
-    }
 
     private val section: Constants.Sections
         get() = Constants.Sections.fromTitle(mTitle.toString())
@@ -206,6 +168,11 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
         val intent = Intent(this, DownloadService::class.java)
         startService(intent)
+
+        // Listen for MessageEvents only
+        ServiceEvents.listen(Message::class.java).subscribe {
+            inspectResultCode(it.result, it.editor)
+        }
 
         // Launch AppRater
         AppRater.appLaunched(this)
@@ -337,7 +304,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     override fun onResume() {
         super.onResume()
         CCLogger.v(TAG, "onResume")
-        registerReceiver(receiver, IntentFilter(Constants.NOTIFICATION))
         // Populate navigation view menu
         val sp = PreferenceManager.getDefaultSharedPreferences(this)
         val rawArray = resources.getStringArray(R.array.pref_basic_editors)
@@ -357,7 +323,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     override fun onPause() {
         super.onPause()
         CCLogger.v(TAG, "onPause")
-        unregisterReceiver(receiver)
         // Stop animation
         if (mFragmentRecycler != null) {
             if (mFragmentRecycler!!.isRefreshing) {
@@ -437,6 +402,33 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         }
 
         headerLayout.versionTextView.text = version
+    }
+
+    /**
+     * Method used to inspect messages from [DownloadService].
+     * @param result the result indicating download status
+     * @param currentEditor the editor searched
+     */
+    private fun inspectResultCode(result: Int, currentEditor: String?) {
+        var shouldSetRefresh = false
+        when (result) {
+            Constants.RESULT_START -> {
+                toast(currentEditor!! + getString(R.string.search_started))
+                shouldSetRefresh = true
+            }
+            Constants.RESULT_FINISHED -> toast(resources.getString(R.string.search_completed))
+            Constants.RESULT_EDITOR_FINISHED -> toast(currentEditor!! + resources.getString(R.string.search_editor_completed))
+            Constants.RESULT_CANCELED -> toast(currentEditor!! + resources.getString(R.string.search_failed))
+            Constants.RESULT_NOT_CONNECTED -> toast(resources.getString(R.string.toast_no_connection))
+            Constants.RESULT_DESTROYED -> CCLogger.i(TAG, "Service destroyed")
+        }
+
+        // Set search animation on UI
+        if (mFragmentRecycler != null) {
+            if (!shouldSetRefresh) {
+                mFragmentRecycler!!.isRefreshing = false
+            }
+        }
     }
 
     /**

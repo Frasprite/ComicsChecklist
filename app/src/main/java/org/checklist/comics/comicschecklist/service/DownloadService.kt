@@ -216,10 +216,7 @@ class DownloadService : IntentService(TAG) {
      */
     private fun publishResults(result: Int, editor: String) {
         CCLogger.v(TAG, "publishResults - Result of search $result $editor")
-        val intent = Intent(Constants.NOTIFICATION)
-        intent.putExtra(Constants.NOTIFICATION_RESULT, result)
-        intent.putExtra(Constants.NOTIFICATION_EDITOR, editor)
-        sendBroadcast(intent)
+        ServiceEvents.publish(Message(result, editor))
     }
 
     /**

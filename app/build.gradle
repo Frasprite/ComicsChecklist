@@ -65,6 +65,10 @@ dependencies {
     implementation 'joda-time:joda-time:2.10'
     implementation 'com.github.badoualy:datepicker-timeline:c6dcd05737'
     implementation 'com.andkulikov:transitionseverywhere:1.8.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    // Because RxAndroid releases are few and far between, it is recommended you also
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
 
     // Unit test stuff
     testImplementation 'junit:junit:4.12'
