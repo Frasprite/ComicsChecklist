@@ -5,7 +5,6 @@ import android.app.ActivityOptions
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
@@ -204,31 +203,37 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     }
 
     /**
-     * Method used to handle the intent received from search.
+     * Method used to handle the intent received from search or from other custom action.
      * @param intent the intent passed through search
      */
     private fun handleIntent(intent: Intent) {
-        // Special processing of the incoming intent only occurs if the action specified
-        // by the intent is ACTION_SEARCH.
-        if (Intent.ACTION_SEARCH == intent.action) {
-            // Handles a search query
-            val query = intent.getStringExtra(SearchManager.QUERY)
-            CCLogger.d(TAG, "handleIntent - handling a search query $query")
-            doMySearch(query)
-        } else if (intent.action != null && intent.action == Constants.ACTION_COMIC_WIDGET) {
-            val comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0)
-            CCLogger.d(TAG, "handleIntent - launching detail for comic ID $comicId")
-            loadComicWithID(comicId)
-        } else if (intent.action != null && intent.action == Constants.ACTION_WIDGET_ADD) {
-            // Open add comic activity
-            CCLogger.d(TAG, "handleIntent - starting add activity")
-            addComic()
-        } else if (intent.action != null && intent.action == Constants.ACTION_ADD_COMIC) {
-            // Intent is coming from shortcut, so open relative action
-            addComic()
-        } else if (intent.action != null && intent.action == Constants.ACTION_SEARCH_STORE) {
-            // Intent is coming from shortcut, so search nearby store
-            searchStore()
+        when (intent.action) {
+            Intent.ACTION_SEARCH -> {
+                // Handles a search query
+                val query = intent.getStringExtra(SearchManager.QUERY)
+                CCLogger.d(TAG, "handleIntent - Handling a search query $query")
+                doMySearch(query)
+            }
+            Constants.ACTION_COMIC_WIDGET -> {
+                val comicId = intent.getIntExtra(Constants.COMIC_ID_FROM_WIDGET, 0)
+                CCLogger.d(TAG, "handleIntent - Launching detail for comic ID $comicId")
+                loadComicWithID(comicId)
+            }
+            Constants.ACTION_WIDGET_ADD -> {
+                // Open add comic activity
+                CCLogger.d(TAG, "handleIntent - Starting add activity (from widget)")
+                addComic()
+            }
+            Constants.ACTION_ADD_COMIC -> {
+                // Intent is coming from shortcut, so open relative action
+                CCLogger.d(TAG, "handleIntent - Starting add activity (from shortcut)")
+                addComic()
+            }
+            Constants.ACTION_SEARCH_STORE -> {
+                // Intent is coming from shortcut, so search nearby store
+                CCLogger.d(TAG, "handleIntent - Searching store")
+                searchStore()
+            }
         }
     }
 
@@ -378,10 +383,9 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
      */
     private fun initVersionInfo() {
         val headerLayout = mNavigationView.getHeaderView(0)
-        val pInfo: PackageInfo
         var version = ""
         try {
-            pInfo = packageManager.getPackageInfo(packageName, 0)
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
             version = "v" + pInfo.versionName
         } catch (e: PackageManager.NameNotFoundException) {
             CCLogger.w(TAG, "Can't find app version!", e)
@@ -477,15 +481,12 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
      * @param comic the comic to show on details UI
      */
     fun launchDetailView(comic: ComicEntity) {
-        val rawEditor = comic.editor
-        val comicId = comic.id
-        CCLogger.d(TAG, "launchDetailView - Comic ID is $comicId editor is $rawEditor")
-        val editor = Constants.Sections.fromName(rawEditor)
-        when (editor) {
+        CCLogger.d(TAG, "launchDetailView - Comic ID is ${comic.id} editor is ${comic.editor}")
+        when (Constants.Sections.fromName(comic.editor)) {
             Constants.Sections.CART -> {
                 // Show note
                 val addComicIntent = Intent(this@ActivityMain, ActivityAddComic::class.java)
-                addComicIntent.putExtra(Constants.ARG_COMIC_ID, comicId)
+                addComicIntent.putExtra(Constants.ARG_COMIC_ID, comic.id)
                 startActivity(addComicIntent)
             }
             else ->
@@ -495,7 +496,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     // In two-pane mode, show the detail view in this activity by adding
                     // or replacing the detail fragment using a fragment transaction
                     val arguments = Bundle()
-                    arguments.putInt(Constants.ARG_COMIC_ID, comicId)
+                    arguments.putInt(Constants.ARG_COMIC_ID, comic.id)
                     val mDetailFragment = FragmentDetail()
                     mDetailFragment.arguments = arguments
                     supportFragmentManager.beginTransaction().replace(R.id.comicDetailContainer, mDetailFragment).commit()
@@ -504,7 +505,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     // In single-pane mode, simply start the detail activity
                     // for the selected item ID
                     val detailIntent = Intent(this, ActivityDetail::class.java)
-                    detailIntent.putExtra(Constants.ARG_COMIC_ID, comicId)
+                    detailIntent.putExtra(Constants.ARG_COMIC_ID, comic.id)
 
                     val options = ActivityOptions.makeCustomAnimation(
                             this,
@@ -529,7 +530,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
             mDrawerLayout.closeDrawer(mNavigationView)
         }
 
-        when (section) {
+        when (mSection) {
             Constants.Sections.FAVORITE, Constants.Sections.CART, Constants.Sections.PANINI, Constants.Sections.BONELLI, Constants.Sections.RW, Constants.Sections.STAR -> {
                 // Update the main content by replacing fragments
                 mFragmentRecycler = FragmentRecycler.newInstance(section)
