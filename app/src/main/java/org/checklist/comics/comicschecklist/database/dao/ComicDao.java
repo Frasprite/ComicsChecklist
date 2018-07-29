@@ -10,6 +10,7 @@ import android.arch.persistence.room.Update;
 
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -56,9 +57,12 @@ public interface ComicDao {
     @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     List<ComicEntity> loadComicsByEditorSync(String editorName);
 
-    @Query("SELECT id, isFavorite, release_date FROM comics WHERE isFavorite = 1 AND release_date = :time")
+    @Query("SELECT COUNT(id) id, isFavorite, release_date FROM comics WHERE isFavorite = 1 AND release_date >= :time")
     int checkFavoritesRelease(long time);
 
     @Update
     int update(ComicEntity comic);
+
+    @Query("UPDATE comics SET comic_name = :name, description = :info, release_date = :date  WHERE id = :comicId")
+    int update(int comicId, String name, String info, Date date);
 }

@@ -1,28 +1,16 @@
 <resources>
 
     <!-- Application theme -->
-    <style name="AppTheme" parent="Theme.AppCompat">
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
-
-    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="SettingsTheme" parent="Theme.AppCompat">
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorPrimary">@color/primary</item>
         <item name="colorAccent">@color/accent</item>
-        <!-- Used for the title and text -->
-        <item name="android:textColorPrimary">@color/white</item>
-        <!-- Used for the background -->
-        <item name="android:background">@color/primary_text</item>
     </style>
 
 </resources>

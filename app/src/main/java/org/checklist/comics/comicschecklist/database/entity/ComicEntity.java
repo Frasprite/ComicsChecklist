@@ -5,13 +5,11 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
-import org.checklist.comics.comicschecklist.model.Comic;
-
 import java.util.Date;
 
 @Entity(tableName = "comics", indices = {@Index(value = {"comic_name", "release_date"},
         unique = true)})
-public class ComicEntity implements Comic {
+public class ComicEntity {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -44,7 +42,7 @@ public class ComicEntity implements Comic {
         this.URL = URL;
     }
 
-    public ComicEntity(Comic comic) {
+    public ComicEntity(ComicEntity comic) {
         this.name = comic.getName();
         this.releaseDate = comic.getReleaseDate();
         this.description = comic.getDescription();
@@ -57,7 +55,6 @@ public class ComicEntity implements Comic {
         this.URL = comic.getURL();
     }
 
-    @Override
     public int getId() {
         return id;
     }
@@ -66,52 +63,42 @@ public class ComicEntity implements Comic {
         this.id = id;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public Date getReleaseDate() {
         return releaseDate;
     }
 
-    @Override
     public String getDescription() {
         return description;
     }
 
-    @Override
     public String getPrice() {
         return price;
     }
 
-    @Override
     public String getFeature() {
         return feature;
     }
 
-    @Override
     public String getCover() {
         return cover;
     }
 
-    @Override
     public String getEditor() {
         return editor;
     }
 
-    @Override
     public boolean isFavorite() {
         return isFavorite;
     }
 
-    @Override
     public boolean isOnCart() {
         return isOnCart;
     }
 
-    @Override
     public String getURL() {
         return URL;
     }

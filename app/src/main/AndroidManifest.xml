@@ -22,8 +22,7 @@
         <activity
             android:name=".ui.ActivityMain"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -49,31 +48,23 @@
 
         <activity
             android:name=".ui.ActivityDetail"
-            android:label="@string/activity_title_comic_detail"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/activity_title_comic_detail" />
 
         <activity
             android:name=".ui.ActivityAddComic"
-            android:label="@string/activity_title_add_comic"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:label="@string/activity_title_add_comic" />
 
         <activity
             android:name=".ui.ActivitySettings"
-            android:label="@string/activity_help_settings" />
+            android:label="@string/activity_help_settings"
+            android:theme="@style/SettingsTheme" />
 
         <!-- Service which launch search & download data -->
         <service android:name="org.checklist.comics.comicschecklist.service.DownloadService" />
 
-        <!-- Database provider -->
-        <provider
-            android:name=".provider.ComicContentProvider"
-            android:authorities="org.checklist.comics.comicschecklist.contentprovider"
-            android:exported="false"
-            tools:ignore="ExportedContentProvider" />
-
         <!-- Widget stuff -->
         <receiver
-            android:name=".provider.WidgetProvider"
+            android:name=".widget.WidgetProvider"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/widget_label">
             <intent-filter>
@@ -85,7 +76,7 @@
         </receiver>
 
         <service
-            android:name=".service.WidgetService"
+            android:name=".widget.WidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
