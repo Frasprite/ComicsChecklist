@@ -11,7 +11,7 @@ class ComicReleaseJobCreator : JobCreator {
 
     override fun create(tag: String): Job? {
         return when (tag) {
-            ComicReleaseSyncJob.TAG -> ComicReleaseSyncJob()
+            ComicReleaseSyncJob::class.simpleName -> ComicReleaseSyncJob()
             else -> null
         }
     }

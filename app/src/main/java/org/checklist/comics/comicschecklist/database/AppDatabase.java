@@ -52,7 +52,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     @Override
                     public void onCreate(@NonNull SupportSQLiteDatabase db) {
                         super.onCreate(db);
-                        CCLogger.v(TAG, "onCreate - Creating database");
+                        CCLogger.INSTANCE.v(TAG, "onCreate - Creating database");
 
                         // Populate database when it is created, using an Intent service
                         Intent intent = new Intent(appContext, DownloadService.class);
