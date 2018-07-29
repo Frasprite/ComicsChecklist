@@ -84,10 +84,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
         // Set options to action bar
         setSupportActionBar(toolbar)
-        if (supportActionBar != null) {
-            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-            supportActionBar!!.setHomeButtonEnabled(true)
-        }
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeButtonEnabled(true)
 
         // The detail container view will be present only in the
         // large-screen layouts (res/values-large-land and

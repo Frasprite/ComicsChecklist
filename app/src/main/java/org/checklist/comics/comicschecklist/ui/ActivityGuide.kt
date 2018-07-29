@@ -18,8 +18,7 @@ class ActivityGuide : AppIntro() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val actionBar = supportActionBar
-        actionBar?.hide()
+        supportActionBar?.hide()
 
         // Adding a slide for each guide
         val sliderPage1 = SliderPage()

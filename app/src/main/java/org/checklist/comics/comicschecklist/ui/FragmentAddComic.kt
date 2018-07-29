@@ -28,7 +28,8 @@ import org.jetbrains.anko.info
 import org.jetbrains.anko.uiThread
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import java.util.*
+
+import java.util.Date
 
 
 /**
@@ -75,6 +76,7 @@ class FragmentAddComic : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        // TODO use ViewModel
         // Load data from database if ID is passed from activity
         if (mComicId > -1) {
             doAsync {
@@ -99,8 +101,8 @@ class FragmentAddComic : Fragment() {
     }
 
     override fun onPause() {
-        var name = nameEditText!!.text.toString()
-        val info = infoEditText!!.text.toString()
+        var name = nameEditText.text.toString()
+        val info = infoEditText.text.toString()
         LOG.info { "onPause - Saving data $name $info" }
 
         if (info.isNotEmpty()) {

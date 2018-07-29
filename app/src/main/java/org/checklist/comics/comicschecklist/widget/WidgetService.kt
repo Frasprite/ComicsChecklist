@@ -72,17 +72,11 @@ internal class ComicsRemoteViewsFactory
             val list = (mContext as CCApp).repository.loadComicsByEditorSync(mEditor)
             CCLogger.d(TAG, "populateWidget - List : " + list!!)
 
-            var mID: Int
-            var mName: String
-            var mRelease: String
             if (list.isNotEmpty()) {
                 CCLogger.d(TAG, "populateWidget - List has data : " + list.size)
                 for (comicEntity in list) {
-                    mID = comicEntity.id
-                    mName = comicEntity.name
-                    mRelease = mContext.getString(R.string.format, comicEntity.releaseDate.time)
-
-                    mWidgetItems.add(WidgetItem(mID, mName, mRelease))
+                    mWidgetItems.add(WidgetItem(comicEntity.id, comicEntity.name,
+                            mContext.getString(R.string.format, comicEntity.releaseDate.time)))
                 }
             }
         }

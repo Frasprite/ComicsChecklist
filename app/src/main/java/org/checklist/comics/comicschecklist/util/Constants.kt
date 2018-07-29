@@ -33,9 +33,6 @@ object Constants {
     const val RESULT_NOT_CONNECTED = 4
     const val RESULT_EDITOR_FINISHED = 5
 
-    const val NOTIFICATION_RESULT = "result"
-    const val NOTIFICATION_EDITOR = "editor"
-    const val NOTIFICATION = "org.checklist.comics.comicschecklist.service.receiver"
     const val PREF_SEARCH_NOTIFICATION = "notifications_new_message"
     const val PREF_FAVORITE_NOTIFICATION = "notifications_favorite_available"
 

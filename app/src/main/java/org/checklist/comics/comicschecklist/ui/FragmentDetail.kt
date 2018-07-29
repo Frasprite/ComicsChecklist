@@ -40,7 +40,7 @@ class FragmentDetail : Fragment(), View.OnClickListener {
         // Inflate this data binding layout
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_detail, container, false)
 
-        return mBinding!!.root
+        return mBinding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,7 +55,7 @@ class FragmentDetail : Fragment(), View.OnClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val comicId = arguments!!.getInt(Constants.ARG_COMIC_ID, -1)
+        val comicId = arguments?.getInt(Constants.ARG_COMIC_ID, -1) ?: -1
         CCLogger.i(TAG, "onCreate - comic with ID $comicId")
 
         val factory = ComicViewModel.Factory(activity!!.application, comicId)
@@ -63,7 +63,7 @@ class FragmentDetail : Fragment(), View.OnClickListener {
         val model = ViewModelProviders.of(this, factory)
                 .get(ComicViewModel::class.java)
 
-        mBinding!!.comicViewModel = model
+        mBinding?.comicViewModel = model
 
         subscribeToModel(model)
     }
@@ -87,7 +87,7 @@ class FragmentDetail : Fragment(), View.OnClickListener {
 
     private fun goToSite() {
         val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(
-                mBinding!!.comicViewModel!!.comic.get()!!.url
+                mBinding?.comicViewModel?.comic?.get()?.url
         ))
         startActivity(browserIntent)
     }
@@ -98,11 +98,11 @@ class FragmentDetail : Fragment(), View.OnClickListener {
             // ACTION_INSERT does not work on all phones; use Intent.ACTION_EDIT in this case
             val intent = Intent(Intent.ACTION_INSERT)
             intent.type = "vnd.android.cursor.item/event"
-            intent.putExtra(CalendarContract.Events.TITLE, mBinding!!.comicViewModel!!.comic.get()!!.name)
+            intent.putExtra(CalendarContract.Events.TITLE, mBinding?.comicViewModel?.comic?.get()?.name)
             intent.putExtra(CalendarContract.Events.DESCRIPTION, getString(R.string.calendar_release))
 
             // Setting dates
-            val timeInMillis = mBinding!!.comicViewModel!!.comic.get()!!.releaseDate.time
+            val timeInMillis = mBinding?.comicViewModel?.comic?.get()?.releaseDate?.time
             intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, timeInMillis)
             intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, timeInMillis)
 
@@ -114,48 +114,48 @@ class FragmentDetail : Fragment(), View.OnClickListener {
             intent.putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
             startActivity(intent)
         } catch (e: Exception) {
-            activity!!.toast(R.string.calendar_error)
+            activity?.toast(R.string.calendar_error)
         }
 
     }
 
     private fun manageFavorite() {
-        var isAFavoriteComic = mBinding!!.comicViewModel!!.comic.get()!!.isFavorite
+        var isAFavoriteComic = mBinding?.comicViewModel?.comic?.get()?.isFavorite ?: false
 
         if (!isAFavoriteComic) {
             CCLogger.i(TAG, "manageFavorite - Add comic to favorite")
             isAFavoriteComic = true
             // Add comic to favorite
-            activity!!.toast(resources.getString(R.string.comic_added_favorite))
+            activity?.toast(resources.getString(R.string.comic_added_favorite))
         } else {
             CCLogger.i(TAG, "manageFavorite - Delete from favorite")
             isAFavoriteComic = false
             // Delete from favorite
-            activity!!.toast(resources.getString(R.string.comic_deleted_favorite))
+            activity?.toast(resources.getString(R.string.comic_deleted_favorite))
         }
 
-        val comicEntity = mBinding!!.comicViewModel!!.comic.get()
+        val comicEntity = mBinding?.comicViewModel?.comic?.get()
         comicEntity!!.isFavorite = isAFavoriteComic
 
         updateData(comicEntity)
     }
 
     private fun manageWishlist() {
-        var isComicOnCart = mBinding!!.comicViewModel!!.comic.get()!!.isOnCart
+        var isComicOnCart = mBinding?.comicViewModel?.comic?.get()?.isOnCart ?: false
 
         if (!isComicOnCart) {
             CCLogger.i(TAG, "manageWishlist - Update entry on comic database: add to cart")
             isComicOnCart = true
             // Update entry on comic database
-            activity!!.toast(resources.getString(R.string.comic_added_cart))
+            activity?.toast(resources.getString(R.string.comic_added_cart))
         } else {
             CCLogger.i(TAG, "manageWishlist - Update entry on comic database: remove from cart")
             isComicOnCart = false
             // Update entry on comic database
-            activity!!.toast(resources.getString(R.string.comic_deleted_cart))
+            activity?.toast(resources.getString(R.string.comic_deleted_cart))
         }
 
-        val comicEntity = mBinding!!.comicViewModel!!.comic.get()
+        val comicEntity = mBinding?.comicViewModel?.comic?.get()
         comicEntity!!.setToCart(isComicOnCart)
 
         updateData(comicEntity)
@@ -163,7 +163,7 @@ class FragmentDetail : Fragment(), View.OnClickListener {
 
     private fun updateData(comicEntity: ComicEntity) {
         doAsync {
-            (activity!!.application as CCApp).repository.updateComic(comicEntity)
+            (activity?.application as CCApp).repository.updateComic(comicEntity)
         }
 
         WidgetService.updateWidget(activity)
