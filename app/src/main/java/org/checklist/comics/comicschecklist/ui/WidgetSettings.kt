@@ -5,7 +5,6 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -13,6 +12,7 @@ import android.widget.ArrayAdapter
 import kotlinx.android.synthetic.main.activity_widget_settings.*
 
 import org.checklist.comics.comicschecklist.R
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper
 import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.widget.WidgetProvider
@@ -45,11 +45,11 @@ class WidgetSettings : AppCompatActivity() {
         val values = resources.getStringArray(R.array.widget_sections_array)
 
         // Loading user editor preference
-        val sp = PreferenceManager.getDefaultSharedPreferences(this)
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
         val rawArray = resources.getStringArray(R.array.pref_basic_editors)
-        var editorSet = sp.getStringSet(Constants.PREF_AVAILABLE_EDITORS, null)
+        var editorSet = preferenceHelper.getStringSet(Constants.PREF_AVAILABLE_EDITORS, emptySet())
 
-        if (editorSet == null) {
+        if (editorSet.isEmpty()) {
             editorSet = HashSet(Arrays.asList(*rawArray))
         }
 

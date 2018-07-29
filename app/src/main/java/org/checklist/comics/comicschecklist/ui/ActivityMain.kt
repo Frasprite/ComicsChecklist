@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
@@ -26,14 +25,17 @@ import kotlinx.android.synthetic.main.nav_header_main.view.*
 import org.checklist.comics.comicschecklist.CCApp
 import org.checklist.comics.comicschecklist.R
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.get
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.set
 import org.checklist.comics.comicschecklist.service.DownloadService
 import org.checklist.comics.comicschecklist.util.AppRater
 import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.service.Message
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.service.ServiceEvents
-import org.jetbrains.anko.alert
 
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 
@@ -77,8 +79,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
-        val sp = PreferenceManager.getDefaultSharedPreferences(this)
-        mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false)
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
+        mUserLearnedDrawer = preferenceHelper[PREF_USER_LEARNED_DRAWER, false]!!
 
         setContentView(R.layout.activity_comic_list)
 
@@ -117,7 +119,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     // The user manually opened the drawer; store this flag to prevent auto-showing
                     // the navigation drawer automatically in the future.
                     mUserLearnedDrawer = true
-                    sp.edit().putBoolean(PREF_USER_LEARNED_DRAWER, true).apply()
+                    preferenceHelper[PREF_USER_LEARNED_DRAWER] = true
                 }
 
                 invalidateOptionsMenu() // creates call to onPrepareOptionsMenu()
@@ -302,11 +304,11 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         super.onResume()
         CCLogger.v(TAG, "onResume")
         // Populate navigation view menu
-        val sp = PreferenceManager.getDefaultSharedPreferences(this)
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
         val rawArray = resources.getStringArray(R.array.pref_basic_editors)
-        var editorSet = sp.getStringSet(Constants.PREF_AVAILABLE_EDITORS, null)
+        var editorSet = preferenceHelper.getStringSet(Constants.PREF_AVAILABLE_EDITORS, emptySet())
 
-        if (editorSet == null) {
+        if (editorSet.isEmpty()) {
             editorSet = rawArray.toList().toHashSet()
         }
 

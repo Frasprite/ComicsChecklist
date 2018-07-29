@@ -3,15 +3,16 @@ package org.checklist.comics.comicschecklist.service
 import android.app.IntentService
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.ConnectivityManager
-import android.preference.PreferenceManager
 
 import org.checklist.comics.comicschecklist.CCApp
 import org.checklist.comics.comicschecklist.database.AppDatabase
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 import org.checklist.comics.comicschecklist.ui.ActivityMain
 import org.checklist.comics.comicschecklist.R
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.get
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.set
 import org.checklist.comics.comicschecklist.log.ParserLog
 import org.checklist.comics.comicschecklist.parser.ParserBonelli
 import org.checklist.comics.comicschecklist.parser.ParserPanini
@@ -51,8 +52,8 @@ class DownloadService : IntentService(TAG) {
         }
 
         // Loading frequency and flag if user want to do manual search
-        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-        val syncPref = sharedPref.getString(Constants.PREF_SYNC_FREQUENCY, "3")
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
+        val syncPref = preferenceHelper[Constants.PREF_SYNC_FREQUENCY, "3"]
         val frequency = Integer.parseInt(syncPref)
         val manualSearch = intent!!.getBooleanExtra(Constants.MANUAL_SEARCH, false)
 
@@ -63,11 +64,11 @@ class DownloadService : IntentService(TAG) {
 
         if (frequency > -1 && !manualSearch) {
             CCLogger.i(TAG, "onHandleIntent - Automatic search launched")
-            automaticSearch(sharedPref, frequency)
+            automaticSearch(frequency)
         } else {
             CCLogger.i(TAG, "onHandleIntent - Manual search needed")
             val editor = intent.getSerializableExtra(Constants.ARG_EDITOR) as Constants.Sections
-            manualSearch(sharedPref, editor)
+            manualSearch(editor)
         }
 
         // Check if this is the fist creation of Room database
@@ -89,17 +90,17 @@ class DownloadService : IntentService(TAG) {
 
     /**
      * Method which will launch automatic search of contents.
-     * @param sharedPref the [SharedPreferences] where to load list of editors to search
      * @param frequency the time passed between last search
      */
-    private fun automaticSearch(sharedPref: SharedPreferences, frequency: Int) {
-        val notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true)
+    private fun automaticSearch(frequency: Int) {
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
+        val notificationPref = preferenceHelper[Constants.PREF_SEARCH_NOTIFICATION, true]
 
         // Loading user editor preference
         val rawArray = resources.getStringArray(R.array.pref_basic_editors)
-        var editorSet = sharedPref.getStringSet(Constants.PREF_AVAILABLE_EDITORS, null)
+        var editorSet = preferenceHelper.getStringSet(Constants.PREF_AVAILABLE_EDITORS, emptySet())
 
-        if (editorSet == null) {
+        if (editorSet.isEmpty()) {
             editorSet = HashSet(Arrays.asList(*rawArray))
         }
 
@@ -108,10 +109,10 @@ class DownloadService : IntentService(TAG) {
             // Check if editor is desired by user and if last day of scan has passed limits
             if (calculateDayDifference(value) >= frequency && editorSet.contains(currentSection.code.toString())) {
                 publishResults(Constants.RESULT_START, currentSection.title)
-                searchComics(notificationPref, currentSection.title, currentSection)
+                notificationPref?.let { searchComics(it, currentSection.title, currentSection) }
 
                 publishResults(Constants.RESULT_FINISHED, "noEditor")
-                if (notificationPref) {
+                if (notificationPref!!) {
                     CCNotificationManager.deleteNotification(this)
                 }
             }
@@ -120,28 +121,28 @@ class DownloadService : IntentService(TAG) {
 
     /**
      * Method which will launch automatic search of contents.
-     * @param sharedPref the [SharedPreferences] where to load list of editors to search
      * @param editor the editor to search
      */
-    private fun manualSearch(sharedPref: SharedPreferences, editor: Constants.Sections) {
-        val notificationPref = sharedPref.getBoolean(Constants.PREF_SEARCH_NOTIFICATION, true)
+    private fun manualSearch(editor: Constants.Sections) {
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
+        val notificationPref = preferenceHelper[Constants.PREF_SEARCH_NOTIFICATION, true]
         CCLogger.i(TAG, "manualSearch - Manual search for editor " + editor.toString())
 
         publishResults(Constants.RESULT_START, editor.title)
-        searchComics(notificationPref, editor.title, editor)
+        notificationPref?.let { searchComics(it, editor.title, editor) }
 
         // Update last scan for editor on shared preference
         val today = System.currentTimeMillis()
         when (editor) {
-            Constants.Sections.PANINI -> sharedPref.edit().putLong(Constants.PREF_PANINI_LAST_SCAN, today).apply()
-            Constants.Sections.BONELLI -> sharedPref.edit().putLong(Constants.PREF_BONELLI_LAST_SCAN, today).apply()
-            Constants.Sections.STAR -> sharedPref.edit().putLong(Constants.PREF_STAR_LAST_SCAN, today).apply()
-            Constants.Sections.RW -> sharedPref.edit().putLong(Constants.PREF_RW_LAST_SCAN, today).apply()
+            Constants.Sections.PANINI -> preferenceHelper[Constants.PREF_PANINI_LAST_SCAN] = today
+            Constants.Sections.BONELLI -> preferenceHelper[Constants.PREF_BONELLI_LAST_SCAN] = today
+            Constants.Sections.STAR -> preferenceHelper[Constants.PREF_STAR_LAST_SCAN] = today
+            Constants.Sections.RW -> preferenceHelper[Constants.PREF_RW_LAST_SCAN] = today
             else -> CCLogger.w(TAG, "Can't search data for given section ${editor.title}")
         }
 
         publishResults(Constants.RESULT_FINISHED, "noEditor")
-        if (notificationPref) {
+        if (notificationPref!!) {
             CCNotificationManager.deleteNotification(this)
             // Favorite data may have changed, update widget as well
             WidgetService.updateWidget(this)
@@ -193,8 +194,8 @@ class DownloadService : IntentService(TAG) {
      * This method will delete old rows on database.
      */
     private fun deleteOldRows() {
-        val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-        val deletePref = sharedPref.getString(Constants.PREF_DELETE_FREQUENCY, "-1")
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
+        val deletePref = preferenceHelper[Constants.PREF_DELETE_FREQUENCY, "-1"]
         val frequency = Integer.parseInt(deletePref)
         if (frequency > -1) {
             val dateTime = DateTime()
@@ -230,15 +231,15 @@ class DownloadService : IntentService(TAG) {
         var result: Int // If result is 3, we need a refresh
         val today = DateTime()
 
-        val sp = PreferenceManager.getDefaultSharedPreferences(this)
-        val dateStart = sp.getLong(editorLastScan, -1)
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
+        val dateStart = preferenceHelper[editorLastScan, -1L]
         val dateLastScan = DateTime(dateStart)
 
         CCLogger.d(TAG, "calculateDayDifference - (in milliseconds) today is $today target is $dateStart")
         // Calculate day difference
         result = Days.daysBetween(today, dateLastScan).days
 
-        sp.edit().putLong(editorLastScan, today.millis).apply()
+        preferenceHelper[editorLastScan] = today.millis
 
         // Set default value in case of error
         if (result < 0) {

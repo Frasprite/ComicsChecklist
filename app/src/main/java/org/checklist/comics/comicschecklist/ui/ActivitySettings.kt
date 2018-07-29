@@ -11,6 +11,8 @@ import com.evernote.android.job.JobManager
 
 import org.checklist.comics.comicschecklist.CCApp
 import org.checklist.comics.comicschecklist.R
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper
+import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.get
 import org.checklist.comics.comicschecklist.extensions.lazyLogger
 import org.checklist.comics.comicschecklist.notification.ComicReleaseSyncJob
 import org.checklist.comics.comicschecklist.widget.WidgetService
@@ -145,16 +147,16 @@ class ActivitySettings : AppCompatPreferenceActivity() {
 
         private fun composeLastSyncMessage(context: Context): String {
             val message: String
-            val sp = PreferenceManager.getDefaultSharedPreferences(context)
-            message = "Panini Comics : ${composeSubString(sp.getLong(Constants.PREF_PANINI_LAST_SCAN, -1))} \n" +
-                      "RW Edizioni : ${sp.getLong(Constants.PREF_RW_LAST_SCAN, -1)} \n" +
-                      "Bonelli : ${sp.getLong(Constants.PREF_BONELLI_LAST_SCAN, -1)} \n" +
-                      "Star Comics : ${sp.getLong(Constants.PREF_STAR_LAST_SCAN, -1)}"
+            val preferenceHelper = PreferenceHelper.defaultPrefs(context)
+            message = "Panini Comics : ${composeSubString(preferenceHelper[Constants.PREF_PANINI_LAST_SCAN, -1L])} \n" +
+                      "RW Edizioni : ${composeSubString(preferenceHelper[Constants.PREF_RW_LAST_SCAN, -1L])} \n" +
+                      "Bonelli : ${composeSubString(preferenceHelper[Constants.PREF_BONELLI_LAST_SCAN, -1L])} \n" +
+                      "Star Comics : ${composeSubString(preferenceHelper[Constants.PREF_STAR_LAST_SCAN, -1L])}"
             return message
         }
 
-        private fun composeSubString(timestamp: Long): String {
-            if (timestamp <= -1)
+        private fun composeSubString(timestamp: Long?): String {
+            if (timestamp == null || timestamp <= -1)
                 return resources.getString(R.string.activity_settings_never)
 
             val dateTimeFormatter = DateTimeFormat.forPattern("dd/MM/yyyy")
@@ -314,9 +316,7 @@ class ActivitySettings : AppCompatPreferenceActivity() {
 
             // Trigger the listener immediately with the preference's current value.
             sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
-                            .getDefaultSharedPreferences(preference.context)
-                            .getString(preference.key, "")!!)
+                    PreferenceHelper.defaultPrefs(preference.context)[preference.key, ""])
         }
     }
 }
