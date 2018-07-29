@@ -61,12 +61,11 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
     private var mFragmentRecycler: FragmentRecycler? = null
 
-    private var mDrawerLayout: DrawerLayout? = null
-    private var mDrawerToggle: ActionBarDrawerToggle? = null
-    private var mNavigationView: NavigationView? = null
+    private lateinit var mDrawerLayout: DrawerLayout
+    private lateinit var mDrawerToggle: ActionBarDrawerToggle
+    private lateinit var mNavigationView: NavigationView
 
-    private var mDrawerTitle: CharSequence? = null
-    private var mTitle: CharSequence? = null
+    private lateinit var mDrawerTitle: CharSequence
 
     private var mUserLearnedDrawer: Boolean = false
     private var mFromSavedInstanceState: Boolean = false
@@ -76,13 +75,20 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         CCLogger.d(TAG, "onCreate - start")
+
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         val sp = PreferenceManager.getDefaultSharedPreferences(this)
         mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false)
 
         setContentView(R.layout.activity_comic_list)
+
+        // Set options to action bar
         setSupportActionBar(toolbar)
+        if (supportActionBar != null) {
+            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+            supportActionBar!!.setHomeButtonEnabled(true)
+        }
 
         // The detail container view will be present only in the
         // large-screen layouts (res/values-large-land and
@@ -91,15 +97,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         mTwoPane = findViewById<View>(R.id.comicDetailContainer) != null
         CCLogger.d(TAG, if (mTwoPane) "Application is running on singlePane" else "Application is running on twoPane")
 
-        mDrawerTitle = title
-        mTitle = mDrawerTitle
+        mDrawerTitle = mSection.title
         mDrawerLayout = findViewById(R.id.drawerLayout)
-
-        // Set action bar
-        if (supportActionBar != null) {
-            supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-            supportActionBar!!.setHomeButtonEnabled(true)
-        }
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the sliding drawer and the action bar app icon
@@ -110,16 +109,12 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                 R.string.drawer_close  /* "close drawer" description for accessibility */
         ) {
             override fun onDrawerClosed(view: View) {
-                if (supportActionBar != null) {
-                    supportActionBar!!.title = mTitle
-                }
+                title = mSection.title
                 invalidateOptionsMenu() // creates call to onPrepareOptionsMenu()
             }
 
             override fun onDrawerOpened(drawerView: View) {
-                if (supportActionBar != null) {
-                    supportActionBar!!.title = mDrawerTitle
-                }
+                title = mDrawerTitle
 
                 if (!mUserLearnedDrawer) {
                     // The user manually opened the drawer; store this flag to prevent auto-showing
@@ -131,10 +126,10 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                 invalidateOptionsMenu() // creates call to onPrepareOptionsMenu()
             }
         }
-        mDrawerLayout!!.addDrawerListener(mDrawerToggle!!)
+        mDrawerLayout.addDrawerListener(mDrawerToggle)
 
         mNavigationView = findViewById(R.id.navigationView)
-        mNavigationView!!.setNavigationItemSelectedListener(this)
+        mNavigationView.setNavigationItemSelectedListener(this)
 
         // Attach listener to navigation bottom
         bottomNavigation.setOnNavigationItemSelectedListener { item ->
@@ -154,10 +149,10 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
         // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer
         if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
-            mDrawerLayout!!.openDrawer(mNavigationView!!)
+            mDrawerLayout.openDrawer(mNavigationView)
         }
 
-        mDrawerLayout!!.addDrawerListener(mDrawerToggle!!)
+        mDrawerLayout.addDrawerListener(mDrawerToggle)
 
         if (savedInstanceState == null) {
             selectItem(Constants.Sections.FAVORITE)
@@ -185,9 +180,9 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     }
 
     override fun onBackPressed() {
-        if (mDrawerLayout!!.isDrawerOpen(GravityCompat.START)) {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             CCLogger.d(TAG, "onBackPressed - closing NavigationView")
-            mDrawerLayout!!.closeDrawer(GravityCompat.START)
+            mDrawerLayout.closeDrawer(GravityCompat.START)
         } else {
             CCLogger.d(TAG, "onBackPressed - closing app")
             super.onBackPressed()
@@ -313,10 +308,10 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         }
 
         // Populate menu
-        mNavigationView!!.menu.findItem(R.id.list_panini).isVisible = editorSet.contains(Constants.Sections.PANINI.code.toString())
-        mNavigationView!!.menu.findItem(R.id.list_star).isVisible = editorSet.contains(Constants.Sections.STAR.code.toString())
-        mNavigationView!!.menu.findItem(R.id.list_bonelli).isVisible = editorSet.contains(Constants.Sections.BONELLI.code.toString())
-        mNavigationView!!.menu.findItem(R.id.list_rw).isVisible = editorSet.contains(Constants.Sections.RW.code.toString())
+        mNavigationView.menu.findItem(R.id.list_panini).isVisible = editorSet.contains(Constants.Sections.PANINI.code.toString())
+        mNavigationView.menu.findItem(R.id.list_star).isVisible = editorSet.contains(Constants.Sections.STAR.code.toString())
+        mNavigationView.menu.findItem(R.id.list_bonelli).isVisible = editorSet.contains(Constants.Sections.BONELLI.code.toString())
+        mNavigationView.menu.findItem(R.id.list_rw).isVisible = editorSet.contains(Constants.Sections.RW.code.toString())
     }
 
     override fun onPause() {
@@ -332,7 +327,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main_top, menu)
-        if (!mDrawerLayout!!.isDrawerOpen(mNavigationView!!)) {
+        if (!mDrawerLayout.isDrawerOpen(mNavigationView)) {
             // Get the SearchView and set the searchable configuration
             val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
             val searchItem = menu.findItem(R.id.search)
@@ -351,7 +346,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         // If the nav drawer is open, hide action items related to the content view
-        val drawerOpen = mDrawerLayout!!.isDrawerOpen(mNavigationView!!)
+        val drawerOpen = mDrawerLayout.isDrawerOpen(mNavigationView)
         // Hide detail buttons
         menu.findItem(R.id.search).isVisible = !drawerOpen
 
@@ -359,15 +354,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return mDrawerToggle!!.onOptionsItemSelected(item) || super.onOptionsItemSelected(item)
-    }
-
-    override fun setTitle(title: CharSequence) {
-        mTitle = title
-        if (supportActionBar != null) {
-            CCLogger.v(TAG, "setTitle - setting $mTitle on mActionBar")
-            supportActionBar!!.title = mTitle
-        }
+        return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item)
     }
 
     /**
@@ -377,20 +364,20 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle!!.syncState()
+        mDrawerToggle.syncState()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         // Pass any configuration change to the drawer toggles
-        mDrawerToggle!!.onConfigurationChanged(newConfig)
+        mDrawerToggle.onConfigurationChanged(newConfig)
     }
 
     /**
      * Method used to init some info on side menu.
      */
     private fun initVersionInfo() {
-        val headerLayout = mNavigationView!!.getHeaderView(0)
+        val headerLayout = mNavigationView.getHeaderView(0)
         val pInfo: PackageInfo
         var version = ""
         try {
@@ -533,16 +520,13 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         CCLogger.d(TAG, "selectItem - $section")
 
         mSection = section
-        if (mNavigationView != null) {
-            if (mDrawerLayout != null) {
-                if (section == Constants.Sections.FAVORITE || section == Constants.Sections.CART ||
-                        section == Constants.Sections.PANINI || section == Constants.Sections.BONELLI ||
-                        section == Constants.Sections.RW || section == Constants.Sections.STAR) {
-                    // Update selected item title, then close the drawer
-                    title = section.title
-                    mDrawerLayout!!.closeDrawer(mNavigationView!!)
-                }
-            }
+        if (section == Constants.Sections.FAVORITE || section == Constants.Sections.CART ||
+                section == Constants.Sections.PANINI || section == Constants.Sections.BONELLI ||
+                section == Constants.Sections.RW || section == Constants.Sections.STAR) {
+            // Update selected item title, then close the drawer
+            title = section.title
+            mDrawerTitle = section.title
+            mDrawerLayout.closeDrawer(mNavigationView)
         }
 
         when (section) {
