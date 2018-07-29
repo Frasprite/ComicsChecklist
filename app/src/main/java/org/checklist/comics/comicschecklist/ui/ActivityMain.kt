@@ -71,8 +71,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     private var mUserLearnedDrawer: Boolean = false
     private var mFromSavedInstanceState: Boolean = false
 
-    private val section: Constants.Sections
-        get() = Constants.Sections.fromTitle(mTitle.toString())
+    private var mSection: Constants.Sections = Constants.Sections.FAVORITE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,7 +146,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     // This method can be called from shortcut (Android 7.1 and above)
                     addComic()
                 R.id.refresh -> if (mFragmentRecycler != null) {
-                    initiateRefresh(section)
+                    initiateRefresh(mSection)
                 }
             }
             true
@@ -532,6 +531,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     @SuppressLint("InflateParams")
     private fun selectItem(section: Constants.Sections) {
         CCLogger.d(TAG, "selectItem - $section")
+
+        mSection = section
         if (mNavigationView != null) {
             if (mDrawerLayout != null) {
                 if (section == Constants.Sections.FAVORITE || section == Constants.Sections.CART ||
@@ -580,57 +581,53 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         CCLogger.d(TAG, "onNavigationItemSelected - start " + item.title)
-        val section: Constants.Sections
-        val result: Boolean
+
         when (item.itemId) {
             R.id.list_favorite -> {
-                section = Constants.Sections.FAVORITE
-                result = true
+                selectItem(Constants.Sections.FAVORITE)
+                return true
             }
             R.id.list_cart -> {
-                section = Constants.Sections.CART
-                result = true
+                selectItem(Constants.Sections.CART)
+                return true
             }
             R.id.list_panini -> {
-                section = Constants.Sections.PANINI
-                result = true
+                selectItem(Constants.Sections.PANINI)
+                return true
             }
             R.id.list_star -> {
-                section = Constants.Sections.STAR
-                result = true
+                selectItem(Constants.Sections.STAR)
+                return true
             }
             R.id.list_bonelli -> {
-                section = Constants.Sections.BONELLI
-                result = true
+                selectItem(Constants.Sections.BONELLI)
+                return true
             }
             R.id.list_rw -> {
-                section = Constants.Sections.RW
-                result = true
+                selectItem(Constants.Sections.RW)
+                return true
             }
             R.id.action_settings -> {
-                section = Constants.Sections.SETTINGS
-                result = false
+                selectItem(Constants.Sections.SETTINGS)
+                return false
             }
             R.id.action_social -> {
-                section = Constants.Sections.GOOGLE
-                result = false
+                selectItem(Constants.Sections.GOOGLE)
+                return false
             }
             R.id.action_help -> {
-                section = Constants.Sections.GUIDA
-                result = false
+                selectItem(Constants.Sections.GUIDA)
+                return false
             }
             R.id.action_info -> {
-                section = Constants.Sections.INFO
-                result = false
+                selectItem(Constants.Sections.INFO)
+                return false
             }
             else -> {
-                section = Constants.Sections.FAVORITE
-                result = true
+                selectItem(Constants.Sections.FAVORITE)
+                return true
             }
         }
-        selectItem(section)
-        CCLogger.v(TAG, "onNavigationItemSelected - end - section $section result $result")
-        return result
     }
 
     companion object {
