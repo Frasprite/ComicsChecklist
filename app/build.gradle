@@ -45,6 +45,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-annotations:27.1.1'
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support:design:27.1.1'
     implementation "com.android.support:gridlayout-v7:27.1.1"
@@ -70,16 +71,6 @@ dependencies {
     // explicitly depend on RxJava's latest version for bug fixes and new features.
     implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
 
-    // Unit test stuff
-    testImplementation 'junit:junit:4.12'
-    // Mockito framework
-    testImplementation 'org.mockito:mockito-core:2.8.9'
-    // UI test stuff
-    androidTestImplementation 'com.android.support:support-annotations:27.1.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
-    // Android Architecture
-
     // ViewModel and LiveData
     implementation "android.arch.lifecycle:extensions:1.1.1"
     implementation "android.arch.lifecycle:common-java8:1.1.1"
@@ -89,6 +80,17 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:1.1.1"
     //annotationProcessor "android.arch.persistence.room:compiler:1.1.0"
     kapt "android.arch.persistence.room:compiler:1.1.1"
+
+    // Test stuff
+    testImplementation 'junit:junit:4.12'
+    // Mockito framework
+    testImplementation 'org.mockito:mockito-core:2.8.9'
+    // UI test stuff
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
 
     // Test helpers for LiveData
     testImplementation "android.arch.core:core-testing:1.1.1"
