@@ -29,7 +29,6 @@ import org.checklist.comics.comicschecklist.extensions.PreferenceHelper
 import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.get
 import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.set
 import org.checklist.comics.comicschecklist.service.DownloadService
-import org.checklist.comics.comicschecklist.util.AppRater
 import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.service.Message
 import org.checklist.comics.comicschecklist.util.Constants
@@ -167,8 +166,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
             inspectResultCode(it.result, it.editor)
         }
 
-        // Launch AppRater
-        AppRater.appLaunched(this)
+        // Show app rater dialog
+        appLaunched()
 
         // Handle search intent
         if (getIntent() != null) {
@@ -558,6 +557,61 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                 }.show()
             }
         }
+    }
+
+    /**
+     * Method which is launched every time the app is opened.
+     */
+    private fun appLaunched() {
+        val prefs = getSharedPreferences(Constants.PREF_APP_RATER, 0)
+        if (prefs.getBoolean(Constants.PREF_USER_NOT_RATING, false)) {
+            return
+        }
+
+        val editor = prefs.edit()
+
+        // Increment counter of how many times user launched the app
+        val launchCount = prefs.getLong(Constants.PREF_LAUNCH_COUNT, 0) + 1
+        editor.putLong(Constants.PREF_LAUNCH_COUNT, launchCount)
+
+        // Take date of first launch
+        var dateFirstLaunch: Long? = prefs.getLong(Constants.PREF_DATE_FIRST_LAUNCH, 0)
+        if (dateFirstLaunch == 0L) {
+            dateFirstLaunch = System.currentTimeMillis()
+            editor.putLong(Constants.PREF_DATE_FIRST_LAUNCH, dateFirstLaunch)
+        }
+
+        // Wait at least 7 days before opening rate window
+        if (launchCount >= Constants.LAUNCHES_UNTIL_PROMPT) {
+            if (System.currentTimeMillis() >= dateFirstLaunch!! + Constants.DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000) {
+
+                // Show dialog
+                alert {
+                    titleResource = R.string.app_name
+                    messageResource = R.string.dialog_rate_text
+
+                    positiveButton(R.string.dialog_rate_button) { dialog -> dialog.dismiss()
+                        startActivity(Intent(Intent.ACTION_VIEW,
+                                Uri.parse("market://details?id=$packageName")))
+                    }
+
+                    negativeButton(R.string.dialog_no_thanks_button) { dialog ->
+                        CCLogger.v(TAG, "onClick - User refused to rate app..")
+                        val editorPref = getSharedPreferences(Constants.PREF_APP_RATER, 0).edit()
+                        if (editorPref != null) {
+                            editorPref.putBoolean(Constants.PREF_USER_NOT_RATING, true)
+                            editorPref.apply()
+                        }
+
+                        dialog.dismiss()
+                    }
+
+                    neutralPressed(R.string.dialog_late_button) { dialog -> dialog.dismiss() }
+                }.show()
+            }
+        }
+
+        editor.apply()
     }
 
     /* ****************************************************************************************

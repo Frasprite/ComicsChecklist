@@ -57,7 +57,7 @@ class DownloadService : IntentService(TAG) {
         val frequency = Integer.parseInt(syncPref)
         val manualSearch = intent!!.getBooleanExtra(Constants.MANUAL_SEARCH, false)
 
-        CCLogger.d(TAG, "onHandleIntent - Checking if search is manual or automatic $frequency")
+        CCLogger.d(TAG, "onHandleIntent - Refresh comics every $frequency (-1 stands for never); should use manual search : $manualSearch")
 
         // Use this code for screenshot
         //myParser.startParseFreeComics();
@@ -67,8 +67,10 @@ class DownloadService : IntentService(TAG) {
             automaticSearch(frequency)
         } else {
             CCLogger.i(TAG, "onHandleIntent - Manual search needed")
-            val editor = intent.getSerializableExtra(Constants.ARG_EDITOR) as Constants.Sections
-            manualSearch(editor)
+            if (intent.hasExtra(Constants.ARG_EDITOR)) {
+                val editor = intent.getSerializableExtra(Constants.ARG_EDITOR) as Constants.Sections
+                manualSearch(editor)
+            }
         }
 
         // Check if this is the fist creation of Room database
