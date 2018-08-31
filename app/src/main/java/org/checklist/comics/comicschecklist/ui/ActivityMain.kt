@@ -288,15 +288,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         super.onStart()
         CCLogger.v(TAG, "onStart")
         initVersionInfo()
-
-        if (mTwoPane) {
-            // In two-pane mode, list items should be given the 'activated' state when touched
-            if (mFragmentRecycler != null) {
-                // TODO highlight item
-                CCLogger.d(TAG, "onStart - two-pane mode, activate item on click")
-                //mFragmentRecycler.setActivateOnItemClick(true);
-            }
-        }
     }
 
     override fun onResume() {
@@ -322,10 +313,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         super.onPause()
         CCLogger.v(TAG, "onPause")
         // Stop animation
-        if (mFragmentRecycler != null) {
-            if (mFragmentRecycler!!.isRefreshing) {
-                mFragmentRecycler!!.isRefreshing = false
-            }
+        if (mFragmentRecycler != null && mFragmentRecycler!!.isRefreshing) {
+            mFragmentRecycler!!.isRefreshing = false
         }
     }
 
@@ -413,10 +402,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         }
 
         // Set search animation on UI
-        if (mFragmentRecycler != null) {
-            if (!shouldSetRefresh) {
-                mFragmentRecycler!!.isRefreshing = false
-            }
+        if (mFragmentRecycler != null && !shouldSetRefresh) {
+            mFragmentRecycler!!.isRefreshing = false
         }
     }
 

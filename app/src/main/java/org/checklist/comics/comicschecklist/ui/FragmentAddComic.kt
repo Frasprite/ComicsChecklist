@@ -76,7 +76,6 @@ class FragmentAddComic : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // TODO use ViewModel
         // Load data from database if ID is passed from activity
         if (mComicId > -1) {
             doAsync {
