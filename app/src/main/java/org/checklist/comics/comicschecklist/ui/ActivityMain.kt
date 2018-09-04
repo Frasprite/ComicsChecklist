@@ -26,8 +26,6 @@ import org.checklist.comics.comicschecklist.CCApp
 import org.checklist.comics.comicschecklist.R
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 import org.checklist.comics.comicschecklist.extensions.PreferenceHelper
-import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.get
-import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.set
 import org.checklist.comics.comicschecklist.service.DownloadService
 import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.service.Message
@@ -67,19 +65,11 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
     private lateinit var mDrawerTitle: CharSequence
 
-    private var mUserLearnedDrawer: Boolean = false
-    private var mFromSavedInstanceState: Boolean = false
-
     private var mSection: Constants.Sections = Constants.Sections.FAVORITE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         CCLogger.d(TAG, "onCreate - start")
-
-        // Read in the flag indicating whether or not the user has demonstrated awareness of the
-        // drawer. See PREF_USER_LEARNED_DRAWER for details.
-        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
-        mUserLearnedDrawer = preferenceHelper[PREF_USER_LEARNED_DRAWER, false]!!
 
         setContentView(R.layout.activity_comic_list)
 
@@ -113,18 +103,11 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
             override fun onDrawerOpened(drawerView: View) {
                 title = mDrawerTitle
-
-                if (!mUserLearnedDrawer) {
-                    // The user manually opened the drawer; store this flag to prevent auto-showing
-                    // the navigation drawer automatically in the future.
-                    mUserLearnedDrawer = true
-                    preferenceHelper[PREF_USER_LEARNED_DRAWER] = true
-                }
-
                 invalidateOptionsMenu() // creates call to onPrepareOptionsMenu()
             }
         }
         mDrawerLayout.addDrawerListener(mDrawerToggle)
+        mDrawerToggle.syncState()
 
         mNavigationView = findViewById(R.id.navigationView)
         mNavigationView.setNavigationItemSelectedListener(this)
@@ -145,18 +128,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
             true
         }
 
-        // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer
-        if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
-            mDrawerLayout.openDrawer(mNavigationView)
-        }
-
-        mDrawerLayout.addDrawerListener(mDrawerToggle)
-
-        if (savedInstanceState == null) {
-            selectItem(Constants.Sections.FAVORITE)
-        } else {
-            mFromSavedInstanceState = true
-        }
+        selectItem(mSection)
 
         val intent = Intent(this, DownloadService::class.java)
         startService(intent)
@@ -657,13 +629,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     }
 
     companion object {
-
         private val TAG = ActivityMain::class.java.simpleName
-
-        /*
-         * Flag used to show the drawer on launch until the user manually
-         * expands it. This shared preference tracks this.
-         */
-        private const val PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned"
     }
 }
