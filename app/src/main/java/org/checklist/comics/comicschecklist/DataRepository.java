@@ -95,8 +95,12 @@ public class DataRepository {
         return mDatabase.comicDao().loadComicsByEditorSync(editor);
     }
 
-    public void updateComic(ComicEntity comicEntity) {
-        mDatabase.comicDao().update(comicEntity);
+    public void updateFavorite(int comicId, Boolean flag) {
+        mDatabase.comicDao().updateFavorite(comicId, flag);
+    }
+
+    public void updateCart(int comicId, Boolean flag) {
+        mDatabase.comicDao().updateCart(comicId, flag);
     }
 
     public void updateComic(int comicId, String name, String info, Date date) {

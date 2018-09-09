@@ -6,7 +6,6 @@ import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
 
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 
@@ -60,9 +59,12 @@ public interface ComicDao {
     @Query("SELECT COUNT(id) id, isFavorite, release_date FROM comics WHERE isFavorite = 1 AND release_date >= :time")
     int checkFavoritesRelease(long time);
 
-    @Update
-    int update(ComicEntity comic);
-
     @Query("UPDATE comics SET comic_name = :name, description = :info, release_date = :date  WHERE id = :comicId")
     int update(int comicId, String name, String info, Date date);
+
+    @Query("UPDATE comics SET isFavorite = :flag WHERE id = :comicId")
+    void updateFavorite(int comicId, Boolean flag);
+
+    @Query("UPDATE comics SET isOnCart = :flag WHERE id = :comicId")
+    void updateCart(int comicId, Boolean flag);
 }

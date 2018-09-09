@@ -174,12 +174,12 @@ class FragmentRecycler : Fragment() {
         // Update the list when the data changes
         if (text == null) {
             when (editor) {
-                Constants.Sections.FAVORITE -> viewModel.getFavoriteComics()
-                Constants.Sections.CART -> viewModel.getWishlistComics()
-                else -> viewModel.filterByEditor(editor.sectionName)
+                Constants.Sections.FAVORITE -> CCApp.instance.repository.getFavoriteComics()
+                Constants.Sections.CART -> CCApp.instance.repository.getWishlistComics()
+                else -> CCApp.instance.repository.filterComics(editor.sectionName)
             }
         } else {
-            viewModel.filterComicsContainingText(editor.sectionName, text)
+            CCApp.instance.repository.filterComics(editor.sectionName, text)
         }
 
         viewModel.comics.observe(this, Observer<List<ComicEntity>> {
@@ -211,15 +211,23 @@ class FragmentRecycler : Fragment() {
      * @param comic the entry to update on database
      */
     fun updateComic(comic: ComicEntity) {
-        if (comic.editor == Constants.Sections.FAVORITE.sectionName) {
-            CCLogger.d(TAG, "deleteComic - Removing favorite comic with ID " + comic.id)
-            // Remove comic from favorite
-            comic.isFavorite = !comic.isFavorite
-            updateData(comic)
-        } else if (comic.editor == Constants.Sections.CART.sectionName) {
-            CCLogger.d(TAG, "onContextItemSelected - Removing comic in cart with ID " + comic.id)
-            // Remove comic from cart
-            removeComicFromCart(comic)
+        val editor = Constants.Sections.fromName(comic.editor)
+        when (editor) {
+            Constants.Sections.FAVORITE -> {
+                CCLogger.d(TAG, "deleteComic - Removing favorite comic with ID " + comic.id)
+                // Remove comic from favorite
+                doAsync {
+                    (activity?.application as CCApp).repository.updateFavorite(comic.id, !comic.isFavorite)
+                }
+            }
+            Constants.Sections.CART -> {
+                CCLogger.d(TAG, "onContextItemSelected - Removing comic in cart with ID " + comic.id)
+                // Remove comic from cart
+                removeComicFromCart(comic)
+            }
+            else -> {
+                // Do nothing for other cases
+            }
         }
 
         WidgetService.updateWidget(activity)
@@ -241,21 +249,12 @@ class FragmentRecycler : Fragment() {
             }
             else -> {
                 // Update comic because it is created from web data
-                comic.setToCart(!comic.isOnCart)
-                updateData(comic)
+                doAsync {
+                    (activity?.application as CCApp).repository.updateCart(comic.id, !comic.isOnCart)
+                }
                 CCLogger.v(TAG, "removeComicFromCart - Comic updated!")
             }
         }
-    }
-
-    /**
-     * Updating data of comic.
-     * @param comicEntity the comic to update
-     */
-    private fun updateData(comicEntity: ComicEntity) {
-        doAsync { (activity!!.application as CCApp).repository.updateComic(comicEntity) }
-
-        WidgetService.updateWidget(activity)
     }
 
     /**

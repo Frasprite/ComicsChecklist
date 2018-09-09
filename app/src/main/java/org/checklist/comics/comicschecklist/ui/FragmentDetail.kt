@@ -135,9 +135,12 @@ class FragmentDetail : Fragment(), View.OnClickListener {
         }
 
         val comicEntity = mBinding?.comicViewModel?.comic?.get()
-        comicEntity!!.isFavorite = isAFavoriteComic
 
-        updateData(comicEntity)
+        doAsync {
+            (activity?.application as CCApp).repository.updateFavorite(comicEntity!!.id, isAFavoriteComic)
+        }
+
+        WidgetService.updateWidget(activity)
     }
 
     private fun manageWishlist() {
@@ -156,14 +159,9 @@ class FragmentDetail : Fragment(), View.OnClickListener {
         }
 
         val comicEntity = mBinding?.comicViewModel?.comic?.get()
-        comicEntity!!.setToCart(isComicOnCart)
 
-        updateData(comicEntity)
-    }
-
-    private fun updateData(comicEntity: ComicEntity) {
         doAsync {
-            (activity?.application as CCApp).repository.updateComic(comicEntity)
+            (activity?.application as CCApp).repository.updateCart(comicEntity!!.id, isComicOnCart)
         }
 
         WidgetService.updateWidget(activity)
