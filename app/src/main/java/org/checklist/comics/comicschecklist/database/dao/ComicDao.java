@@ -35,6 +35,9 @@ public interface ComicDao {
     @Query("DELETE FROM comics WHERE editor LIKE :editor AND isFavorite = 0 AND isOnCart = 0")
     int deleteComics(String editor);
 
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics ORDER BY release_date")
+    LiveData<List<ComicEntity>> loadAllComics();
+
     @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE isFavorite = 1 ORDER BY release_date")
     LiveData<List<ComicEntity>> loadFavoriteComics();
 
