@@ -171,16 +171,8 @@ class FragmentRecycler : Fragment() {
      */
     private fun subscribeUi(viewModel: ComicListViewModel, text: String?, editor: Constants.Sections) {
         CCLogger.v(TAG, "subscribeUi - Text $text and editor $editor")
-        // Update the list when the data changes
-        if (text == null) {
-            when (editor) {
-                Constants.Sections.FAVORITE -> CCApp.instance.repository.getFavoriteComics()
-                Constants.Sections.CART -> CCApp.instance.repository.getWishlistComics()
-                else -> CCApp.instance.repository.filterComics(editor.sectionName)
-            }
-        } else {
-            CCApp.instance.repository.filterComics(editor.sectionName, text)
-        }
+
+        filterData(text, editor)
 
         viewModel.comics.observe(this, Observer<List<ComicEntity>> {
             myComics ->
@@ -197,13 +189,18 @@ class FragmentRecycler : Fragment() {
     }
 
     /**
-     * Method used to update the list after user gave an input on search view.
-     * @param newText the text to use for filter data
+     * Method used to filter data from DB.
      */
-    fun updateList(newText: String) {
-        val viewModel = ViewModelProviders.of(this).get(ComicListViewModel::class.java)
-
-        subscribeUi(viewModel, newText, arguments!!.getSerializable(Constants.ARG_EDITOR) as Constants.Sections)
+    fun filterData(text: String?, editor: Constants.Sections) {
+        if (text == null) {
+            when (editor) {
+                Constants.Sections.FAVORITE -> CCApp.instance.repository.getFavoriteComics()
+                Constants.Sections.CART -> CCApp.instance.repository.getWishlistComics()
+                else -> CCApp.instance.repository.filterComics(editor.sectionName)
+            }
+        } else {
+            CCApp.instance.repository.filterComics(editor.sectionName, text)
+        }
     }
 
     /**

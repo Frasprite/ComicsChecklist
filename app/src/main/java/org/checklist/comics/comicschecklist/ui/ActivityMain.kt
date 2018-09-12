@@ -57,7 +57,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device
     private var mTwoPane: Boolean = false
 
-    private var mFragmentRecycler: FragmentRecycler? = null
+    private val FRAGMENT_TAG = "FragmentRecycler"
+    // TODO on rotation fragment show favorite, should be fixed
 
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
@@ -121,9 +122,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                 R.id.addComic ->
                     // This method can be called from shortcut (Android 7.1 and above)
                     addComic()
-                R.id.refresh -> if (mFragmentRecycler != null) {
+                R.id.refresh ->
                     initiateRefresh(mSection)
-                }
             }
             true
         }
@@ -248,8 +248,9 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         CCLogger.d(TAG, "doMySearch - start searching $query")
 
         // Filtering data based on editor and newText
-        if (mFragmentRecycler != null) {
-            mFragmentRecycler!!.updateList(query)
+        val fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
+        if (fragmentRecycler != null) {
+            (fragmentRecycler as FragmentRecycler).filterData(query, mSection)
         }
     }
 
@@ -285,8 +286,9 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         super.onPause()
         CCLogger.v(TAG, "onPause")
         // Stop animation
-        if (mFragmentRecycler != null && mFragmentRecycler!!.isRefreshing) {
-            mFragmentRecycler!!.isRefreshing = false
+        val fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
+        if (fragmentRecycler != null && (fragmentRecycler as FragmentRecycler).isRefreshing) {
+            fragmentRecycler.isRefreshing = false
         }
     }
 
@@ -374,8 +376,9 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         }
 
         // Set search animation on UI
-        if (mFragmentRecycler != null && !shouldSetRefresh) {
-            mFragmentRecycler!!.isRefreshing = false
+        val fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
+        if (fragmentRecycler != null && !shouldSetRefresh) {
+            (fragmentRecycler as FragmentRecycler).isRefreshing = false
         }
     }
 
@@ -429,8 +432,9 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         startService(intent)
 
         // Update refresh spinner
-        if (mFragmentRecycler != null && mFragmentRecycler!!.isRefreshing) {
-            mFragmentRecycler!!.isRefreshing = false
+        val fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
+        if (fragmentRecycler != null && (fragmentRecycler as FragmentRecycler).isRefreshing) {
+            fragmentRecycler.isRefreshing = false
         }
     }
 
@@ -491,8 +495,14 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         when (mSection) {
             Constants.Sections.FAVORITE, Constants.Sections.CART, Constants.Sections.PANINI, Constants.Sections.BONELLI, Constants.Sections.RW, Constants.Sections.STAR -> {
                 // Update the main content by replacing fragments
-                mFragmentRecycler = FragmentRecycler.newInstance(section)
-                supportFragmentManager.beginTransaction().replace(R.id.container, mFragmentRecycler).commit()
+                var fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
+                CCLogger.v(TAG, "selectItem - Calling fragment $fragmentRecycler")
+                if (fragmentRecycler == null) {
+                    fragmentRecycler = FragmentRecycler.newInstance(section)
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragmentRecycler, FRAGMENT_TAG).commit()
+                } else {
+                    (fragmentRecycler as FragmentRecycler).filterData(null, mSection)
+                }
             }
             Constants.Sections.SETTINGS -> {
                 // Open settings
@@ -508,8 +518,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
             Constants.Sections.INFO -> {
                 // Open info dialog with custom view
                 alert {
-                    negativeButton(R.string.dialog_confirm_button) {
-                        dialog -> dialog.dismiss()
+                    negativeButton(R.string.dialog_confirm_button) { dialog ->
+                        dialog.dismiss()
                     }
 
                     customView = layoutInflater.inflate(R.layout.dialog_info, null)
@@ -549,7 +559,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     titleResource = R.string.app_name
                     messageResource = R.string.dialog_rate_text
 
-                    positiveButton(R.string.dialog_rate_button) { dialog -> dialog.dismiss()
+                    positiveButton(R.string.dialog_rate_button) { dialog ->
+                        dialog.dismiss()
                         startActivity(Intent(Intent.ACTION_VIEW,
                                 Uri.parse("market://details?id=$packageName")))
                     }
