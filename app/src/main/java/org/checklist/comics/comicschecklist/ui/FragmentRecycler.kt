@@ -192,12 +192,8 @@ class FragmentRecycler : Fragment() {
      * Method used to filter data from DB.
      */
     fun filterData(text: String?, editor: Constants.Sections) {
-        if (text == null) {
-            when (editor) {
-                Constants.Sections.FAVORITE -> CCApp.instance.repository.getFavoriteComics()
-                Constants.Sections.CART -> CCApp.instance.repository.getWishlistComics()
-                else -> CCApp.instance.repository.filterComics(editor.sectionName)
-            }
+        if (text == null || text.isEmpty()) {
+            CCApp.instance.repository.filterComics(editor)
         } else {
             CCApp.instance.repository.filterComics(editor.sectionName, text)
         }
