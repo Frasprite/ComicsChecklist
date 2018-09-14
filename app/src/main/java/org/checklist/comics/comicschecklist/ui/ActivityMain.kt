@@ -31,10 +31,12 @@ import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.service.Message
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.service.ServiceEvents
+import org.checklist.comics.comicschecklist.util.Filter
 
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
+import kotlin.properties.Delegates
 
 /**
  * An activity representing a list of Comics. This activity
@@ -57,8 +59,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device
     private var mTwoPane: Boolean = false
 
-    private val FRAGMENT_TAG = "FragmentRecycler"
-    // TODO on rotation fragment show favorite, should be fixed
+    private val mFragmentTag = "FragmentRecycler"
 
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
@@ -66,7 +67,14 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
     private lateinit var mDrawerTitle: CharSequence
 
-    private var mSection: Constants.Sections = Constants.Sections.FAVORITE
+    private var mSection: Constants.Sections by Delegates.observable(Constants.Sections.FAVORITE) { _, old, new ->
+        // Enable swipe to refresh on fragment
+        CCLogger.v(TAG, "mSection is changing from $old to $new")
+        val fragmentRecycler = supportFragmentManager.findFragmentByTag(mFragmentTag)
+        if (fragmentRecycler != null) {
+            (fragmentRecycler as FragmentRecycler).enableSwipeToRefresh(new)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,7 +131,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     // This method can be called from shortcut (Android 7.1 and above)
                     addComic()
                 R.id.refresh ->
-                    initiateRefresh(mSection)
+                    initiateRefresh()
             }
             true
         }
@@ -247,20 +255,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     private fun doMySearch(query: String) {
         CCLogger.d(TAG, "doMySearch - start searching $query")
 
-        // Filtering data based on editor and newText
-        val fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
-        if (fragmentRecycler != null) {
-            (fragmentRecycler as FragmentRecycler).filterData(query, mSection)
-        }
-    }
-
-    /**
-     * @see android.app.Activity.onStart
-     */
-    override fun onStart() {
-        super.onStart()
-        CCLogger.v(TAG, "onStart")
-        initVersionInfo()
+        CCApp.instance.repository.filterComics(Filter(mSection, query))
     }
 
     override fun onResume() {
@@ -280,16 +275,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         mNavigationView.menu.findItem(R.id.list_star).isVisible = editorSet.contains(Constants.Sections.STAR.code.toString())
         mNavigationView.menu.findItem(R.id.list_bonelli).isVisible = editorSet.contains(Constants.Sections.BONELLI.code.toString())
         mNavigationView.menu.findItem(R.id.list_rw).isVisible = editorSet.contains(Constants.Sections.RW.code.toString())
-    }
 
-    override fun onPause() {
-        super.onPause()
-        CCLogger.v(TAG, "onPause")
-        // Stop animation
-        val fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
-        if (fragmentRecycler != null && (fragmentRecycler as FragmentRecycler).isRefreshing) {
-            fragmentRecycler.isRefreshing = false
-        }
+        initVersionInfo()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -362,11 +349,9 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
      * @param currentEditor the editor searched
      */
     private fun inspectResultCode(result: Int, currentEditor: String?) {
-        var shouldSetRefresh = false
         when (result) {
             Constants.RESULT_START -> {
                 toast(currentEditor!! + getString(R.string.search_started))
-                shouldSetRefresh = true
             }
             Constants.RESULT_FINISHED -> toast(resources.getString(R.string.search_completed))
             Constants.RESULT_EDITOR_FINISHED -> toast(currentEditor!! + resources.getString(R.string.search_editor_completed))
@@ -374,23 +359,16 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
             Constants.RESULT_NOT_CONNECTED -> toast(resources.getString(R.string.toast_no_connection))
             Constants.RESULT_DESTROYED -> CCLogger.i(TAG, "Service destroyed")
         }
-
-        // Set search animation on UI
-        val fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
-        if (fragmentRecycler != null && !shouldSetRefresh) {
-            (fragmentRecycler as FragmentRecycler).isRefreshing = false
-        }
     }
 
     /**
      * By abstracting the refresh process to a single method, the app allows both the
      * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
-     * @param mEditor the editor picked by user
      */
-    fun initiateRefresh(mEditor: Constants.Sections) {
-        CCLogger.i(TAG, "initiateRefresh - start for editor $mEditor")
+    fun initiateRefresh() {
+        CCLogger.i(TAG, "initiateRefresh - start for editor $mSection")
 
-        if (mEditor == Constants.Sections.FAVORITE || mEditor == Constants.Sections.CART) {
+        if (mSection == Constants.Sections.FAVORITE || mSection == Constants.Sections.CART) {
             alert {
                 titleResource = R.string.dialog_pick_editor_title
 
@@ -416,7 +394,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                 }
             }.show()
         } else {
-            startRefresh(mEditor)
+            startRefresh(mSection)
         }
     }
 
@@ -430,12 +408,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         intent.putExtra(Constants.ARG_EDITOR, editor)
         intent.putExtra(Constants.MANUAL_SEARCH, true)
         startService(intent)
-
-        // Update refresh spinner
-        val fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
-        if (fragmentRecycler != null && (fragmentRecycler as FragmentRecycler).isRefreshing) {
-            fragmentRecycler.isRefreshing = false
-        }
     }
 
     /**
@@ -495,13 +467,13 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         when (mSection) {
             Constants.Sections.FAVORITE, Constants.Sections.CART, Constants.Sections.PANINI, Constants.Sections.BONELLI, Constants.Sections.RW, Constants.Sections.STAR -> {
                 // Update the main content by replacing fragments
-                var fragmentRecycler = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
+                var fragmentRecycler = supportFragmentManager.findFragmentByTag(mFragmentTag)
                 CCLogger.v(TAG, "selectItem - Calling fragment $fragmentRecycler")
                 if (fragmentRecycler == null) {
                     fragmentRecycler = FragmentRecycler.newInstance(section)
-                    supportFragmentManager.beginTransaction().replace(R.id.container, fragmentRecycler, FRAGMENT_TAG).commit()
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragmentRecycler, mFragmentTag).commit()
                 } else {
-                    (fragmentRecycler as FragmentRecycler).filterData(editor = mSection)
+                    CCApp.instance.repository.filterComics(Filter(sections = mSection))
                 }
             }
             Constants.Sections.SETTINGS -> {
@@ -592,10 +564,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         CCLogger.d(TAG, "onNavigationItemSelected - start " + item.title)
 
         when (item.itemId) {
-            R.id.list_favorite -> {
-                selectItem(Constants.Sections.FAVORITE)
-                return true
-            }
             R.id.list_cart -> {
                 selectItem(Constants.Sections.CART)
                 return true

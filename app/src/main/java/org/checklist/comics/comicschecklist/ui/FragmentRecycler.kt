@@ -21,6 +21,8 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBinding
 import org.checklist.comics.comicschecklist.widget.WidgetService
 import org.checklist.comics.comicschecklist.log.CCLogger
+import org.checklist.comics.comicschecklist.service.Message
+import org.checklist.comics.comicschecklist.service.ServiceEvents
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.util.Filter
 import org.checklist.comics.comicschecklist.viewmodel.ComicListViewModel
@@ -64,13 +66,27 @@ class FragmentRecycler : Fragment() {
      *
      * @see android.support.v4.widget.SwipeRefreshLayout.setRefreshing
      */
-    var isRefreshing: Boolean
+    private var isRefreshing: Boolean
         get() = swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing
         set(refreshing) {
-            if (swipeRefreshLayout != null) {
-                swipeRefreshLayout.isRefreshing = refreshing
+            activity?.runOnUiThread {
+                if (swipeRefreshLayout != null) {
+                    swipeRefreshLayout.isRefreshing = refreshing
+                }
             }
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Listen for MessageEvents only
+        ServiceEvents.listen(Message::class.java).subscribe {
+            isRefreshing = when (it.result) {
+                Constants.RESULT_START -> true
+                else -> false
+            }
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         CCLogger.d(TAG, "onCreateView - start")
@@ -118,11 +134,7 @@ class FragmentRecycler : Fragment() {
             itemTouchHelper.attachToRecyclerView(recyclerView)
         }
 
-        // Enable swipe to refresh if we are on other categories
-        if (editor == Constants.Sections.FAVORITE || editor == Constants.Sections.CART) {
-            CCLogger.v(TAG, "onViewCreated - Locking swipe to refresh")
-            swipeRefreshLayout.isEnabled = false
-        }
+        enableSwipeToRefresh(editor)
 
         // Set color of progress view
         swipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent)
@@ -137,7 +149,7 @@ class FragmentRecycler : Fragment() {
           refreshes the content. Call the same method in response to the Refresh action from the
           action bar.
          */
-        setOnRefreshListener { (activity as ActivityMain).initiateRefresh(editor) }
+        setOnRefreshListener { (activity as ActivityMain).initiateRefresh() }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -145,6 +157,12 @@ class FragmentRecycler : Fragment() {
         val viewModel = ViewModelProviders.of(this).get(ComicListViewModel::class.java)
 
         subscribeUi(viewModel = viewModel, editor = arguments!!.getSerializable(Constants.ARG_EDITOR) as Constants.Sections)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Stop animation
+        isRefreshing = false
     }
 
     /**
@@ -173,7 +191,7 @@ class FragmentRecycler : Fragment() {
     private fun subscribeUi(viewModel: ComicListViewModel, text: String = "", editor: Constants.Sections) {
         CCLogger.v(TAG, "subscribeUi - Text $text and editor $editor")
 
-        filterData(text, editor)
+        CCApp.instance.repository.filterComics(Filter(editor, text))
 
         viewModel.comics.observe(this, Observer<List<ComicEntity>> {
             myComics ->
@@ -187,14 +205,6 @@ class FragmentRecycler : Fragment() {
             // sync.
             mBinding!!.executePendingBindings()
         })
-    }
-
-    /**
-     * Method used to filter data from DB.
-     */
-    fun filterData(text: String = "", editor: Constants.Sections) {
-        val filter = Filter(editor, text)
-        CCApp.instance.repository.filterComics(filter)
     }
 
     /**
@@ -272,6 +282,12 @@ class FragmentRecycler : Fragment() {
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(listener)
         }
+    }
+
+    fun enableSwipeToRefresh(editor: Constants.Sections) {
+        CCLogger.v(TAG, "enableSwipeToRefresh - Checking if swipe to refresh must be locked for $editor")
+        // Enable swipe to refresh if we are on other categories
+        swipeRefreshLayout?.isEnabled = !(editor == Constants.Sections.FAVORITE || editor == Constants.Sections.CART)
     }
 
     companion object {
