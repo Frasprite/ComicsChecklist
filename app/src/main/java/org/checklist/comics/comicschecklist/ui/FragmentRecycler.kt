@@ -22,6 +22,7 @@ import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBind
 import org.checklist.comics.comicschecklist.widget.WidgetService
 import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.util.Constants
+import org.checklist.comics.comicschecklist.util.Filter
 import org.checklist.comics.comicschecklist.viewmodel.ComicListViewModel
 
 import org.jetbrains.anko.doAsync
@@ -143,7 +144,7 @@ class FragmentRecycler : Fragment() {
         super.onActivityCreated(savedInstanceState)
         val viewModel = ViewModelProviders.of(this).get(ComicListViewModel::class.java)
 
-        subscribeUi(viewModel, null, arguments!!.getSerializable(Constants.ARG_EDITOR) as Constants.Sections)
+        subscribeUi(viewModel = viewModel, editor = arguments!!.getSerializable(Constants.ARG_EDITOR) as Constants.Sections)
     }
 
     /**
@@ -169,7 +170,7 @@ class FragmentRecycler : Fragment() {
      * @param viewModel the view model which store and manage the data to show
      * @param text the part of text to search on database
      */
-    private fun subscribeUi(viewModel: ComicListViewModel, text: String?, editor: Constants.Sections) {
+    private fun subscribeUi(viewModel: ComicListViewModel, text: String = "", editor: Constants.Sections) {
         CCLogger.v(TAG, "subscribeUi - Text $text and editor $editor")
 
         filterData(text, editor)
@@ -191,12 +192,9 @@ class FragmentRecycler : Fragment() {
     /**
      * Method used to filter data from DB.
      */
-    fun filterData(text: String?, editor: Constants.Sections) {
-        if (text == null || text.isEmpty()) {
-            CCApp.instance.repository.filterComics(editor)
-        } else {
-            CCApp.instance.repository.filterComics(editor.sectionName, text)
-        }
+    fun filterData(text: String = "", editor: Constants.Sections) {
+        val filter = Filter(editor, text)
+        CCApp.instance.repository.filterComics(filter)
     }
 
     /**

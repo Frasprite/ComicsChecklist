@@ -501,7 +501,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     fragmentRecycler = FragmentRecycler.newInstance(section)
                     supportFragmentManager.beginTransaction().replace(R.id.container, fragmentRecycler, FRAGMENT_TAG).commit()
                 } else {
-                    (fragmentRecycler as FragmentRecycler).filterData(null, mSection)
+                    (fragmentRecycler as FragmentRecycler).filterData(editor = mSection)
                 }
             }
             Constants.Sections.SETTINGS -> {
