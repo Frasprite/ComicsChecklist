@@ -40,37 +40,27 @@ import java.util.HashSet
 class DownloadService : IntentService(TAG) {
 
     override fun onHandleIntent(intent: Intent?) {
-        // Checking first if we are connected to the web
-        val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetworkInfo
-        val isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting
 
-        if (!isConnected) {
+        if (!checkConnection(this.applicationContext)) {
             publishResults(Constants.RESULT_NOT_CONNECTED, "noEditor")
             CCNotificationManager.createNotification(this, resources.getString(R.string.toast_no_connection), false)
             return
         }
 
-        // Loading frequency and flag if user want to do manual search
-        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
-        val syncPref = preferenceHelper[Constants.PREF_SYNC_FREQUENCY, "3"]
-        val frequency = Integer.parseInt(syncPref)
         val manualSearch = intent!!.getBooleanExtra(Constants.MANUAL_SEARCH, false)
 
-        CCLogger.d(TAG, "onHandleIntent - Refresh comics every $frequency (-1 stands for never); should use manual search : $manualSearch")
+        CCLogger.d(TAG, "onHandleIntent - Should use manual search : $manualSearch")
 
         // Use this code for screenshot
         //myParser.startParseFreeComics();
 
-        if (frequency > -1 && !manualSearch) {
-            CCLogger.i(TAG, "onHandleIntent - Automatic search launched")
-            automaticSearch(frequency)
-        } else {
+        if (manualSearch && intent.hasExtra(Constants.ARG_EDITOR)) {
             CCLogger.i(TAG, "onHandleIntent - Manual search needed")
-            if (intent.hasExtra(Constants.ARG_EDITOR)) {
-                val editor = intent.getSerializableExtra(Constants.ARG_EDITOR) as Constants.Sections
-                manualSearch(editor)
-            }
+            val editor = intent.getSerializableExtra(Constants.ARG_EDITOR) as Constants.Sections
+            manualSearch(editor)
+        } else {
+            CCLogger.i(TAG, "onHandleIntent - Automatic search launched")
+            automaticSearch()
         }
 
         // Check if this is the fist creation of Room database
@@ -92,11 +82,16 @@ class DownloadService : IntentService(TAG) {
 
     /**
      * Method which will launch automatic search of contents.
-     * @param frequency the time passed between last search
+     *
+     * This will search the frequency of updates and if it is >= -1, will launch search of new entries.
      */
-    private fun automaticSearch(frequency: Int) {
+    private fun automaticSearch() {
         val preferenceHelper = PreferenceHelper.defaultPrefs(this)
-        val notificationPref = preferenceHelper[Constants.PREF_SEARCH_NOTIFICATION, true]
+
+        val syncPref = preferenceHelper[Constants.PREF_SYNC_FREQUENCY, "3"]
+        val frequency = Integer.parseInt(syncPref)
+
+        if (frequency <= -1) return
 
         // Loading user editor preference
         val rawArray = resources.getStringArray(R.array.pref_basic_editors)
@@ -110,15 +105,12 @@ class DownloadService : IntentService(TAG) {
             CCLogger.d(TAG, "automaticSearch - Current editor $currentSection key of last scan $value")
             // Check if editor is desired by user and if last day of scan has passed limits
             if (calculateDayDifference(value) >= frequency && editorSet.contains(currentSection.code.toString())) {
-                publishResults(Constants.RESULT_START, currentSection.title)
-                notificationPref?.let { searchComics(it, currentSection.title, currentSection) }
-
-                publishResults(Constants.RESULT_FINISHED, "noEditor")
-                if (notificationPref!!) {
-                    CCNotificationManager.deleteNotification(this)
-                }
+                searchData(currentSection)
             }
         }
+
+        // Update widget as well
+        WidgetService.updateWidget(this)
     }
 
     /**
@@ -126,70 +118,81 @@ class DownloadService : IntentService(TAG) {
      * @param editor the editor to search
      */
     private fun manualSearch(editor: Constants.Sections) {
-        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
-        val notificationPref = preferenceHelper[Constants.PREF_SEARCH_NOTIFICATION, true]
         CCLogger.i(TAG, "manualSearch - Manual search for editor " + editor.toString())
 
-        publishResults(Constants.RESULT_START, editor.title)
-        notificationPref?.let { searchComics(it, editor.title, editor) }
+        searchData(editor)
 
-        // Update last scan for editor on shared preference
-        val today = System.currentTimeMillis()
-        when (editor) {
-            Constants.Sections.PANINI -> preferenceHelper[Constants.PREF_PANINI_LAST_SCAN] = today
-            Constants.Sections.BONELLI -> preferenceHelper[Constants.PREF_BONELLI_LAST_SCAN] = today
-            Constants.Sections.STAR -> preferenceHelper[Constants.PREF_STAR_LAST_SCAN] = today
-            Constants.Sections.RW -> preferenceHelper[Constants.PREF_RW_LAST_SCAN] = today
-            else -> CCLogger.w(TAG, "Can't search data for given section ${editor.title}")
-        }
-
-        publishResults(Constants.RESULT_FINISHED, "noEditor")
-        if (notificationPref!!) {
-            CCNotificationManager.deleteNotification(this)
-            // Favorite data may have changed, update widget as well
-            WidgetService.updateWidget(this)
-        }
+        // Update widget as well
+        WidgetService.updateWidget(this)
     }
 
     /**
      * Start searching for specified comics editor.
      *
-     * @param notificationPref boolean indicating if notification are desired
-     * @param editorTitle editor personal text
      * @param editor editor to search
      */
-    private fun searchComics(notificationPref: Boolean, editorTitle: String, editor: Constants.Sections) {
-        if (notificationPref) {
-            CCNotificationManager.createNotification(this, editorTitle + resources.getString(R.string.search_started), true)
-        }
+    private fun searchData(editor: Constants.Sections) {
+        publishResults(Constants.RESULT_START, editor.title)
+
+        CCNotificationManager.createNotification(this, editor.title + resources.getString(R.string.search_started), true)
 
         // Select editor
-        var comicEntities: ArrayList<ComicEntity>? = null
+        val comicEntities: ArrayList<ComicEntity> = ArrayList()
         when (editor) {
-            Constants.Sections.PANINI -> comicEntities = ParserPanini().initParser()
-            Constants.Sections.STAR -> comicEntities = ParserStar().initParser()
-            Constants.Sections.BONELLI -> comicEntities = ParserBonelli().initParser()
-            Constants.Sections.RW -> comicEntities = ParserRW().initParser()
+            Constants.Sections.PANINI -> comicEntities.addAll(ParserPanini().initParser())
+            Constants.Sections.STAR -> comicEntities.addAll(ParserStar().initParser())
+            Constants.Sections.BONELLI -> comicEntities.addAll(ParserBonelli().initParser())
+            Constants.Sections.RW -> comicEntities.addAll(ParserRW().initParser())
             else -> CCLogger.w(TAG, "Can't search data for given section ${editor.title}")
         }
 
-        // See result
-        if (comicEntities == null || comicEntities.size == 0) {
-            publishResults(Constants.RESULT_CANCELED, editorTitle)
-            if (notificationPref) {
-                CCNotificationManager.updateNotification(this, editorTitle + resources.getString(R.string.search_failed), false)
-            }
-        } else {
-            // Inserting found comics into database
-            (this.applicationContext as CCApp).repository.insertComics(comicEntities)
+        // Check if there are favorite and wishlist comics for current editor
+        val checkedComicList = (this.applicationContext as CCApp).repository.loadCheckedComicsByEditorSync(editor.sectionName)
+        CCLogger.v(TAG, "searchData - Found ${checkedComicList.size} which are added into wishlist / favorite")
 
-            publishResults(Constants.RESULT_EDITOR_FINISHED, editorTitle)
-            if (notificationPref) {
-                CCNotificationManager.updateNotification(this, editorTitle + resources.getString(R.string.search_editor_completed), true)
+        if (checkedComicList.size > 0) {
+            filterComics(comicEntities, checkedComicList)
+        }
+
+        if (comicEntities.size > 0) {
+            (this.applicationContext as CCApp).repository.insertComics(comicEntities)
+        }
+
+        publishResults(Constants.RESULT_EDITOR_FINISHED, editor.title)
+        CCNotificationManager.updateNotification(this, editor.title + resources.getString(R.string.search_editor_completed), true)
+
+        ParserLog.printReport()
+
+        CCNotificationManager.deleteNotification(this)
+
+        // Update last scan for editor on shared preference
+        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
+        when (editor) {
+            Constants.Sections.PANINI -> preferenceHelper[Constants.PREF_PANINI_LAST_SCAN] = System.currentTimeMillis()
+            Constants.Sections.BONELLI -> preferenceHelper[Constants.PREF_BONELLI_LAST_SCAN] = System.currentTimeMillis()
+            Constants.Sections.STAR -> preferenceHelper[Constants.PREF_STAR_LAST_SCAN] = System.currentTimeMillis()
+            Constants.Sections.RW -> preferenceHelper[Constants.PREF_RW_LAST_SCAN] = System.currentTimeMillis()
+            else -> CCLogger.w(TAG, "Can't search data for given section ${editor.title}")
+        }
+    }
+
+    /**
+     * Method used to filter favorite and wishlist listed comics (in order to avoid any override or unwanted remove).
+     * @param comicEntities the list to filter
+     * @param checkedComicList the list of comics to subtract from target list
+     */
+    private fun filterComics(comicEntities: ArrayList<ComicEntity>, checkedComicList: MutableList<ComicEntity>) {
+        CCLogger.d(TAG, "filterComics - Total comics before filter = ${comicEntities.size}")
+
+        for (checkedComic in checkedComicList) {
+            for (comic in ArrayList(comicEntities)) {
+                if (comic.name == checkedComic.name && comic.releaseDate == checkedComic.releaseDate) {
+                    comicEntities.remove(comic)
+                }
             }
         }
 
-        ParserLog.printReport()
+        CCLogger.d(TAG, "filterComics - Total comics after filter = ${comicEntities.size}")
     }
 
     /**
@@ -267,6 +270,13 @@ class DownloadService : IntentService(TAG) {
             aMap[Constants.Sections.BONELLI] = Constants.PREF_BONELLI_LAST_SCAN
             aMap[Constants.Sections.STAR] = Constants.PREF_STAR_LAST_SCAN
             mEditorMap = Collections.unmodifiableMap<Constants.Sections, String>(aMap)
+        }
+
+        fun checkConnection(applicationContext: Context): Boolean {
+            // Checking first if we are connected to the web
+            val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetworkInfo
+            return activeNetwork != null && activeNetwork.isConnectedOrConnecting
         }
     }
 }

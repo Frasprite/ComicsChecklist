@@ -9,6 +9,10 @@ import android.view.MenuItem
 import kotlinx.android.synthetic.main.app_bar_detail.*
 
 import org.checklist.comics.comicschecklist.R
+import org.checklist.comics.comicschecklist.log.CCLogger
+import org.checklist.comics.comicschecklist.service.DownloadService
+import org.checklist.comics.comicschecklist.service.Message
+import org.checklist.comics.comicschecklist.service.ServiceEvents
 import org.checklist.comics.comicschecklist.util.Constants
 
 /**
@@ -48,6 +52,11 @@ class ActivityDetail : AppCompatActivity() {
             fragment.arguments = arguments
             supportFragmentManager.beginTransaction().add(R.id.comicDetailContainer, fragment).commit()
         }
+
+        // Listen for MessageEvents only
+        ServiceEvents.listen(Message::class.java).subscribe {
+            inspectResultCode(it.result, it.editor)
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
@@ -63,5 +72,25 @@ class ActivityDetail : AppCompatActivity() {
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    /**
+     * Method used to inspect messages from [DownloadService].
+     * @param result the result indicating download status
+     * @param currentEditor the editor searched
+     */
+    private fun inspectResultCode(result: Int, currentEditor: String?) {
+        CCLogger.v(TAG, "inspectResultCode - Current editor $currentEditor")
+        when (result) {
+            Constants.RESULT_DESTROYED -> {
+                // Close activity details due to entity primary key (could be changed)
+                CCLogger.i(TAG, "inspectResultCode - Service destroyed, closing detail activity")
+                this.finish()
+            }
+        }
+    }
+
+    companion object {
+        private val TAG = ActivityDetail::class.java.simpleName
     }
 }

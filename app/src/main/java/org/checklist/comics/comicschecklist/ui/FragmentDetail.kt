@@ -73,7 +73,11 @@ class FragmentDetail : Fragment(), View.OnClickListener {
      * @param model the view model which store and manage the data to show
      */
     private fun subscribeToModel(model: ComicViewModel) {
-        model.observableComic.observe(this, Observer<ComicEntity> { model.setComic(it!!) })
+        model.observableComic.observe(this, Observer<ComicEntity> {
+            if (it != null) {
+                model.setComic(it)
+            }
+        })
     }
 
     override fun onClick(view: View) {

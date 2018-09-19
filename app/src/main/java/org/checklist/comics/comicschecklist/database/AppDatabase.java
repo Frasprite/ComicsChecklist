@@ -15,7 +15,6 @@ import android.support.annotation.VisibleForTesting;
 import org.checklist.comics.comicschecklist.database.converter.DateConverter;
 import org.checklist.comics.comicschecklist.database.dao.ComicDao;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
-import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.Constants;
 
@@ -23,12 +22,10 @@ import org.checklist.comics.comicschecklist.util.Constants;
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
 
-    private static final String TAG = AppDatabase.class.getSimpleName();
-
     private static AppDatabase sInstance;
 
     @VisibleForTesting
-    public static final String DATABASE_NAME = "comics-db";
+    private static final String DATABASE_NAME = "comics-db";
 
     public abstract ComicDao comicDao();
 
@@ -52,7 +49,6 @@ public abstract class AppDatabase extends RoomDatabase {
                     @Override
                     public void onCreate(@NonNull SupportSQLiteDatabase db) {
                         super.onCreate(db);
-                        CCLogger.INSTANCE.v(TAG, "onCreate - Creating database");
 
                         // Populate database when it is created, using an Intent service
                         Intent intent = new Intent(appContext, DownloadService.class);

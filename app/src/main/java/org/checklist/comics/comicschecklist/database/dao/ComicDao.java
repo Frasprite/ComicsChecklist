@@ -56,6 +56,9 @@ public interface ComicDao {
     @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     List<ComicEntity> loadComicsByEditorSync(String editorName);
 
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editor AND (isOnCart = 1 OR isFavorite = 1)")
+    List<ComicEntity> loadCheckedComicsByEditorSync(String editor);
+
     @Query("SELECT COUNT(id) id, isFavorite, release_date FROM comics WHERE isFavorite = 1 AND release_date >= :time")
     int checkFavoritesRelease(long time);
 

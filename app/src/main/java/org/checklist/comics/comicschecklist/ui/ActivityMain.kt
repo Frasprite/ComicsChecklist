@@ -60,6 +60,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     private var mTwoPane: Boolean = false
 
     private val mFragmentTag = "FragmentRecycler"
+    private val mFragmentDetailTag = "FragmentDetail"
 
     private lateinit var mDrawerLayout: DrawerLayout
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
@@ -353,11 +354,17 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
             Constants.RESULT_START -> {
                 toast(currentEditor!! + getString(R.string.search_started))
             }
-            Constants.RESULT_FINISHED -> toast(resources.getString(R.string.search_completed))
             Constants.RESULT_EDITOR_FINISHED -> toast(currentEditor!! + resources.getString(R.string.search_editor_completed))
-            Constants.RESULT_CANCELED -> toast(currentEditor!! + resources.getString(R.string.search_failed))
             Constants.RESULT_NOT_CONNECTED -> toast(resources.getString(R.string.toast_no_connection))
-            Constants.RESULT_DESTROYED -> CCLogger.i(TAG, "Service destroyed")
+            Constants.RESULT_DESTROYED -> {
+                CCLogger.i(TAG, "Service destroyed")
+                // Reset fragment detail due to entity primary key
+                if (mTwoPane) {
+                    val fragment = supportFragmentManager.findFragmentByTag(mFragmentDetailTag)
+                    if (fragment != null)
+                        supportFragmentManager.beginTransaction().remove(fragment).commit()
+                }
+            }
         }
     }
 
@@ -433,7 +440,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     arguments.putInt(Constants.ARG_COMIC_ID, comic.id)
                     val mDetailFragment = FragmentDetail()
                     mDetailFragment.arguments = arguments
-                    supportFragmentManager.beginTransaction().replace(R.id.comicDetailContainer, mDetailFragment).commit()
+                    supportFragmentManager.beginTransaction().replace(R.id.comicDetailContainer, mDetailFragment, mFragmentDetailTag).commit()
                 } else {
                     CCLogger.d(TAG, "launchDetailView - Launching detail view in SINGLE PANE mode")
                     // In single-pane mode, simply start the detail activity

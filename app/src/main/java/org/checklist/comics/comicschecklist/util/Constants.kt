@@ -27,8 +27,6 @@ object Constants {
     const val CREATE_DATABASE = "create_database"
 
     const val RESULT_START = 0
-    const val RESULT_CANCELED = 1
-    const val RESULT_FINISHED = 2
     const val RESULT_DESTROYED = 3
     const val RESULT_NOT_CONNECTED = 4
     const val RESULT_EDITOR_FINISHED = 5

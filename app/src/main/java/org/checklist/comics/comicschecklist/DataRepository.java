@@ -98,6 +98,10 @@ public class DataRepository {
         return mDatabase.comicDao().loadComicsByEditorSync(editor);
     }
 
+    public List<ComicEntity> loadCheckedComicsByEditorSync(String editor) {
+        return mDatabase.comicDao().loadCheckedComicsByEditorSync(editor);
+    }
+
     public void updateFavorite(int comicId, Boolean flag) {
         mDatabase.comicDao().updateFavorite(comicId, flag);
     }
