@@ -67,11 +67,6 @@
 
     <string name="dialog_delete_content_title">Scegli un editore</string>
     <string name="dialog_last_sync_title">Ultime sincronizzazioni</string>
-    <string name="dialog_context_action">Scegli cosa fare</string>
-    <string-array name="dialog_available_actions">
-        <item>Togli dalla lista</item>
-        <item>Cancella tutta la lista</item>
-    </string-array>
     <string name="dialog_pick_editor_title">Scegli un editore</string>
 
     <!-- Navigation drawer text -->
@@ -102,7 +97,6 @@
     <string name="menu_comic_site">Sito web</string>
 	<string name="menu_favorites">Aggiungi ai preferiti</string>
     <string name="menu_wishlist">Da comprare</string>
-    <string name="menu_layout">Layout lista</string>
 
     <!-- Search text -->
     <string name="search_hint">Cerca un fumetto</string>
