@@ -4,7 +4,8 @@ Comics Checklist
 This project is my first Android application published on Google Play store.<br>
 The idea behind this app is to provide a list of comics release (as far as possible): it simply scrape web pages for comics data.
 
-You will find some code about:
+You will find some code about listed libraries / framework / language:
+* [Kotlin](https://kotlinlang.org/)
 * [Room](https://developer.android.com/topic/libraries/architecture/room.html)
 * [ViewModels](https://developer.android.com/reference/android/arch/lifecycle/ViewModel.html)
 * [LiveData](https://developer.android.com/reference/android/arch/lifecycle/LiveData.html)
@@ -12,6 +13,10 @@ You will find some code about:
 * [jsoup](https://jsoup.org/)
 * [AppIntro](https://github.com/apl-devs/AppIntro)
 * [Android-job](https://github.com/evernote/android-job)
+* [Joda-Time](http://www.joda.org/joda-time/)
+* Reactive Extensions: [RxJava](https://github.com/ReactiveX/RxJava) and [RxAndroid](https://github.com/ReactiveX/RxAndroid)
+* [DatePicker Timeline](https://github.com/badoualy/datepicker-timeline)
+* [Transitions Everywhere](https://github.com/andkulikov/Transitions-Everywhere)
 
 ### Features
 
@@ -42,7 +47,7 @@ This is a description of detailed operation developed so far:
 * The app use a service [IntentService](https://developer.android.com/reference/android/app/IntentService.html) to search data from the web.
 * All data is stocked on SQL database (using *Room*, from [Android Architecture Components](https://developer.android.com/topic/libraries/architecture/index.html)).
 
-#### Pattern used so far (TBA)
+#### Pattern used so far
 The app uses:
 * Model-View-ViewModel (MVVM) pattern for the presentation layer: [MVVM](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel).
 * [Repository pattern](https://medium.com/corebuild-software/android-repository-pattern-using-rx-room-bac6c65d7385), which handle all communications with DAO.

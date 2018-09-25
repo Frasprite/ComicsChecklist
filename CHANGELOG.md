@@ -13,9 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Find new editors ?
 - Make some advertisement on forums (http://www.dcleaguers.it/)
 
-## [2.2] - 03/09/2018
+## [2.2] - 27/09/2018
 ### Added
 - Add more Unit test & Android test
+- Bug fix
 
 ### Changed
 - Switch to [Kotlin](https://developer.android.com/kotlin/)
