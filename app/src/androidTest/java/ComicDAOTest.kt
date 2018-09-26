@@ -3,9 +3,6 @@ import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.matcher.ViewMatchers.assertThat
 
-import junit.framework.Assert.assertNotNull
-import junit.framework.Assert.assertNull
-
 import org.checklist.comics.comicschecklist.DataRepository
 import org.checklist.comics.comicschecklist.database.AppDatabase
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity
@@ -14,6 +11,8 @@ import org.checklist.comics.comicschecklist.util.Constants
 import org.hamcrest.Matchers.greaterThan
 
 import org.junit.After
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 

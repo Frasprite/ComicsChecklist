@@ -13,6 +13,7 @@ import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.support.v4.widget.DrawerLayout
 import android.support.test.InstrumentationRegistry
+import android.support.test.espresso.action.ViewActions.typeText
 
 import android.view.Gravity
 
@@ -27,6 +28,14 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition
+import android.support.v7.widget.RecyclerView
+import android.support.test.espresso.matcher.ViewMatchers.withClassName
+import android.support.test.espresso.contrib.RecyclerViewActions
+import android.support.test.espresso.matcher.ViewMatchers
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.anything
+
 
 @RunWith(AndroidJUnit4::class)
 class ActivityMainTest {
@@ -81,6 +90,28 @@ class ActivityMainTest {
         val expectedNoStatisticsText = InstrumentationRegistry.getTargetContext()
                 .getString(R.string.empty_cart_list)
         onView(withId(R.id.emptyTextView)).check(matches(withText(expectedNoStatisticsText)))
+    }
+
+    @Test
+    fun scrollToBottomTest() {
+        onView(withClassName(`is`(RecyclerView::class.java.canonicalName)))
+                .perform(scrollToPosition<RecyclerView.ViewHolder>(45))
+                .check(matches(anything()))
+    }
+
+    @Test
+    fun clickItemTest() {
+        // First scroll to the position that needs to be matched and click on it.
+        onView(ViewMatchers.withId(R.id.recyclerView))
+                .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
+    }
+
+    @Test
+    fun searchTest() {
+        onView(withId(R.id.search)).perform(click())
+        onView(withId(android.support.design.R.id.search_src_text)).perform(typeText("spider"))
+        onView(ViewMatchers.withId(R.id.recyclerView))
+                .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
     }
 
 }
