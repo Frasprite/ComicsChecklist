@@ -1,7 +1,6 @@
 package org.checklist.comics.comicschecklist.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import androidx.core.content.ContextCompat
 
 import com.github.paolorotolo.appintro.AppIntro

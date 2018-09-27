@@ -63,7 +63,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
 
     // Third party libraries
-    implementation 'com.github.apl-devs:appintro:v4.2.2'
+    implementation 'com.github.apl-devs:appintro:v4.2.3'
     implementation 'org.jsoup:jsoup:1.11.2'
     implementation 'com.evernote:android-job:1.2.6'
     implementation 'joda-time:joda-time:2.10'
