@@ -12,9 +12,12 @@ android {
         targetSdkVersion 28
         versionCode 20
         versionName "2.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
+
+        // Enabling multidex support.
+        multiDexEnabled true
     }
 
     testOptions {
@@ -23,7 +26,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -44,13 +47,15 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:support-annotations:28.0.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
-    implementation "com.android.support:gridlayout-v7:28.0.0"
-    implementation "com.android.support:cardview-v7:28.0.0"
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation "androidx.gridlayout:gridlayout:1.0.0"
+    implementation "androidx.cardview:cardview:1.0.0"
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+    implementation 'androidx.preference:preference:1.0.0'
+    implementation 'com.android.support:multidex:1.0.3'
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -70,29 +75,29 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
 
     // ViewModel and LiveData
-    implementation "android.arch.lifecycle:extensions:1.1.1"
-    implementation "android.arch.lifecycle:common-java8:1.1.1"
-    kapt "android.arch.lifecycle:compiler:1.1.1"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.0.0"
+    kapt "androidx.lifecycle:lifecycle-compiler:2.0.0"
 
     // Room
-    implementation "android.arch.persistence.room:runtime:1.1.1"
+    implementation "androidx.room:room-runtime:2.0.0-rc01"
     //annotationProcessor "android.arch.persistence.room:compiler:1.1.0"
-    kapt "android.arch.persistence.room:compiler:1.1.1"
+    kapt "androidx.room:room-compiler:2.0.0-rc01"
 
     // Test stuff
     testImplementation 'junit:junit:4.12'
     // Mockito framework
-    testImplementation 'org.mockito:mockito-core:2.8.9'
+    testImplementation 'org.mockito:mockito-core:2.19.0'
     // UI test stuff
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-contrib:3.0.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.1.0-alpha4'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test:rules:1.1.0-alpha4'
 
     // Test helpers for LiveData
-    testImplementation "android.arch.core:core-testing:1.1.1"
+    testImplementation "androidx.arch.core:core-testing:2.0.0"
 
     // Test helpers for Room
-    testImplementation "android.arch.persistence.room:testing:1.1.1"
+    testImplementation "androidx.room:room-testing:2.0.0-rc01"
 }
