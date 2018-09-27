@@ -1,19 +1,19 @@
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.DrawerActions
-import android.support.test.espresso.contrib.DrawerMatchers.isClosed
-import android.support.test.espresso.contrib.NavigationViewActions
-import android.support.test.espresso.intent.Intents
-import android.support.test.espresso.intent.Intents.intended
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
-import android.support.v4.widget.DrawerLayout
-import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.contrib.DrawerActions
+import androidx.test.espresso.contrib.DrawerMatchers.isClosed
+import androidx.test.espresso.contrib.NavigationViewActions
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.Intents.intended
+import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.rule.ActivityTestRule
+import androidx.test.runner.AndroidJUnit4
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.test.InstrumentationRegistry
+import androidx.test.espresso.action.ViewActions.typeText
 
 import android.view.Gravity
 
@@ -28,11 +28,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition
-import android.support.v7.widget.RecyclerView
-import android.support.test.espresso.matcher.ViewMatchers.withClassName
-import android.support.test.espresso.contrib.RecyclerViewActions
-import android.support.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition
+import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.matcher.ViewMatchers
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.anything
 
@@ -70,9 +70,9 @@ class ActivityMainTest {
     @Throws(Exception::class)
     fun ensureDrawerLayoutTest() {
         val activity = mActivityRule.activity
-        val viewById = activity.findViewById<DrawerLayout>(R.id.drawerLayout)
+        val viewById = activity.findViewById<androidx.drawerlayout.widget.DrawerLayout>(R.id.drawerLayout)
         assertThat(viewById, notNullValue())
-        assertThat(viewById, instanceOf(DrawerLayout::class.java))
+        assertThat(viewById, instanceOf(androidx.drawerlayout.widget.DrawerLayout::class.java))
     }
 
     @Test
@@ -94,8 +94,8 @@ class ActivityMainTest {
 
     @Test
     fun scrollToBottomTest() {
-        onView(withClassName(`is`(RecyclerView::class.java.canonicalName)))
-                .perform(scrollToPosition<RecyclerView.ViewHolder>(45))
+        onView(withClassName(`is`(androidx.recyclerview.widget.RecyclerView::class.java.canonicalName)))
+                .perform(scrollToPosition<androidx.recyclerview.widget.RecyclerView.ViewHolder>(45))
                 .check(matches(anything()))
     }
 
@@ -103,15 +103,15 @@ class ActivityMainTest {
     fun clickItemTest() {
         // First scroll to the position that needs to be matched and click on it.
         onView(ViewMatchers.withId(R.id.recyclerView))
-                .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
+                .perform(RecyclerViewActions.actionOnItemAtPosition<androidx.recyclerview.widget.RecyclerView.ViewHolder>(1, click()))
     }
 
     @Test
     fun searchTest() {
         onView(withId(R.id.search)).perform(click())
-        onView(withId(android.support.design.R.id.search_src_text)).perform(typeText("spider"))
+        onView(withId(com.google.android.material.R.id.search_src_text)).perform(typeText("spider"))
         onView(ViewMatchers.withId(R.id.recyclerView))
-                .perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(0, click()))
+                .perform(RecyclerViewActions.actionOnItemAtPosition<androidx.recyclerview.widget.RecyclerView.ViewHolder>(0, click()))
     }
 
 }

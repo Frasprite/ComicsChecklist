@@ -1,7 +1,7 @@
-import android.arch.lifecycle.LiveData
-import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.matcher.ViewMatchers.assertThat
+import androidx.lifecycle.LiveData
+import androidx.room.Room
+import androidx.test.InstrumentationRegistry
+import androidx.test.espresso.matcher.ViewMatchers.assertThat
 
 import org.checklist.comics.comicschecklist.DataRepository
 import org.checklist.comics.comicschecklist.database.AppDatabase

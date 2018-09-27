@@ -1,6 +1,6 @@
 package org.checklist.comics.comicschecklist.ui
 
-import android.databinding.BindingAdapter
+import androidx.databinding.BindingAdapter
 import android.view.View
 
 @BindingAdapter("visibleGone")

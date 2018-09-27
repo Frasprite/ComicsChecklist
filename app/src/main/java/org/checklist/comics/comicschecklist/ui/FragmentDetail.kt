@@ -1,18 +1,17 @@
 package org.checklist.comics.comicschecklist.ui
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil
 import android.net.Uri
 import android.os.Bundle
 import android.provider.CalendarContract
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import kotlinx.android.synthetic.main.fragment_detail.*
+
 import org.checklist.comics.comicschecklist.CCApp
 
 import org.checklist.comics.comicschecklist.R
@@ -32,7 +31,7 @@ import org.jetbrains.anko.toast
  * in two-pane mode (on tablets) or a [ActivityDetail]
  * on handsets.
  */
-class FragmentDetail : Fragment(), View.OnClickListener {
+class FragmentDetail : androidx.fragment.app.Fragment(), View.OnClickListener {
 
     private var mBinding: FragmentDetailBinding? = null
 

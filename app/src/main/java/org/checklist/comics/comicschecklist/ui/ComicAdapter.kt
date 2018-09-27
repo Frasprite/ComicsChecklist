@@ -1,8 +1,8 @@
 package org.checklist.comics.comicschecklist.ui
 
-import android.databinding.DataBindingUtil
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.RecyclerView
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 
@@ -10,7 +10,7 @@ import org.checklist.comics.comicschecklist.R
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 import org.checklist.comics.comicschecklist.databinding.ListItemViewBinding
 
-internal class ComicAdapter internal constructor(private val mComicClickCallback: ComicClickCallback?) : RecyclerView.Adapter<ComicAdapter.ComicViewHolder>() {
+internal class ComicAdapter internal constructor(private val mComicClickCallback: ComicClickCallback?) : androidx.recyclerview.widget.RecyclerView.Adapter<ComicAdapter.ComicViewHolder>() {
 
     internal lateinit var mComicList: List<ComicEntity>
 
@@ -42,5 +42,5 @@ internal class ComicAdapter internal constructor(private val mComicClickCallback
         return mComicList.size
     }
 
-    internal class ComicViewHolder(val binding: ListItemViewBinding) : RecyclerView.ViewHolder(binding.root)
+    internal class ComicViewHolder(val binding: ListItemViewBinding) : androidx.recyclerview.widget.RecyclerView.ViewHolder(binding.root)
 }

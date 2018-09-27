@@ -1,8 +1,8 @@
 package org.checklist.comics.comicschecklist.ui
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.core.content.ContextCompat
 
 import com.github.paolorotolo.appintro.AppIntro
 import com.github.paolorotolo.appintro.AppIntroFragment
@@ -61,13 +61,13 @@ class ActivityGuide : AppIntro() {
         setZoomAnimation()
     }
 
-    override fun onSkipPressed(currentFragment: Fragment?) {
+    override fun onSkipPressed(currentFragment: androidx.fragment.app.Fragment?) {
         super.onSkipPressed(currentFragment)
         // Just close the activity
         this.finish()
     }
 
-    override fun onDonePressed(currentFragment: Fragment?) {
+    override fun onDonePressed(currentFragment: androidx.fragment.app.Fragment?) {
         super.onDonePressed(currentFragment)
         // Just close the activity
         this.finish()

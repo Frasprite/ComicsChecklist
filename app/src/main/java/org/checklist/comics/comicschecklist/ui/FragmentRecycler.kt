@@ -1,18 +1,15 @@
 package org.checklist.comics.comicschecklist.ui
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import kotlinx.android.synthetic.main.fragment_recycler_view.*
 
 import org.checklist.comics.comicschecklist.CCApp
@@ -35,17 +32,17 @@ import org.jetbrains.anko.doAsync
  * 'activated' state upon selection. This helps indicate which item is
  * currently being viewed in a [FragmentDetail].
  */
-class FragmentRecycler : Fragment() {
+class FragmentRecycler : androidx.fragment.app.Fragment() {
 
     private lateinit var mComicAdapter: ComicAdapter
     private var mBinding: FragmentRecyclerViewBinding? = null
 
     private val sItemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
             return false
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+        override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, swipeDir: Int) {
             // Remove swiped item from list
             val position = viewHolder.adapterPosition
             val comic = mComicAdapter.mComicList[position]
@@ -169,16 +166,16 @@ class FragmentRecycler : Fragment() {
      * Set the layout type of [RecyclerView].
      * @param recyclerView the current recycler view where to set layout
      */
-    private fun setRecyclerViewLayoutManager(recyclerView: RecyclerView) {
+    private fun setRecyclerViewLayoutManager(recyclerView: androidx.recyclerview.widget.RecyclerView) {
         var scrollPosition = 0
 
         // If a layout manager has already been set, get current scroll position.
         if (recyclerView.layoutManager != null) {
-            scrollPosition = (recyclerView.layoutManager as LinearLayoutManager)
+            scrollPosition = (recyclerView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager)
                     .findFirstCompletelyVisibleItemPosition()
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
         recyclerView.scrollToPosition(scrollPosition)
     }
 

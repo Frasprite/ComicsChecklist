@@ -9,16 +9,14 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.SearchView
+import com.google.android.material.navigation.NavigationView
+import androidx.core.view.GravityCompat
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 
@@ -32,8 +30,8 @@ import org.checklist.comics.comicschecklist.service.Message
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.service.ServiceEvents
 import org.checklist.comics.comicschecklist.util.Filter
-
 import org.jetbrains.anko.alert
+
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import kotlin.properties.Delegates
@@ -62,7 +60,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     private val mFragmentTag = "FragmentRecycler"
     private val mFragmentDetailTag = "FragmentDetail"
 
-    private lateinit var mDrawerLayout: DrawerLayout
+    private lateinit var mDrawerLayout: androidx.drawerlayout.widget.DrawerLayout
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
     private lateinit var mNavigationView: NavigationView
 
