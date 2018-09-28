@@ -6,9 +6,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased / To be scheduled
 - Add more animation (or magic for someone)
-- Switch to [ConstraintLayout](https://developer.android.com/reference/android/support/constraint/ConstraintLayout)
-- Update messages when comics / URL are invalid
-- Update settings (due the colors changes when we are on Samsung devices)
 - Add Android Wear feature
 - Find new editors ?
 - Make some advertisement on forums (http://www.dcleaguers.it/)
