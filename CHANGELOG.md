@@ -6,15 +6,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Unreleased / To be scheduled
 - Add more animation (or magic for someone)
-- Switch to [ConstraintLayout](https://developer.android.com/reference/android/support/constraint/ConstraintLayout)
-- Switch to [Android Architecture](https://developer.android.com/topic/libraries/architecture/)
-- Switch to [Kotlin](https://developer.android.com/kotlin/)
-- Update messages when comics / URL are invalid
-- Update settings (due the colors changes when we are on Samsung devices)
-- Add more Unit test & Android test
 - Add Android Wear feature
 - Find new editors ?
 - Make some advertisement on forums (http://www.dcleaguers.it/)
+
+## [2.2] - 27/09/2018
+### Added
+- Add more Unit test & Android test
+- Bug fix
+
+### Changed
+- Switch to [Kotlin](https://developer.android.com/kotlin/)
+- Switch to [Android Architecture](https://developer.android.com/topic/libraries/architecture/)
 
 ## [2.1] - 05/06/2018
 ### Added

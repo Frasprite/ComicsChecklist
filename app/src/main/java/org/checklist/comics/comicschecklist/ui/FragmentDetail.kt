@@ -1,18 +1,17 @@
 package org.checklist.comics.comicschecklist.ui
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil
 import android.net.Uri
 import android.os.Bundle
 import android.provider.CalendarContract
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import kotlinx.android.synthetic.main.fragment_detail.*
+
 import org.checklist.comics.comicschecklist.CCApp
 
 import org.checklist.comics.comicschecklist.R
@@ -32,7 +31,7 @@ import org.jetbrains.anko.toast
  * in two-pane mode (on tablets) or a [ActivityDetail]
  * on handsets.
  */
-class FragmentDetail : Fragment(), View.OnClickListener {
+class FragmentDetail : androidx.fragment.app.Fragment(), View.OnClickListener {
 
     private var mBinding: FragmentDetailBinding? = null
 
@@ -73,7 +72,11 @@ class FragmentDetail : Fragment(), View.OnClickListener {
      * @param model the view model which store and manage the data to show
      */
     private fun subscribeToModel(model: ComicViewModel) {
-        model.observableComic.observe(this, Observer<ComicEntity> { model.setComic(it!!) })
+        model.observableComic.observe(this, Observer<ComicEntity> {
+            if (it != null) {
+                model.setComic(it)
+            }
+        })
     }
 
     override fun onClick(view: View) {
@@ -135,9 +138,12 @@ class FragmentDetail : Fragment(), View.OnClickListener {
         }
 
         val comicEntity = mBinding?.comicViewModel?.comic?.get()
-        comicEntity!!.isFavorite = isAFavoriteComic
 
-        updateData(comicEntity)
+        doAsync {
+            (activity?.application as CCApp).repository.updateFavorite(comicEntity!!.id, isAFavoriteComic)
+        }
+
+        WidgetService.updateWidget(activity)
     }
 
     private fun manageWishlist() {
@@ -156,14 +162,9 @@ class FragmentDetail : Fragment(), View.OnClickListener {
         }
 
         val comicEntity = mBinding?.comicViewModel?.comic?.get()
-        comicEntity!!.setToCart(isComicOnCart)
 
-        updateData(comicEntity)
-    }
-
-    private fun updateData(comicEntity: ComicEntity) {
         doAsync {
-            (activity?.application as CCApp).repository.updateComic(comicEntity)
+            (activity?.application as CCApp).repository.updateCart(comicEntity!!.id, isComicOnCart)
         }
 
         WidgetService.updateWidget(activity)

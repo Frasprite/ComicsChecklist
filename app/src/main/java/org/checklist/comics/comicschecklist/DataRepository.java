@@ -1,11 +1,14 @@
 package org.checklist.comics.comicschecklist;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MediatorLiveData;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import org.checklist.comics.comicschecklist.database.AppDatabase;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 import org.checklist.comics.comicschecklist.util.Constants;
+import org.checklist.comics.comicschecklist.util.Filter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,12 +23,31 @@ public class DataRepository {
 
     private final AppDatabase mDatabase;
     private MediatorLiveData<List<ComicEntity>> mObservableComics;
+    private MutableLiveData<Filter> mFilter = new MutableLiveData<>();
 
     private DataRepository(final AppDatabase database) {
         mDatabase = database;
         mObservableComics = new MediatorLiveData<>();
 
-        mObservableComics.addSource(mDatabase.comicDao().loadComicsByEditor(Constants.Sections.FAVORITE.getSectionName()),
+        LiveData<List<ComicEntity>> comicsList = Transformations.switchMap(mFilter, input -> {
+
+            if (!input.getTextToSearch().isEmpty()) {
+                return mDatabase.comicDao().loadComicsContainingText(input.getTextToSearch());
+            }
+
+            switch (input.getSections()) {
+                case FAVORITE:
+                    return mDatabase.comicDao().loadFavoriteComics();
+                case CART:
+                    return mDatabase.comicDao().loadWishlistComics();
+                default:
+                    return mDatabase.comicDao().loadComicsByEditor(input.getSections().getSectionName());
+            }
+        });
+
+        filterComics(new Filter(Constants.Sections.FAVORITE, ""));
+
+        mObservableComics.addSource(comicsList,
                 comicEntities -> {
                     if (mDatabase.getDatabaseCreated().getValue() != null) {
                         mObservableComics.postValue(comicEntities);
@@ -52,30 +74,11 @@ public class DataRepository {
     }
 
     /**
-     * Get a list of comics with given editor.
-     * @param editorName one of editor listed on {@link org.checklist.comics.comicschecklist.util.Constants.Sections} raw name
+     * Get a list of comics with given filter.
+     * @param filter data class composed by 2 main info listed on {@link org.checklist.comics.comicschecklist.util.Filter}
      */
-    public void filterComics(String editorName) {
-        mObservableComics.addSource(mDatabase.comicDao().loadComicsByEditor(editorName),
-                comicEntities -> {
-                    if (mDatabase.getDatabaseCreated().getValue() != null) {
-                        mObservableComics.postValue(comicEntities);
-                    }
-                });
-    }
-
-    /**
-     * Return a list of comics with given editor and containing specific character.
-     * @param editorName one of editor listed on {@link org.checklist.comics.comicschecklist.util.Constants.Sections} raw name
-     * @param textToSearch the text to search on DB
-     */
-    public void filterComics(String editorName, String textToSearch) {
-        mObservableComics.addSource(mDatabase.comicDao().loadComicsContainingText(editorName, textToSearch),
-                comicEntities -> {
-                    if (mDatabase.getDatabaseCreated().getValue() != null) {
-                        mObservableComics.postValue(comicEntities);
-                    }
-                });
+    public void filterComics(Filter filter) {
+        this.mFilter.setValue(filter);
     }
 
     /**
@@ -95,8 +98,16 @@ public class DataRepository {
         return mDatabase.comicDao().loadComicsByEditorSync(editor);
     }
 
-    public void updateComic(ComicEntity comicEntity) {
-        mDatabase.comicDao().update(comicEntity);
+    public List<ComicEntity> loadCheckedComicsByEditorSync(String editor) {
+        return mDatabase.comicDao().loadCheckedComicsByEditorSync(editor);
+    }
+
+    public void updateFavorite(int comicId, Boolean flag) {
+        mDatabase.comicDao().updateFavorite(comicId, flag);
+    }
+
+    public void updateCart(int comicId, Boolean flag) {
+        mDatabase.comicDao().updateCart(comicId, flag);
     }
 
     public void updateComic(int comicId, String name, String info, Date date) {
@@ -109,24 +120,6 @@ public class DataRepository {
 
     public void deleteComic(ComicEntity comicEntity) {
         mDatabase.comicDao().deleteComic(comicEntity);
-    }
-
-    public void getFavoriteComics() {
-        mObservableComics.addSource(mDatabase.comicDao().loadFavoriteComics(),
-                comicEntities -> {
-                    if (mDatabase.getDatabaseCreated().getValue() != null) {
-                        mObservableComics.postValue(comicEntities);
-                    }
-                });
-    }
-
-    public void getWishlistComics() {
-        mObservableComics.addSource(mDatabase.comicDao().loadWishlistComics(),
-                comicEntities -> {
-                    if (mDatabase.getDatabaseCreated().getValue() != null) {
-                        mObservableComics.postValue(comicEntities);
-                    }
-                });
     }
 
     public void insertComics(ArrayList<ComicEntity> comicsList) {

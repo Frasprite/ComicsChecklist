@@ -1,8 +1,7 @@
 package org.checklist.comics.comicschecklist.ui
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,6 @@ import com.transitionseverywhere.Fade
 import com.transitionseverywhere.TransitionManager
 import com.transitionseverywhere.TransitionSet
 import com.transitionseverywhere.extra.Scale
-
 import kotlinx.android.synthetic.main.fragment_add_comic.*
 
 import org.checklist.comics.comicschecklist.CCApp
@@ -37,7 +35,7 @@ import java.util.Date
  * Mandatory empty constructor for the fragment manager to instantiate the
  * fragment (e.g. upon screen orientation changes).
  */
-class FragmentAddComic : Fragment() {
+class FragmentAddComic : androidx.fragment.app.Fragment() {
 
     private var mComicId = -1
     private var mDateTime: DateTime = DateTime()
@@ -76,7 +74,6 @@ class FragmentAddComic : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // TODO use ViewModel
         // Load data from database if ID is passed from activity
         if (mComicId > -1) {
             doAsync {

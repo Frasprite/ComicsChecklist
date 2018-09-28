@@ -2,7 +2,6 @@ package org.checklist.comics.comicschecklist.ui
 
 import android.content.Context
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.os.Bundle
 import android.preference.*
 import android.view.MenuItem
@@ -208,8 +207,8 @@ class ActivitySettings : AppCompatPreferenceActivity() {
         private fun launchDeleteContentDialog(context: Context) {
             alert {
                 titleResource = R.string.dialog_delete_content_title
-                val itemList = Resources.getSystem().getStringArray(R.array.pref_available_editors)
-                items(itemList.toList(), onItemSelected = { dialog, which ->
+                val itemList = activity?.resources?.getStringArray(R.array.pref_available_editors)
+                items(itemList!!.toList(), onItemSelected = { dialog, which ->
                     // The 'which' argument contains the index position of the selected item
                     val section: Constants.Sections? = when (which) {
                         0 ->

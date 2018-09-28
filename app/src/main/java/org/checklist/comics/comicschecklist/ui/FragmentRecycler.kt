@@ -1,18 +1,15 @@
 package org.checklist.comics.comicschecklist.ui
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
-import android.databinding.DataBindingUtil
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
 import kotlinx.android.synthetic.main.fragment_recycler_view.*
 
 import org.checklist.comics.comicschecklist.CCApp
@@ -21,7 +18,10 @@ import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 import org.checklist.comics.comicschecklist.databinding.FragmentRecyclerViewBinding
 import org.checklist.comics.comicschecklist.widget.WidgetService
 import org.checklist.comics.comicschecklist.log.CCLogger
+import org.checklist.comics.comicschecklist.service.Message
+import org.checklist.comics.comicschecklist.service.ServiceEvents
 import org.checklist.comics.comicschecklist.util.Constants
+import org.checklist.comics.comicschecklist.util.Filter
 import org.checklist.comics.comicschecklist.viewmodel.ComicListViewModel
 
 import org.jetbrains.anko.doAsync
@@ -32,17 +32,17 @@ import org.jetbrains.anko.doAsync
  * 'activated' state upon selection. This helps indicate which item is
  * currently being viewed in a [FragmentDetail].
  */
-class FragmentRecycler : Fragment() {
+class FragmentRecycler : androidx.fragment.app.Fragment() {
 
     private lateinit var mComicAdapter: ComicAdapter
     private var mBinding: FragmentRecyclerViewBinding? = null
 
     private val sItemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        override fun onMove(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, target: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
             return false
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+        override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, swipeDir: Int) {
             // Remove swiped item from list
             val position = viewHolder.adapterPosition
             val comic = mComicAdapter.mComicList[position]
@@ -63,13 +63,27 @@ class FragmentRecycler : Fragment() {
      *
      * @see android.support.v4.widget.SwipeRefreshLayout.setRefreshing
      */
-    var isRefreshing: Boolean
+    private var isRefreshing: Boolean
         get() = swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing
         set(refreshing) {
-            if (swipeRefreshLayout != null) {
-                swipeRefreshLayout.isRefreshing = refreshing
+            activity?.runOnUiThread {
+                if (swipeRefreshLayout != null) {
+                    swipeRefreshLayout.isRefreshing = refreshing
+                }
             }
         }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Listen for MessageEvents only
+        ServiceEvents.listen(Message::class.java).subscribe {
+            isRefreshing = when (it.result) {
+                Constants.RESULT_START -> true
+                else -> false
+            }
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         CCLogger.d(TAG, "onCreateView - start")
@@ -117,11 +131,7 @@ class FragmentRecycler : Fragment() {
             itemTouchHelper.attachToRecyclerView(recyclerView)
         }
 
-        // Enable swipe to refresh if we are on other categories
-        if (editor == Constants.Sections.FAVORITE || editor == Constants.Sections.CART) {
-            CCLogger.v(TAG, "onViewCreated - Locking swipe to refresh")
-            swipeRefreshLayout.isEnabled = false
-        }
+        enableSwipeToRefresh(editor)
 
         // Set color of progress view
         swipeRefreshLayout.setColorSchemeResources(R.color.primary_light, R.color.primary, R.color.primary_dark, R.color.accent)
@@ -136,30 +146,36 @@ class FragmentRecycler : Fragment() {
           refreshes the content. Call the same method in response to the Refresh action from the
           action bar.
          */
-        setOnRefreshListener { (activity as ActivityMain).initiateRefresh(editor) }
+        setOnRefreshListener { (activity as ActivityMain).initiateRefresh() }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         val viewModel = ViewModelProviders.of(this).get(ComicListViewModel::class.java)
 
-        subscribeUi(viewModel, null, arguments!!.getSerializable(Constants.ARG_EDITOR) as Constants.Sections)
+        subscribeUi(viewModel = viewModel, editor = arguments!!.getSerializable(Constants.ARG_EDITOR) as Constants.Sections)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // Stop animation
+        isRefreshing = false
     }
 
     /**
      * Set the layout type of [RecyclerView].
      * @param recyclerView the current recycler view where to set layout
      */
-    private fun setRecyclerViewLayoutManager(recyclerView: RecyclerView) {
+    private fun setRecyclerViewLayoutManager(recyclerView: androidx.recyclerview.widget.RecyclerView) {
         var scrollPosition = 0
 
         // If a layout manager has already been set, get current scroll position.
         if (recyclerView.layoutManager != null) {
-            scrollPosition = (recyclerView.layoutManager as LinearLayoutManager)
+            scrollPosition = (recyclerView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager)
                     .findFirstCompletelyVisibleItemPosition()
         }
 
-        recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
         recyclerView.scrollToPosition(scrollPosition)
     }
 
@@ -169,18 +185,10 @@ class FragmentRecycler : Fragment() {
      * @param viewModel the view model which store and manage the data to show
      * @param text the part of text to search on database
      */
-    private fun subscribeUi(viewModel: ComicListViewModel, text: String?, editor: Constants.Sections) {
+    private fun subscribeUi(viewModel: ComicListViewModel, text: String = "", editor: Constants.Sections) {
         CCLogger.v(TAG, "subscribeUi - Text $text and editor $editor")
-        // Update the list when the data changes
-        if (text == null) {
-            when (editor) {
-                Constants.Sections.FAVORITE -> viewModel.getFavoriteComics()
-                Constants.Sections.CART -> viewModel.getWishlistComics()
-                else -> viewModel.filterByEditor(editor.sectionName)
-            }
-        } else {
-            viewModel.filterComicsContainingText(editor.sectionName, text)
-        }
+
+        CCApp.instance.repository.filterComics(Filter(editor, text))
 
         viewModel.comics.observe(this, Observer<List<ComicEntity>> {
             myComics ->
@@ -197,29 +205,27 @@ class FragmentRecycler : Fragment() {
     }
 
     /**
-     * Method used to update the list after user gave an input on search view.
-     * @param newText the text to use for filter data
-     */
-    fun updateList(newText: String) {
-        val viewModel = ViewModelProviders.of(this).get(ComicListViewModel::class.java)
-
-        subscribeUi(viewModel, newText, arguments!!.getSerializable(Constants.ARG_EDITOR) as Constants.Sections)
-    }
-
-    /**
      * Update a changes of favorite or wished comic on database.
      * @param comic the entry to update on database
      */
     fun updateComic(comic: ComicEntity) {
-        if (comic.editor == Constants.Sections.FAVORITE.sectionName) {
-            CCLogger.d(TAG, "deleteComic - Removing favorite comic with ID " + comic.id)
-            // Remove comic from favorite
-            comic.isFavorite = !comic.isFavorite
-            updateData(comic)
-        } else if (comic.editor == Constants.Sections.CART.sectionName) {
-            CCLogger.d(TAG, "onContextItemSelected - Removing comic in cart with ID " + comic.id)
-            // Remove comic from cart
-            removeComicFromCart(comic)
+        val editor = Constants.Sections.fromName(comic.editor)
+        when (editor) {
+            Constants.Sections.FAVORITE -> {
+                CCLogger.d(TAG, "deleteComic - Removing favorite comic with ID " + comic.id)
+                // Remove comic from favorite
+                doAsync {
+                    (activity?.application as CCApp).repository.updateFavorite(comic.id, !comic.isFavorite)
+                }
+            }
+            Constants.Sections.CART -> {
+                CCLogger.d(TAG, "onContextItemSelected - Removing comic in cart with ID " + comic.id)
+                // Remove comic from cart
+                removeComicFromCart(comic)
+            }
+            else -> {
+                // Do nothing for other cases
+            }
         }
 
         WidgetService.updateWidget(activity)
@@ -241,21 +247,12 @@ class FragmentRecycler : Fragment() {
             }
             else -> {
                 // Update comic because it is created from web data
-                comic.setToCart(!comic.isOnCart)
-                updateData(comic)
+                doAsync {
+                    (activity?.application as CCApp).repository.updateCart(comic.id, !comic.isOnCart)
+                }
                 CCLogger.v(TAG, "removeComicFromCart - Comic updated!")
             }
         }
-    }
-
-    /**
-     * Updating data of comic.
-     * @param comicEntity the comic to update
-     */
-    private fun updateData(comicEntity: ComicEntity) {
-        doAsync { (activity!!.application as CCApp).repository.updateComic(comicEntity) }
-
-        WidgetService.updateWidget(activity)
     }
 
     /**
@@ -282,6 +279,12 @@ class FragmentRecycler : Fragment() {
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setOnRefreshListener(listener)
         }
+    }
+
+    fun enableSwipeToRefresh(editor: Constants.Sections) {
+        CCLogger.v(TAG, "enableSwipeToRefresh - Checking if swipe to refresh must be locked for $editor")
+        // Enable swipe to refresh if we are on other categories
+        swipeRefreshLayout?.isEnabled = !(editor == Constants.Sections.FAVORITE || editor == Constants.Sections.CART)
     }
 
     companion object {

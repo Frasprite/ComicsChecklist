@@ -1,12 +1,11 @@
 package org.checklist.comics.comicschecklist.database.dao;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.lifecycle.LiveData;
+import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
+import androidx.room.Query;
 
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
 
@@ -45,8 +44,8 @@ public interface ComicDao {
     @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     LiveData<List<ComicEntity>> loadComicsByEditor(String editorName);
 
-    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editorName AND comic_name LIKE '%' || :character || '%' ORDER BY release_date")
-    LiveData<List<ComicEntity>> loadComicsContainingText(String editorName, String character);
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE comic_name LIKE '%' || :character || '%' ORDER BY release_date")
+    LiveData<List<ComicEntity>> loadComicsContainingText(String character);
 
     @Query("SELECT * FROM comics WHERE id = :id")
     LiveData<ComicEntity> loadComic(int id);
@@ -57,12 +56,18 @@ public interface ComicDao {
     @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editorName ORDER BY release_date")
     List<ComicEntity> loadComicsByEditorSync(String editorName);
 
+    @Query("SELECT id, comic_name, release_date, editor, isFavorite, isOnCart FROM comics WHERE editor LIKE :editor AND (isOnCart = 1 OR isFavorite = 1)")
+    List<ComicEntity> loadCheckedComicsByEditorSync(String editor);
+
     @Query("SELECT COUNT(id) id, isFavorite, release_date FROM comics WHERE isFavorite = 1 AND release_date >= :time")
     int checkFavoritesRelease(long time);
 
-    @Update
-    int update(ComicEntity comic);
-
     @Query("UPDATE comics SET comic_name = :name, description = :info, release_date = :date  WHERE id = :comicId")
     int update(int comicId, String name, String info, Date date);
+
+    @Query("UPDATE comics SET isFavorite = :flag WHERE id = :comicId")
+    void updateFavorite(int comicId, Boolean flag);
+
+    @Query("UPDATE comics SET isOnCart = :flag WHERE id = :comicId")
+    void updateCart(int comicId, Boolean flag);
 }

@@ -1,11 +1,11 @@
 package org.checklist.comics.comicschecklist.viewmodel
 
 import android.app.Application
-import android.arch.lifecycle.AndroidViewModel
-import android.arch.lifecycle.LiveData
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.databinding.ObservableField
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.databinding.ObservableField
 
 import org.checklist.comics.comicschecklist.CCApp
 import org.checklist.comics.comicschecklist.DataRepository

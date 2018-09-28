@@ -1,7 +1,7 @@
 package org.checklist.comics.comicschecklist.ui
 
 import android.os.Build
-import android.support.v7.util.DiffUtil
+import androidx.recyclerview.widget.DiffUtil
 
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 

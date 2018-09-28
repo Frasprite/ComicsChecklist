@@ -9,16 +9,14 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.NavigationView
-import android.support.v4.view.GravityCompat
-import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.SearchView
+import com.google.android.material.navigation.NavigationView
+import androidx.core.view.GravityCompat
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-
 import kotlinx.android.synthetic.main.app_bar_main.*
 import kotlinx.android.synthetic.main.nav_header_main.view.*
 
@@ -26,18 +24,17 @@ import org.checklist.comics.comicschecklist.CCApp
 import org.checklist.comics.comicschecklist.R
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity
 import org.checklist.comics.comicschecklist.extensions.PreferenceHelper
-import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.get
-import org.checklist.comics.comicschecklist.extensions.PreferenceHelper.set
 import org.checklist.comics.comicschecklist.service.DownloadService
-import org.checklist.comics.comicschecklist.util.AppRater
 import org.checklist.comics.comicschecklist.log.CCLogger
 import org.checklist.comics.comicschecklist.service.Message
 import org.checklist.comics.comicschecklist.util.Constants
 import org.checklist.comics.comicschecklist.service.ServiceEvents
-
+import org.checklist.comics.comicschecklist.util.Filter
 import org.jetbrains.anko.alert
+
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
+import kotlin.properties.Delegates
 
 /**
  * An activity representing a list of Comics. This activity
@@ -60,27 +57,27 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     // Whether or not the activity is in two-pane mode, i.e. running on a tablet device
     private var mTwoPane: Boolean = false
 
-    private var mFragmentRecycler: FragmentRecycler? = null
+    private val mFragmentTag = "FragmentRecycler"
+    private val mFragmentDetailTag = "FragmentDetail"
 
-    private lateinit var mDrawerLayout: DrawerLayout
+    private lateinit var mDrawerLayout: androidx.drawerlayout.widget.DrawerLayout
     private lateinit var mDrawerToggle: ActionBarDrawerToggle
     private lateinit var mNavigationView: NavigationView
 
     private lateinit var mDrawerTitle: CharSequence
 
-    private var mUserLearnedDrawer: Boolean = false
-    private var mFromSavedInstanceState: Boolean = false
-
-    private var mSection: Constants.Sections = Constants.Sections.FAVORITE
+    private var mSection: Constants.Sections by Delegates.observable(Constants.Sections.FAVORITE) { _, old, new ->
+        // Enable swipe to refresh on fragment
+        CCLogger.v(TAG, "mSection is changing from $old to $new")
+        val fragmentRecycler = supportFragmentManager.findFragmentByTag(mFragmentTag)
+        if (fragmentRecycler != null) {
+            (fragmentRecycler as FragmentRecycler).enableSwipeToRefresh(new)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         CCLogger.d(TAG, "onCreate - start")
-
-        // Read in the flag indicating whether or not the user has demonstrated awareness of the
-        // drawer. See PREF_USER_LEARNED_DRAWER for details.
-        val preferenceHelper = PreferenceHelper.defaultPrefs(this)
-        mUserLearnedDrawer = preferenceHelper[PREF_USER_LEARNED_DRAWER, false]!!
 
         setContentView(R.layout.activity_comic_list)
 
@@ -114,18 +111,11 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
 
             override fun onDrawerOpened(drawerView: View) {
                 title = mDrawerTitle
-
-                if (!mUserLearnedDrawer) {
-                    // The user manually opened the drawer; store this flag to prevent auto-showing
-                    // the navigation drawer automatically in the future.
-                    mUserLearnedDrawer = true
-                    preferenceHelper[PREF_USER_LEARNED_DRAWER] = true
-                }
-
                 invalidateOptionsMenu() // creates call to onPrepareOptionsMenu()
             }
         }
         mDrawerLayout.addDrawerListener(mDrawerToggle)
+        mDrawerToggle.syncState()
 
         mNavigationView = findViewById(R.id.navigationView)
         mNavigationView.setNavigationItemSelectedListener(this)
@@ -139,25 +129,13 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                 R.id.addComic ->
                     // This method can be called from shortcut (Android 7.1 and above)
                     addComic()
-                R.id.refresh -> if (mFragmentRecycler != null) {
-                    initiateRefresh(mSection)
-                }
+                R.id.refresh ->
+                    initiateRefresh()
             }
             true
         }
 
-        // If the user hasn't 'learned' about the drawer, open it to introduce them to the drawer
-        if (!mUserLearnedDrawer && !mFromSavedInstanceState) {
-            mDrawerLayout.openDrawer(mNavigationView)
-        }
-
-        mDrawerLayout.addDrawerListener(mDrawerToggle)
-
-        if (savedInstanceState == null) {
-            selectItem(Constants.Sections.FAVORITE)
-        } else {
-            mFromSavedInstanceState = true
-        }
+        selectItem(mSection)
 
         val intent = Intent(this, DownloadService::class.java)
         startService(intent)
@@ -167,8 +145,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
             inspectResultCode(it.result, it.editor)
         }
 
-        // Launch AppRater
-        AppRater.appLaunched(this)
+        // Show app rater dialog
+        appLaunched()
 
         // Handle search intent
         if (getIntent() != null) {
@@ -276,28 +254,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     private fun doMySearch(query: String) {
         CCLogger.d(TAG, "doMySearch - start searching $query")
 
-        // Filtering data based on editor and newText
-        if (mFragmentRecycler != null) {
-            mFragmentRecycler!!.updateList(query)
-        }
-    }
-
-    /**
-     * @see android.app.Activity.onStart
-     */
-    override fun onStart() {
-        super.onStart()
-        CCLogger.v(TAG, "onStart")
-        initVersionInfo()
-
-        if (mTwoPane) {
-            // In two-pane mode, list items should be given the 'activated' state when touched
-            if (mFragmentRecycler != null) {
-                // TODO highlight item
-                CCLogger.d(TAG, "onStart - two-pane mode, activate item on click")
-                //mFragmentRecycler.setActivateOnItemClick(true);
-            }
-        }
+        CCApp.instance.repository.filterComics(Filter(mSection, query))
     }
 
     override fun onResume() {
@@ -317,17 +274,8 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         mNavigationView.menu.findItem(R.id.list_star).isVisible = editorSet.contains(Constants.Sections.STAR.code.toString())
         mNavigationView.menu.findItem(R.id.list_bonelli).isVisible = editorSet.contains(Constants.Sections.BONELLI.code.toString())
         mNavigationView.menu.findItem(R.id.list_rw).isVisible = editorSet.contains(Constants.Sections.RW.code.toString())
-    }
 
-    override fun onPause() {
-        super.onPause()
-        CCLogger.v(TAG, "onPause")
-        // Stop animation
-        if (mFragmentRecycler != null) {
-            if (mFragmentRecycler!!.isRefreshing) {
-                mFragmentRecycler!!.isRefreshing = false
-            }
-        }
+        initVersionInfo()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -400,23 +348,20 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
      * @param currentEditor the editor searched
      */
     private fun inspectResultCode(result: Int, currentEditor: String?) {
-        var shouldSetRefresh = false
         when (result) {
             Constants.RESULT_START -> {
                 toast(currentEditor!! + getString(R.string.search_started))
-                shouldSetRefresh = true
             }
-            Constants.RESULT_FINISHED -> toast(resources.getString(R.string.search_completed))
             Constants.RESULT_EDITOR_FINISHED -> toast(currentEditor!! + resources.getString(R.string.search_editor_completed))
-            Constants.RESULT_CANCELED -> toast(currentEditor!! + resources.getString(R.string.search_failed))
             Constants.RESULT_NOT_CONNECTED -> toast(resources.getString(R.string.toast_no_connection))
-            Constants.RESULT_DESTROYED -> CCLogger.i(TAG, "Service destroyed")
-        }
-
-        // Set search animation on UI
-        if (mFragmentRecycler != null) {
-            if (!shouldSetRefresh) {
-                mFragmentRecycler!!.isRefreshing = false
+            Constants.RESULT_DESTROYED -> {
+                CCLogger.i(TAG, "Service destroyed")
+                // Reset fragment detail due to entity primary key
+                if (mTwoPane) {
+                    val fragment = supportFragmentManager.findFragmentByTag(mFragmentDetailTag)
+                    if (fragment != null)
+                        supportFragmentManager.beginTransaction().remove(fragment).commit()
+                }
             }
         }
     }
@@ -424,12 +369,11 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     /**
      * By abstracting the refresh process to a single method, the app allows both the
      * SwipeGestureLayout onRefresh() method and the Refresh action item to refresh the content.
-     * @param mEditor the editor picked by user
      */
-    fun initiateRefresh(mEditor: Constants.Sections) {
-        CCLogger.i(TAG, "initiateRefresh - start for editor $mEditor")
+    fun initiateRefresh() {
+        CCLogger.i(TAG, "initiateRefresh - start for editor $mSection")
 
-        if (mEditor == Constants.Sections.FAVORITE || mEditor == Constants.Sections.CART) {
+        if (mSection == Constants.Sections.FAVORITE || mSection == Constants.Sections.CART) {
             alert {
                 titleResource = R.string.dialog_pick_editor_title
 
@@ -455,7 +399,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                 }
             }.show()
         } else {
-            startRefresh(mEditor)
+            startRefresh(mSection)
         }
     }
 
@@ -469,11 +413,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         intent.putExtra(Constants.ARG_EDITOR, editor)
         intent.putExtra(Constants.MANUAL_SEARCH, true)
         startService(intent)
-
-        // Update refresh spinner
-        if (mFragmentRecycler != null && mFragmentRecycler!!.isRefreshing) {
-            mFragmentRecycler!!.isRefreshing = false
-        }
     }
 
     /**
@@ -499,7 +438,7 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
                     arguments.putInt(Constants.ARG_COMIC_ID, comic.id)
                     val mDetailFragment = FragmentDetail()
                     mDetailFragment.arguments = arguments
-                    supportFragmentManager.beginTransaction().replace(R.id.comicDetailContainer, mDetailFragment).commit()
+                    supportFragmentManager.beginTransaction().replace(R.id.comicDetailContainer, mDetailFragment, mFragmentDetailTag).commit()
                 } else {
                     CCLogger.d(TAG, "launchDetailView - Launching detail view in SINGLE PANE mode")
                     // In single-pane mode, simply start the detail activity
@@ -533,8 +472,14 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         when (mSection) {
             Constants.Sections.FAVORITE, Constants.Sections.CART, Constants.Sections.PANINI, Constants.Sections.BONELLI, Constants.Sections.RW, Constants.Sections.STAR -> {
                 // Update the main content by replacing fragments
-                mFragmentRecycler = FragmentRecycler.newInstance(section)
-                supportFragmentManager.beginTransaction().replace(R.id.container, mFragmentRecycler).commit()
+                var fragmentRecycler = supportFragmentManager.findFragmentByTag(mFragmentTag)
+                CCLogger.v(TAG, "selectItem - Calling fragment $fragmentRecycler")
+                if (fragmentRecycler == null) {
+                    fragmentRecycler = FragmentRecycler.newInstance(section)
+                    supportFragmentManager.beginTransaction().replace(R.id.container, fragmentRecycler, mFragmentTag).commit()
+                } else {
+                    CCApp.instance.repository.filterComics(Filter(sections = mSection))
+                }
             }
             Constants.Sections.SETTINGS -> {
                 // Open settings
@@ -550,14 +495,70 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
             Constants.Sections.INFO -> {
                 // Open info dialog with custom view
                 alert {
-                    negativeButton(R.string.dialog_confirm_button) {
-                        dialog -> dialog.dismiss()
+                    negativeButton(R.string.dialog_confirm_button) { dialog ->
+                        dialog.dismiss()
                     }
 
                     customView = layoutInflater.inflate(R.layout.dialog_info, null)
                 }.show()
             }
         }
+    }
+
+    /**
+     * Method which is launched every time the app is opened.
+     */
+    private fun appLaunched() {
+        val prefs = getSharedPreferences(Constants.PREF_APP_RATER, 0)
+        if (prefs.getBoolean(Constants.PREF_USER_NOT_RATING, false)) {
+            return
+        }
+
+        val editor = prefs.edit()
+
+        // Increment counter of how many times user launched the app
+        val launchCount = prefs.getLong(Constants.PREF_LAUNCH_COUNT, 0) + 1
+        editor.putLong(Constants.PREF_LAUNCH_COUNT, launchCount)
+
+        // Take date of first launch
+        var dateFirstLaunch: Long? = prefs.getLong(Constants.PREF_DATE_FIRST_LAUNCH, 0)
+        if (dateFirstLaunch == 0L) {
+            dateFirstLaunch = System.currentTimeMillis()
+            editor.putLong(Constants.PREF_DATE_FIRST_LAUNCH, dateFirstLaunch)
+        }
+
+        // Wait at least 7 days before opening rate window
+        if (launchCount >= Constants.LAUNCHES_UNTIL_PROMPT) {
+            if (System.currentTimeMillis() >= dateFirstLaunch!! + Constants.DAYS_UNTIL_PROMPT * 24 * 60 * 60 * 1000) {
+
+                // Show dialog
+                alert {
+                    titleResource = R.string.app_name
+                    messageResource = R.string.dialog_rate_text
+
+                    positiveButton(R.string.dialog_rate_button) { dialog ->
+                        dialog.dismiss()
+                        startActivity(Intent(Intent.ACTION_VIEW,
+                                Uri.parse("market://details?id=$packageName")))
+                    }
+
+                    negativeButton(R.string.dialog_no_thanks_button) { dialog ->
+                        CCLogger.v(TAG, "onClick - User refused to rate app..")
+                        val editorPref = getSharedPreferences(Constants.PREF_APP_RATER, 0).edit()
+                        if (editorPref != null) {
+                            editorPref.putBoolean(Constants.PREF_USER_NOT_RATING, true)
+                            editorPref.apply()
+                        }
+
+                        dialog.dismiss()
+                    }
+
+                    neutralPressed(R.string.dialog_late_button) { dialog -> dialog.dismiss() }
+                }.show()
+            }
+        }
+
+        editor.apply()
     }
 
     /* ****************************************************************************************
@@ -568,10 +569,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
         CCLogger.d(TAG, "onNavigationItemSelected - start " + item.title)
 
         when (item.itemId) {
-            R.id.list_favorite -> {
-                selectItem(Constants.Sections.FAVORITE)
-                return true
-            }
             R.id.list_cart -> {
                 selectItem(Constants.Sections.CART)
                 return true
@@ -616,13 +613,6 @@ class ActivityMain : AppCompatActivity(), SearchView.OnQueryTextListener, Naviga
     }
 
     companion object {
-
         private val TAG = ActivityMain::class.java.simpleName
-
-        /*
-         * Flag used to show the drawer on launch until the user manually
-         * expands it. This shared preference tracks this.
-         */
-        private const val PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned"
     }
 }

@@ -27,14 +27,20 @@ object Constants {
     const val CREATE_DATABASE = "create_database"
 
     const val RESULT_START = 0
-    const val RESULT_CANCELED = 1
-    const val RESULT_FINISHED = 2
     const val RESULT_DESTROYED = 3
     const val RESULT_NOT_CONNECTED = 4
     const val RESULT_EDITOR_FINISHED = 5
 
     const val PREF_SEARCH_NOTIFICATION = "notifications_new_message"
     const val PREF_FAVORITE_NOTIFICATION = "notifications_favorite_available"
+
+    /* App rater constants */
+    const val PREF_USER_NOT_RATING = "not_showing_again"
+    const val PREF_APP_RATER = "app_rater"
+    const val PREF_LAUNCH_COUNT = "launch_count"
+    const val PREF_DATE_FIRST_LAUNCH = "date_first_launch"
+    const val DAYS_UNTIL_PROMPT = 7
+    const val LAUNCHES_UNTIL_PROMPT = 7
 
     /* Widget & shortcut */
     const val WIDGET_EDITOR = "WIDGET_EDITOR"

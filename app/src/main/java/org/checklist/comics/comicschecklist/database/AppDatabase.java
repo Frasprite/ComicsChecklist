@@ -1,21 +1,20 @@
 package org.checklist.comics.comicschecklist.database;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.persistence.db.SupportSQLiteDatabase;
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.Room;
-import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.TypeConverters;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 import org.checklist.comics.comicschecklist.database.converter.DateConverter;
 import org.checklist.comics.comicschecklist.database.dao.ComicDao;
 import org.checklist.comics.comicschecklist.database.entity.ComicEntity;
-import org.checklist.comics.comicschecklist.log.CCLogger;
 import org.checklist.comics.comicschecklist.service.DownloadService;
 import org.checklist.comics.comicschecklist.util.Constants;
 
@@ -23,12 +22,10 @@ import org.checklist.comics.comicschecklist.util.Constants;
 @TypeConverters(DateConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
 
-    private static final String TAG = AppDatabase.class.getSimpleName();
-
     private static AppDatabase sInstance;
 
     @VisibleForTesting
-    public static final String DATABASE_NAME = "comics-db";
+    private static final String DATABASE_NAME = "comics-db";
 
     public abstract ComicDao comicDao();
 
@@ -52,7 +49,6 @@ public abstract class AppDatabase extends RoomDatabase {
                     @Override
                     public void onCreate(@NonNull SupportSQLiteDatabase db) {
                         super.onCreate(db);
-                        CCLogger.INSTANCE.v(TAG, "onCreate - Creating database");
 
                         // Populate database when it is created, using an Intent service
                         Intent intent = new Intent(appContext, DownloadService.class);
