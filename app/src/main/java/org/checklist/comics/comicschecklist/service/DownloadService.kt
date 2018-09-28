@@ -237,7 +237,13 @@ class DownloadService : IntentService(TAG) {
         val today = DateTime()
 
         val preferenceHelper = PreferenceHelper.defaultPrefs(this)
-        val dateStart = preferenceHelper[editorLastScan, -1L]
+        val dateStart: Long
+        // Adding try catch for migration from old code
+        dateStart = try {
+            preferenceHelper[editorLastScan, -1L]!!
+        } catch (exception: ClassCastException) {
+            -1L
+        }
         val dateLastScan = DateTime(dateStart)
 
         CCLogger.d(TAG, "calculateDayDifference - (in milliseconds) today is $today target is $dateStart")
@@ -276,7 +282,7 @@ class DownloadService : IntentService(TAG) {
             // Checking first if we are connected to the web
             val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
             val activeNetwork = connectivityManager.activeNetworkInfo
-            return activeNetwork != null && activeNetwork.isConnectedOrConnecting
+            return activeNetwork != null && activeNetwork.isConnected
         }
     }
 }
