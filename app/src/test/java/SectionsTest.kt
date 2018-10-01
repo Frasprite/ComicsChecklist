@@ -1,7 +1,6 @@
 import org.checklist.comics.comicschecklist.util.Constants
 
-import junit.framework.Assert.*
-
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class SectionsTest {

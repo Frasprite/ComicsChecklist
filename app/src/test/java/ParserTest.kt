@@ -1,11 +1,8 @@
-import junit.framework.Assert.*
-
-import org.junit.Test
-
 import org.checklist.comics.comicschecklist.parser.*
 
 import org.jsoup.nodes.Element
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert.*
+import org.junit.Test
 
 import java.util.*
 
