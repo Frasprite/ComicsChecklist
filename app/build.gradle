@@ -10,8 +10,8 @@ android {
         applicationId "org.checklist.comics.comicschecklist"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 20
-        versionName "2.1"
+        versionCode 23
+        versionName "2.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
@@ -64,7 +64,7 @@ dependencies {
 
     // Third party libraries
     implementation 'com.github.apl-devs:appintro:v4.2.3'
-    implementation 'org.jsoup:jsoup:1.11.2'
+    implementation 'org.jsoup:jsoup:1.11.3'
     implementation 'com.evernote:android-job:1.2.6'
     implementation 'joda-time:joda-time:2.10'
     implementation 'com.github.badoualy:datepicker-timeline:c6dcd05737'
