@@ -36,9 +36,10 @@ class ParserRW : Parser() {
             CCLogger.d(TAG, "initParser - Today is " + dateTime.toString() + " adding " + i + " day(s)")
             mCurrentReleaseDate = searchReleaseDate(i)
             val day = dateTime.plusDays(i).dayOfMonth
+            val month = dateTime.plusDays(i).monthOfYear
 
             // Example : http://www.rwedizioni.it/news/uscite-2-dicembre/
-            val url = FIRST_RW + MIDDLE_RW + day + MIDDLE_RW + getTargetReadableMonth(i) + END_RW
+            val url = FIRST_RW + MIDDLE_RW + day + MIDDLE_RW + getTargetReadableMonth(month) + END_RW
             rawComicEntities = parseUrl(url)
             if (rawComicEntities.isNotEmpty()) {
                 comicEntities.addAll(rawComicEntities)
@@ -225,15 +226,12 @@ class ParserRW : Parser() {
 
     /**
      * Return the current month in [String] format.
-     * @param days the days to add
+     * @param month the current month (be careful, month goes from goes form 0 to 11)
      * @return current month in a readable form
      */
-    private fun getTargetReadableMonth(days: Int): String {
-        val dateTime = DateTime()
-        dateTime.plusDays(days)
-        val month = dateTime.monthOfYear
-        val monthString = DateFormatSymbols.getInstance(Locale.ITALIAN).months[month].toLowerCase()
-        CCLogger.d(TAG, "getCurrentReadableMonth - Month is $monthString")
+    private fun getTargetReadableMonth(month: Int): String {
+        val monthString = DateFormatSymbols.getInstance(Locale.ITALIAN).months[month - 1].toLowerCase()
+        CCLogger.v(TAG, "getCurrentReadableMonth - Raw month is $month which give $monthString")
         return monthString
     }
 
